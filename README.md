@@ -26,6 +26,9 @@ Or turn on GitHub Pages for the branch (Settings → Pages → deploy from branc
 | Label | Woven label flips up and tilts toward the cursor; monogram scales behind it |
 | Marquee | Drifts constantly, speeds up and reverses with scroll direction |
 | Footer | Giant wordmark rises letter by letter |
+| Menu | Ink panel wipes down, category names rise in; hovering dims the others and wipes in a new film still + description. Clicking a category scrolls the archive track to that piece |
+| Bag | Drawer slides in from the right; "Add to bag" sends a dot arcing up to the bag count, which pops. Removing an item slides and collapses it |
+| Returns | Accordion answers open with measured height + fade |
 
 The nav changes colour to suit each section, gets a background once you scroll past the hero, and hides when you scroll down.
 `prefers-reduced-motion` skips the loader and all scroll animation.
@@ -50,12 +53,22 @@ shown while the video loads. The film only plays while it's on screen.
 Type: **Archivo Narrow** Medium (wordmark / display), **Archivo** (body). Both are loaded from Google Fonts.
 The wordmark is the exact vector from Figma, split into one SVG symbol per letter (top of `index.html`).
 
+## Shop features
+
+- **Menu** (top left): categories are read from the `data-cat` on each tag, so the counts stay correct as you add pieces.
+  Preview stills are `assets/img/menu-1…5.jpg` (frames from the film). Esc closes; focus stays inside while open.
+- **Bag** (top right): each piece is 1 of 1, so it can only be added once. The bag is saved in the browser (`localStorage`).
+- **Returns**: steps + FAQ accordion, linked from the menu and footer.
+
 ## To do before launch
 
 - **Copy and pieces are placeholders.** The six hang tags (names, eras, categories) and the story text
   should be replaced with the real drop.
 - **Mailing list:** `setupForm()` in `assets/js/main.js` only validates the email and shows a thank-you message.
   Connect it to your provider (Klaviyo, Mailchimp, Shopify, etc.) where the `TODO` comment is.
+- **Prices are placeholders** (`data-price` on each `.js-add` button).
+- **Checkout isn't connected.** The Checkout button only shows a message; hand the bag to Shopify/Stripe where the `TODO` is in `setupCart()`.
+- **Returns policy wording is a starting draft** (30 days, unworn, no exchanges, final-sale note). Check it against your actual policy and local consumer law before publishing.
 - Add product photography to the tags if you want images; each tag is an `<article class="tag">` in `index.html`.
 
 ## Files
