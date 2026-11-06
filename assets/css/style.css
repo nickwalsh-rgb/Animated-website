@@ -362,6 +362,14 @@ body.menu-open .nav__count span { color: var(--ink); }
 .tag__body dt { opacity: .6; }
 .tag__body dd { text-align: right; }
 
+@media (max-height: 780px) and (min-width: 721px) {
+  .archive__pin { padding-top: 84px; padding-bottom: 24px; }
+  .archive__head { margin-bottom: 20px; }
+  .archive__head .eyebrow { display: none; }
+  .archive__head .display { font-size: clamp(36px, 4.6vw, 64px); }
+  .tag { width: clamp(200px, (100svh - 260px) * 0.585, 320px); padding-top: 48px; }
+}
+
 /* ==========================================================================
    Label
    ========================================================================== */
