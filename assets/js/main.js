@@ -102,6 +102,45 @@
   /* ---------- Nav: theme per section + hide on scroll down ---------- */
   setupNavTheme(lenis);
 
+  /* ---------- Field: a small window opens into the full-bleed film ---------- */
+  const field = $(".field");
+  const fieldLines = splitLines($(".field__line"));
+  const smallInset = () => (window.innerWidth <= 720 ? "30% 14% 30% 14%" : "26% 33% 26% 33%");
+  gsap.set(fieldLines, { yPercent: 110 });
+  gsap.set(".field__caption .eyebrow", { autoAlpha: 0 });
+
+  const fieldTl = gsap.timeline({
+    defaults: { ease: "none" },
+    scrollTrigger: {
+      trigger: field,
+      pin: ".field__pin",
+      start: "top top",
+      end: "+=160%",
+      scrub: 0.6,
+      invalidateOnRefresh: true,
+      // Nav goes light once the film fills the screen.
+      onUpdate: (self) => (field.dataset.theme = self.progress > 0.45 ? "film" : "bone"),
+      onLeaveBack: () => (field.dataset.theme = "bone"),
+    },
+  });
+  fieldTl
+    .fromTo(".field__frame",
+      { clipPath: () => `inset(${smallInset()} round 4px)` },
+      { clipPath: "inset(0% 0% 0% 0% round 0px)", duration: 1, ease: "power2.inOut" }, 0)
+    .fromTo(".field__video", { scale: 1.18 }, { scale: 1, duration: 1.2 }, 0)
+    .to(".field__meta", { autoAlpha: 0, duration: 0.3 }, 0.1)
+    .to(".field__shade", { opacity: 1, duration: 0.5 }, 0.55)
+    .to(".field__caption .eyebrow", { autoAlpha: 1, duration: 0.3 }, 0.8)
+    .to(fieldLines, { yPercent: 0, duration: 0.5, stagger: 0.12, ease: "power3.out" }, 0.8)
+    .to({}, { duration: 0.3 }); // hold on the full frame before moving on
+
+  // Only decode/play the film while it's on screen.
+  const video = $(".field__video");
+  new IntersectionObserver(([entry]) => {
+    if (entry.isIntersecting) video.play().catch(() => {});
+    else video.pause();
+  }, { threshold: 0.01 }).observe(video);
+
   /* ---------- Manifesto: words light up as you read ---------- */
   const words = splitWords($(".js-words"));
   gsap.to(words, {

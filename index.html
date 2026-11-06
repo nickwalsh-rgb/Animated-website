@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body class="is-loading" data-nav="bone">
+  <div class="grain" aria-hidden="true"></div>
 
   <!-- Wordmark letters, traced from the Figma "Archive 88 / Wordmark" component.
        Each letter is its own symbol so it can be animated on its own. -->
@@ -82,6 +83,27 @@
           <span>Scroll</span>
           <span class="scroll-cue__line"></span>
         </a>
+      </div>
+    </section>
+
+    <!-- ============ FIELD (film) ============ -->
+    <section class="field" data-theme="bone" aria-label="Field film">
+      <div class="field__pin">
+        <div class="field__frame">
+          <video class="field__video" muted loop playsinline preload="metadata"
+                 poster="assets/img/forest-poster.jpg" aria-hidden="true">
+            <source src="assets/video/forest.mp4" type="video/mp4" />
+          </video>
+          <div class="field__shade"></div>
+        </div>
+        <div class="field__meta">
+          <span class="eyebrow">Field film</span>
+          <span class="eyebrow">Curated pieces</span>
+        </div>
+        <div class="field__caption">
+          <span class="eyebrow">( Outside )</span>
+          <p class="field__line">Made for the<br />long way round.</p>
+        </div>
       </div>
     </section>
 

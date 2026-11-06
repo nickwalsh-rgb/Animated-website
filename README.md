@@ -20,6 +20,7 @@ Or turn on GitHub Pages for the branch (Settings → Pages → deploy from branc
 | --- | --- |
 | Loader | Wordmark letters rise one by one while a counter runs 00 → 88, then the panel lifts away |
 | Hero | Wordmark letters rise in, then drift apart at different speeds as you scroll |
+| Field film | A small window opens into the full-screen forest film as you scroll, then the line "Made for the long way round" rises in |
 | Story | The manifesto lights up word by word as you read |
 | Archive | Pinned horizontal track of hang tags that swing with scroll speed |
 | Label | Woven label flips up and tilts toward the cursor; monogram scales behind it |
@@ -28,6 +29,14 @@ Or turn on GitHub Pages for the branch (Settings → Pages → deploy from branc
 
 The nav changes colour to suit each section, gets a background once you scroll past the hero, and hides when you scroll down.
 `prefers-reduced-motion` skips the loader and all scroll animation.
+A light film grain sits over the whole page for texture.
+
+## Film
+
+`assets/video/forest.mp4` is the supplied forest-to-ocean clip, edited for the web:
+warm, lower-saturation grade with lifted blacks, light denoise, a 1.5s crossfade so it loops
+without a jump (6.5s), no audio, 1280×720, ~2.8 MB. `assets/img/forest-poster.jpg` is the first frame,
+shown while the video loads. The film only plays while it's on screen.
 
 ## Brand tokens (from Figma)
 
@@ -55,7 +64,8 @@ The wordmark is the exact vector from Figma, split into one SVG symbol per lette
 index.html            page + inline wordmark/monogram symbols
 assets/css/style.css  layout, tokens, responsive rules
 assets/js/main.js     all animation
-assets/img/           wordmark.svg, monogram.svg, favicon.svg
+assets/img/           wordmark.svg, monogram.svg, favicon.svg, forest-poster.jpg
+assets/video/         forest.mp4
 assets/vendor/        gsap, ScrollTrigger, lenis
 .claude/skills/       design/animation skills for Claude Code
 ```
