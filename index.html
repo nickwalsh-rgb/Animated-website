@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body class="is-loading" data-nav="bone">
+  <div class="grain" aria-hidden="true"></div>
 
   <!-- Wordmark letters, traced from the Figma "Archive 88 / Wordmark" component.
        Each letter is its own symbol so it can be animated on its own. -->
@@ -44,16 +45,79 @@
 
   <!-- ============ NAV ============ -->
   <header class="nav">
+    <button class="nav__menu js-menu-btn" type="button" aria-expanded="false" aria-controls="menu">
+      <span class="nav__burger" aria-hidden="true"><i></i><i></i></span>
+      <span class="nav__swap"><span>Menu</span><span aria-hidden="true">Close</span></span>
+    </button>
     <a href="#top" class="nav__logo" aria-label="Archive 88 — home">
       <svg viewBox="0 0 640 68" aria-hidden="true"><use href="#wm-A" class="wm-l"/><use href="#wm-R" class="wm-l"/><use href="#wm-C" class="wm-l"/><use href="#wm-H" class="wm-l"/><use href="#wm-I" class="wm-l"/><use href="#wm-V" class="wm-l"/><use href="#wm-E" class="wm-l"/><use href="#wm-8a" class="wm-l"/><use href="#wm-8b" class="wm-l"/></svg>
     </a>
-    <nav class="nav__links" aria-label="Primary">
-      <a href="#archive">Archive</a>
-      <a href="#story">Story</a>
-      <a href="#label">Label</a>
-      <a href="#join" class="nav__cta">Join the list</a>
-    </nav>
+    <div class="nav__right">
+      <a href="#join" class="nav__join">Join the list</a>
+      <button class="nav__cart js-cart-btn" type="button" aria-expanded="false" aria-controls="cart">
+        <span>Bag</span>
+        <span class="nav__count" aria-label="items"><span class="js-cart-count">0</span></span>
+      </button>
+    </div>
   </header>
+
+  <!-- ============ MENU (categories) ============ -->
+  <div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Shop by category" hidden>
+    <div class="menu__bg"></div>
+    <div class="menu__inner">
+      <div class="menu__col">
+        <span class="eyebrow menu__eyebrow">( Shop by category )</span>
+        <ul class="menu__cats">
+          <li><a href="#archive" data-cat="all" data-img="1" data-desc="Everything currently in the archive. One of each, numbered."><span class="menu__num">00</span><span class="menu__name"><span>All pieces</span></span><span class="menu__count js-cat-count"></span><span class="menu__arrow" aria-hidden="true">→</span></a></li>
+          <li><a href="#archive" data-cat="outerwear" data-img="2" data-desc="Chore coats, waxed jackets and field layers, built for weather."><span class="menu__num">01</span><span class="menu__name"><span>Outerwear</span></span><span class="menu__count js-cat-count"></span><span class="menu__arrow" aria-hidden="true">→</span></a></li>
+          <li><a href="#archive" data-cat="knitwear" data-img="3" data-desc="Heavy-gauge wool and cotton knits, softened by years of wear."><span class="menu__num">02</span><span class="menu__name"><span>Knitwear</span></span><span class="menu__count js-cat-count"></span><span class="menu__arrow" aria-hidden="true">→</span></a></li>
+          <li><a href="#archive" data-cat="denim" data-img="4" data-desc="Selvedge and rigid denim with honest fades."><span class="menu__num">03</span><span class="menu__name"><span>Denim</span></span><span class="menu__count js-cat-count"></span><span class="menu__arrow" aria-hidden="true">→</span></a></li>
+          <li><a href="#archive" data-cat="workwear" data-img="5" data-desc="Overshirts and utility pieces made to be used."><span class="menu__num">04</span><span class="menu__name"><span>Workwear</span></span><span class="menu__count js-cat-count"></span><span class="menu__arrow" aria-hidden="true">→</span></a></li>
+          <li><a href="#archive" data-cat="jersey" data-img="1" data-desc="Rugby shirts and heavyweight tops."><span class="menu__num">05</span><span class="menu__name"><span>Jersey</span></span><span class="menu__count js-cat-count"></span><span class="menu__arrow" aria-hidden="true">→</span></a></li>
+        </ul>
+      </div>
+
+      <div class="menu__preview" aria-hidden="true">
+        <div class="menu__frame">
+          <img class="menu__img is-active" src="assets/img/menu-1.jpg" alt="" />
+          <img class="menu__img" src="assets/img/menu-1.jpg" alt="" />
+        </div>
+        <p class="menu__desc js-menu-desc">Everything currently in the archive. One of each, numbered.</p>
+      </div>
+
+      <div class="menu__foot">
+        <nav class="menu__links" aria-label="More">
+          <a href="#story">Story</a>
+          <a href="#label">Label</a>
+          <a href="#returns">Returns</a>
+          <a href="#join">Join the list</a>
+        </nav>
+        <p>Curated pieces — Est. 1988</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CART ============ -->
+  <div class="cart" id="cart" role="dialog" aria-modal="true" aria-labelledby="cart-title" hidden>
+    <div class="cart__scrim js-cart-close"></div>
+    <div class="cart__panel">
+      <div class="cart__head">
+        <h2 id="cart-title">Your bag <span class="cart__qty">(<span class="js-cart-count">0</span>)</span></h2>
+        <button class="cart__close js-cart-close" type="button">Close</button>
+      </div>
+      <ul class="cart__items js-cart-items"></ul>
+      <div class="cart__empty js-cart-empty">
+        <p>Your bag is empty.</p>
+        <p class="cart__empty-sub">Every piece is one of one. When it's gone, it's gone.</p>
+        <a href="#archive" class="cart__browse js-cart-browse">Browse the archive</a>
+      </div>
+      <div class="cart__foot">
+        <div class="cart__row"><span>Subtotal</span><span class="js-subtotal">£0</span></div>
+        <p class="cart__note">Shipping calculated at checkout. 30-day returns.</p>
+        <button class="cart__checkout js-checkout" type="button" disabled>Checkout</button>
+      </div>
+    </div>
+  </div>
 
   <main id="top">
 
@@ -85,6 +149,27 @@
       </div>
     </section>
 
+    <!-- ============ FIELD (film) ============ -->
+    <section class="field" data-theme="bone" aria-label="Field film">
+      <div class="field__pin">
+        <div class="field__frame">
+          <video class="field__video" muted loop playsinline preload="metadata"
+                 poster="assets/img/forest-poster.jpg" aria-hidden="true">
+            <source src="assets/video/forest.mp4" type="video/mp4" />
+          </video>
+          <div class="field__shade"></div>
+        </div>
+        <div class="field__meta">
+          <span class="eyebrow">Field film</span>
+          <span class="eyebrow">Curated pieces</span>
+        </div>
+        <div class="field__caption">
+          <span class="eyebrow">( Outside )</span>
+          <p class="field__line">Made for the<br />long way round.</p>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ MANIFESTO ============ -->
     <section class="manifesto" id="story" data-theme="ink">
       <div class="manifesto__inner">
@@ -108,58 +193,64 @@
 
         <div class="archive__track">
           <!-- Sample pieces — swap names, eras and colours for the real drop. -->
-          <article class="tag tag--ink">
+          <article data-cat="outerwear" class="tag tag--ink">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 001</span><span>1 / 1</span></div>
             <svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg>
             <div class="tag__body">
               <h3>Chore Jacket</h3>
               <dl><dt>Category</dt><dd>Outerwear</dd><dt>Era</dt><dd>c. 1988</dd></dl>
+              <button class="tag__add js-add" type="button" data-id="001" data-name="Chore Jacket" data-cat="outerwear" data-price="185"><span class="tag__price">£185</span><span class="tag__cta">Add to bag</span></button>
             </div>
           </article>
-          <article class="tag tag--pine">
+          <article data-cat="knitwear" class="tag tag--pine">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 002</span><span>1 / 1</span></div>
             <svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg>
             <div class="tag__body">
               <h3>Fisherman Knit</h3>
               <dl><dt>Category</dt><dd>Knitwear</dd><dt>Era</dt><dd>c. 1979</dd></dl>
+              <button class="tag__add js-add" type="button" data-id="002" data-name="Fisherman Knit" data-cat="knitwear" data-price="140"><span class="tag__price">£140</span><span class="tag__cta">Add to bag</span></button>
             </div>
           </article>
-          <article class="tag tag--paper">
+          <article data-cat="denim" class="tag tag--paper">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 003</span><span>1 / 1</span></div>
             <svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg>
             <div class="tag__body">
               <h3>Selvedge Denim</h3>
               <dl><dt>Category</dt><dd>Denim</dd><dt>Era</dt><dd>c. 1991</dd></dl>
+              <button class="tag__add js-add" type="button" data-id="003" data-name="Selvedge Denim" data-cat="denim" data-price="160"><span class="tag__price">£160</span><span class="tag__cta">Add to bag</span></button>
             </div>
           </article>
-          <article class="tag tag--ink">
+          <article data-cat="workwear" class="tag tag--ink">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 004</span><span>1 / 1</span></div>
             <svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg>
             <div class="tag__body">
               <h3>Field Overshirt</h3>
               <dl><dt>Category</dt><dd>Workwear</dd><dt>Era</dt><dd>c. 1985</dd></dl>
+              <button class="tag__add js-add" type="button" data-id="004" data-name="Field Overshirt" data-cat="workwear" data-price="120"><span class="tag__price">£120</span><span class="tag__cta">Add to bag</span></button>
             </div>
           </article>
-          <article class="tag tag--pine">
+          <article data-cat="outerwear" class="tag tag--pine">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 005</span><span>1 / 1</span></div>
             <svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg>
             <div class="tag__body">
               <h3>Waxed Hunting Coat</h3>
               <dl><dt>Category</dt><dd>Outerwear</dd><dt>Era</dt><dd>c. 1982</dd></dl>
+              <button class="tag__add js-add" type="button" data-id="005" data-name="Waxed Hunting Coat" data-cat="outerwear" data-price="210"><span class="tag__price">£210</span><span class="tag__cta">Add to bag</span></button>
             </div>
           </article>
-          <article class="tag tag--paper">
+          <article data-cat="jersey" class="tag tag--paper">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 006</span><span>1 / 1</span></div>
             <svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg>
             <div class="tag__body">
               <h3>Rugby Shirt</h3>
               <dl><dt>Category</dt><dd>Jersey</dd><dt>Era</dt><dd>c. 1988</dd></dl>
+              <button class="tag__add js-add" type="button" data-id="006" data-name="Rugby Shirt" data-cat="jersey" data-price="95"><span class="tag__price">£95</span><span class="tag__cta">Add to bag</span></button>
             </div>
           </article>
         </div>
@@ -205,6 +296,47 @@
       </div>
     </div>
 
+    <!-- ============ RETURNS ============ -->
+    <section class="returns" id="returns" data-theme="paper">
+      <div class="returns__grid">
+        <div class="returns__intro">
+          <span class="eyebrow">( Returns )</span>
+          <h2 class="display js-lines">Returns,<br />kept simple.</h2>
+          <p class="returns__lede js-reveal">
+            If a piece isn't right, send it back within 30 days of delivery for a full refund.
+          </p>
+          <ol class="returns__steps">
+            <li class="js-reveal"><span>01</span><div><h3>Start a return</h3><p>Use the link in your order confirmation email.</p></div></li>
+            <li class="js-reveal"><span>02</span><div><h3>Pack it up</h3><p>As it arrived: unworn, with the woven label and tags attached.</p></div></li>
+            <li class="js-reveal"><span>03</span><div><h3>Get refunded</h3><p>To your original payment method once it's back with us.</p></div></li>
+          </ol>
+        </div>
+
+        <div class="returns__faq">
+          <div class="acc js-acc">
+            <button class="acc__q" type="button" aria-expanded="false" aria-controls="acc-1" id="acc-q1"><span>How long do I have?</span><i aria-hidden="true"></i></button>
+            <div class="acc__a" id="acc-1" role="region" aria-labelledby="acc-q1" hidden><p>30 days from the day your order is delivered.</p></div>
+          </div>
+          <div class="acc js-acc">
+            <button class="acc__q" type="button" aria-expanded="false" aria-controls="acc-2" id="acc-q2"><span>What condition does it need to be in?</span><i aria-hidden="true"></i></button>
+            <div class="acc__a" id="acc-2" role="region" aria-labelledby="acc-q2" hidden><p>The way it reached you: unworn, unwashed, with the Archive 88 woven label and the numbered hang tag still attached.</p></div>
+          </div>
+          <div class="acc js-acc">
+            <button class="acc__q" type="button" aria-expanded="false" aria-controls="acc-3" id="acc-q3"><span>Can I exchange for another size?</span><i aria-hidden="true"></i></button>
+            <div class="acc__a" id="acc-3" role="region" aria-labelledby="acc-q3" hidden><p>Every piece is one of one, so there's no other size to swap to. Return it for a refund and choose something else from the archive.</p></div>
+          </div>
+          <div class="acc js-acc">
+            <button class="acc__q" type="button" aria-expanded="false" aria-controls="acc-4" id="acc-q4"><span>How long does a refund take?</span><i aria-hidden="true"></i></button>
+            <div class="acc__a" id="acc-4" role="region" aria-labelledby="acc-q4" hidden><p>We check every return by hand. Once it's approved, the refund goes back to your original payment method. Your bank may take a few more days to show it.</p></div>
+          </div>
+          <div class="acc js-acc">
+            <button class="acc__q" type="button" aria-expanded="false" aria-controls="acc-5" id="acc-q5"><span>Is anything final sale?</span><i aria-hidden="true"></i></button>
+            <div class="acc__a" id="acc-5" role="region" aria-labelledby="acc-q5" hidden><p>Pieces marked "Final sale" on their tag can't be returned. We'll always say so before you buy.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ JOIN ============ -->
     <section class="join" id="join" data-theme="bone">
       <span class="eyebrow">( Join the list )</span>
@@ -226,6 +358,7 @@
         <a href="#archive">Archive</a>
         <a href="#story">Story</a>
         <a href="#label">Label</a>
+        <a href="#returns">Returns</a>
         <a href="#join">Join</a>
       </nav>
       <p>© <span class="js-year">2026</span> Archive 88</p>
