@@ -282,7 +282,7 @@ def tag_card(p, site, root, extra_class="", photos=None):
     return f'''          <article class="tag tag--{p["tag"]}{" is-sold" if sold else ""}{extra_class}" {data}>
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. {e(p["number"])}</span><span>{e(p["size"])}</span></div>
-            <a class="tag__photo {photo_cls}" href="{url}" tabindex="-1" aria-hidden="true">{photo}{'<span class="tag__stamp">Sold</span>' if sold else ''}</a>
+            <a class="tag__photo {photo_cls}" href="{url}" tabindex="-1" aria-hidden="true" style="view-transition-name: piece-{p["handle"]}">{photo}{'<span class="tag__stamp">Sold</span>' if sold else ''}</a>
             <div class="tag__body">
               <h3><a class="tag__link" href="{url}">{e(p["title"])}</a></h3>
               <dl><dt>Category</dt><dd>{e(cat_title(site, p["category"]))}</dd><dt>Era</dt><dd>{e(p["era"])}</dd></dl>
@@ -338,6 +338,28 @@ def countdown(nxt, cls=""):
             f'{unit("m", "Minutes")}{unit("s", "Seconds")}</div></div>')
 
 
+SWATCH = {"ink": ("var(--ink)", "var(--bone)"), "pine": ("var(--pine)", "var(--bone)"), "paper": ("var(--bone)", "var(--ink)")}
+
+
+def cart_suggest(site, products, root):
+    """Empty bag: three pieces still available, newest first, so the bag is never a dead end."""
+    avail = sorted((p for p in products if p["available"]), key=lambda p: -int(re.sub(r"\D", "", p["number"]) or 0))[:3]
+    if not avail:
+        return ""
+    rows = []
+    for p in avail:
+        photos = PHOTOS[p["handle"]]
+        bg, fg = SWATCH.get(p["tag"], SWATCH["ink"])
+        thumb = (img_tag(photos[0], root, "", "64px") if photos
+                 else '<svg viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg>')
+        rows.append(f'<li><a class="cart__sug" href="{root}products/{p["handle"]}/">'
+                    f'<span class="cart__swatch{" has-photo" if photos else ""}" style="--sw-bg:{bg};--sw-fg:{fg}">{thumb}</span>'
+                    f'<span class="cart__sug-meta"><small>No. {e(p["number"])}, size {e(p["size"])}</small><strong>{e(p["title"])}</strong></span>'
+                    f'<span class="cart__price">{money(p["price"], site)}</span></a></li>')
+    return ('<div class="cart__suggest"><p class="cart__suggest-title">Still in the archive</p><ul>'
+            + "".join(rows) + "</ul></div>")
+
+
 def base_ctx(site, products, root, page_id):
     cats_html, first_desc = menu_cats(site, products, root)
     return {"_site": site, "root": root, "home": root, "page": page_id, "wm": WM, "year": NOW.year,
@@ -345,10 +367,19 @@ def base_ctx(site, products, root, page_id):
             "og_type": "website", "og_image": site["url"] + "assets/img/og-image.jpg",
             "og_image_type": "image/jpeg", "og_image_w": 1200, "og_image_h": 630,
             "og_image_alt": "The Archive 88 wordmark over a sunlit pine forest path, two people walking toward the sea.",
-            "extra_meta": ""}
+            "extra_meta": "", "cart_suggest": cart_suggest(site, products, root)}
+
+
+def mark_current(body_html, root, current):
+    """aria-current="page" on links (menu, footer, logo) that point at the page being built."""
+    if current is None:
+        return body_html
+    target = re.escape(f'href="{root}{current}"')
+    return re.sub(rf'<a ([^>]*?){target}', lambda m: m.group(0).replace("<a ", '<a aria-current="page" ', 1), body_html)
 
 
 def page(ctx, body_attrs, body_html, scripts):
+    body_html = mark_current(body_html, ctx["root"], ctx.get("current"))
     head = fill(partial("head"), ctx)
     tail = "\n".join(f'  <script src="{ctx["root"]}{s}"></script>' for s in [*SCRIPTS, *scripts])
     return (f"{head}<body {body_attrs}>\n  <div class=\"grain\" aria-hidden=\"true\"></div>\n\n{partial('defs')}\n"
@@ -405,6 +436,7 @@ def breadcrumbs_ld(site, items):
 def build_home(site, products, current, nxt, looks=()):
     root = ""
     ctx = base_ctx(site, products, root, "home")
+    ctx["current"] = ""
     faq = accordion([(f["q"], f'<p>{e(f["a"])}</p>') for f in site["returns_faq"]], "acc")
     in_drop = [p for p in products if current and p["drop"] == current["handle"]]
     drop_attr = f' data-drop="{nxt["iso"]}"' if nxt else ""
@@ -423,7 +455,7 @@ def build_home(site, products, current, nxt, looks=()):
         "next_drop_hero": (f' <span class="hero__drop js-drop"{drop_attr}>Next drop: {e(nxt["label"])}.</span>'
                            if nxt else ""),
         "countdown": countdown(nxt, "js-reveal"),
-        "lookbook_feature": ("    <section class=\"lookfeat\" id=\"look\" data-theme=\"bone\" aria-label=\"Shop the look\">\n"
+        "lookbook_feature": ("    <section class=\"lookfeat\" id=\"look\" data-theme=\"bone\" data-chapter=\"Look\" aria-label=\"Shop the look\">\n"
                              + look_html(looks[0], 0, site, root, feature=True) + "\n    </section>") if looks else "",
     })
     body = "\n".join(fill(partial(n), ctx) for n in ["loader", "header", "home-main", "footer"])
@@ -445,6 +477,9 @@ def build_product(site, products, p, nxt):
         slides = [f'          <figure class="pdp__slide is-empty tag--{p["tag"]}"><svg viewBox="0 0 146 68" aria-hidden="true">'
                   f'<use href="#mono"/></svg><figcaption>{e(shot)}<small>Photo to come</small></figcaption></figure>'
                   for shot in site["shot_list"]]
+    # Page transition: the first photo shares a name with this piece's hang-tag photo on the
+    # page you came from, so the browser morphs one into the other.
+    slides[0] = slides[0].replace("<figure class=", f'<figure style="view-transition-name: piece-{p["handle"]}" class=', 1)
     pager = "".join(f'<i{" class=\"is-on\"" if i == 0 else ""}></i>' for i in range(len(slides)))
 
     if p["available"]:
@@ -458,12 +493,27 @@ def build_product(site, products, p, nxt):
                + (f'{e(nxt["name"])} drops {e(nxt["label"])}. ' if nxt else "")
                + f'Join the list to see it first.</p>\n          <a class="btn btn--ink btn--block" href="{root}#join">Join the list</a>')
 
+    # Phones: a slim bar pinned to the bottom while the main buy button is out of view.
+    bar_action = (add_button(p, site, "buy-btn buy-btn--bar", photos) if p["available"]
+                  else f'<a class="btn btn--ink buybar__join" href="{root}#join">Join the list</a>')
+    buybar = (f'<div class="buybar js-buybar" inert><div class="buybar__meta"><strong>{e(title)}</strong>'
+              f'<span>{"No. " + e(p["number"]) + ", size " + e(p["size"]) if p["available"] else "Sold"}</span></div>{bar_action}</div>')
+
     rows = "".join(f"<tr><th scope=\"row\">{e(k)}</th><td>{e(v)} cm</td></tr>" for k, v in p["measurements_cm"].items())
+    # "Check the fit": compare one of your own measurements (remembered on this device) with this piece.
+    fit_opts = "".join(f'<option value="{e(k)}" data-cm="{v}">{e(k)}</option>' for k, v in p["measurements_cm"].items())
+    fit = ('<form class="fit js-fit" novalidate><p class="fit__title">Check the fit</p>'
+           '<p class="fit__help">Lay something you own that fits well flat, measure it the same way, and compare.</p>'
+           f'<div class="fit__row"><label class="fit__field"><span>Measurement</span><select class="js-fit-key">{fit_opts}</select></label>'
+           '<label class="fit__field"><span>Yours, in cm</span><input class="js-fit-val" type="number" inputmode="decimal" '
+           'min="1" max="250" step="0.5" placeholder="e.g. 56" /></label></div>'
+           '<div class="fit__scale js-fit-scale" aria-hidden="true" hidden><i class="fit__mark fit__mark--piece"></i><i class="fit__mark fit__mark--you"></i></div>'
+           '<p class="fit__out js-fit-out" role="status" aria-live="polite"></p></form>')
     flaws = ("<ul class=\"pdp__flaws\">" + "".join(f"<li>{e(f)}</li>" for f in p.get("flaws", [])) + "</ul>"
              if p.get("flaws") else "<p>Nothing to note beyond normal wear for its age.</p>")
     details = accordion([
         ("Measurements", f'<table class="pdp__measure"><caption>Measured flat, in centimetres. Labelled size: {e(p["size"])}. '
-                         f'<a href="{root}size-guide/">How we measure</a>.</caption><tbody>{rows}</tbody></table>'),
+                         f'<a href="{root}size-guide/">How we measure</a>.</caption><tbody>{rows}</tbody></table>' + fit),
         ("Condition", f'<p><strong>{e(p["condition"])}.</strong> {e(p.get("condition_notes", ""))}</p>{flaws}'),
         ("Material", f'<p>{e(p["material"])}</p>'),
         ("Shipping", f'<p>{e(site["shipping"]["text"])}</p>'),
@@ -495,7 +545,7 @@ def build_product(site, products, p, nxt):
         "name": e(title), "title_lower": e(title.lower()), "price_fmt": money(p["price"], site),
         "size": e(p["size"]), "era": e(p["era"]), "condition": e(p["condition"]),
         "description": e(p["description"]), "gallery": "\n".join(slides), "pager": pager,
-        "buy": buy, "details": details, "more": more,
+        "buy": buy, "buybar": buybar, "details": details, "more": more,
     })
     body = "\n".join(fill(partial(n), ctx) for n in ["header", "product-main", "footer"])
     write(f"products/{p['handle']}/index.html",
@@ -505,6 +555,7 @@ def build_product(site, products, p, nxt):
 def build_shop(site, products, nxt):
     root = "../"
     ctx = base_ctx(site, products, root, "shop")
+    ctx["current"] = "shop/"
     avail = [p for p in products if p["available"]]
     chip = lambda group, val, label, n=None, on=False: (
         f'<button class="chip{" is-on" if on else ""}" type="button" data-{group}="{e(val)}" aria-pressed="{"true" if on else "false"}">'
@@ -535,6 +586,7 @@ def build_shop(site, products, nxt):
 def build_record(site, products, drops):
     root = "../"
     ctx = base_ctx(site, products, root, "record")
+    ctx["current"] = "record/"
     groups = []
     for d in reversed([d for d in drops if any(p["drop"] == d["handle"] for p in products)]):
         pieces = sorted((p for p in products if p["drop"] == d["handle"]), key=lambda p: p["number"])
@@ -583,6 +635,7 @@ def build_info_pages(site, products):
         slug_ = f.stem
         root = "../"
         ctx = base_ctx(site, products, root, slug_)
+        ctx["current"] = f"{slug_}/"
         is_legal = meta.get("legal", False)
         ctx.update({
             "title": e(f'{meta["title"]} - Archive 88'), "description": e(meta["description"]),
@@ -694,6 +747,12 @@ def look_html(lk, i, site, root, feature=False):
     eyebrow = "Shop the look" if feature else f"Look {i + 1:02d}"
     more = (f'\n          <a class="archive__all look__more" href="{root}lookbook/">See every look <span aria-hidden="true">→</span></a>'
             if feature else "")
+    # Every available piece in one go (secondary, ink): only worth offering for two or more.
+    avail = [sp["p"] for sp in lk["spots"] if sp["p"]["available"]]
+    whole = (f'\n          <button class="btn btn--ink look__whole js-add-look" type="button" '
+             f'data-ids="{",".join(e(P["number"]) for P in avail)}" data-title="{e(lk["title"])}">'
+             f'<span class="js-look-label">Add the whole look</span> <span class="look__whole-price">{money(sum(P["price"] for P in avail), site)}</span></button>'
+             if len(avail) > 1 else "")
     return (f'      <article class="look{flipped}" id="look-{hid}" aria-labelledby="look-title-{hid}">\n'
             f'        <figure class="look__figure{empty} js-look">\n'
             f'          {figure_img}\n{spots}\n'
@@ -703,7 +762,7 @@ def look_html(lk, i, site, root, feature=False):
             f'          <h2 class="look__title" id="look-title-{hid}">{e(lk["title"])}</h2>\n'
             f'          <p class="look__caption">{e(lk["caption"])}</p>\n'
             f'          <p class="look__hint">Hover or tap a number to shop that piece.</p>\n'
-            f'          <ol class="look__pieces">\n{pieces}\n          </ol>{more}\n'
+            f'          <ol class="look__pieces">\n{pieces}\n          </ol>{whole}{more}\n'
             f'        </div>\n'
             f'      </article>')
 
@@ -711,6 +770,7 @@ def look_html(lk, i, site, root, feature=False):
 def build_lookbook(site, products, looks):
     root = "../"
     ctx = base_ctx(site, products, root, "lookbook")
+    ctx["current"] = "lookbook/"
     ctx.update({
         "title": "Shop the look - Archive 88",
         "description": e("Editorial looks from Archive 88. Tap each piece to see it and add it to your bag."),

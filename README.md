@@ -55,11 +55,19 @@ category, and lists any pieces that are still waiting for photos.
 - Film: a small window opens into the graded forest film.
 - Story, then **the archive**: a pinned sideways row of hang tags with a thin progress line. Each tag shows the first photo (or the monogram until photos exist), links to its product page, and has Add to bag. Sold pieces stay, greyed out with a Sold stamp.
 - Label, marquee, **Returns** and **Join the list** (sharing one colour band; the email field has a visible label).
+- **Chapter rail**: once the first chapter scrolls in, a slim index on the right (Story, Archive, Label, Look, Returns, Join) shows
+  where you are and jumps to any chapter. Built from `data-chapter` on each section. On phones it becomes a thin progress line at the top.
+- **Join the list**: checked when you leave the field, then Joining / Joined / error states. The real sign-up goes in
+  `window.A88.subscribe(email)` (return a promise); until then it succeeds locally.
 
 **Product pages** `products/<handle>/`
 - Gallery of every photo in the piece's folder. With no photos yet it shows labelled slots from the shot list (Front, Back, Label, Detail, Flaws). Phones swipe sideways with a pager line.
 - Number, name, price, size / era / condition, description, Add to bag (or Sold + Join the list), final-sale note when set.
 - Details: measurements table (cm), condition and flaws, material, shipping, returns.
+- **Check the fit**: enter one of your own measurements; it says how this piece compares (and shows it on a small scale).
+  Your numbers are remembered on this device per measurement, so they carry over to other pieces.
+- **Zoom**: with real photos, a zoom button (or clicking the photo) opens a full-screen viewer: click to magnify at that spot, move to look around, arrows for the next photo.
+- **Phones**: a slim Add to bag bar pins to the bottom whenever the main button is off screen (Join the list for sold pieces).
 - More from the archive: three related pieces.
 - Own share preview (product photo when available), `product:*` Open Graph tags and Product + Breadcrumb structured data for Google.
 
@@ -71,13 +79,16 @@ garment. Hover (mouse) or tap (touch) a marker to open a card with the piece, it
 the card, Esc or clicking elsewhere closes it, and on phones the card docks on the side of the photo away from the marker.
 The list beside each photo mirrors the markers. Looks, markers (x/y in % of the photo) and captions live in `data/lookbook.json`;
 until a photo exists a labelled slot is shown. Pieces from future drops are left out automatically.
+**Add the whole look** (shown when two or more pieces are available) adds every piece not already in the bag.
 
 **The record** `record/`: every piece ever released, grouped by drop, with sold pieces kept on the list.
 
 **Info pages:** About, Contact, Size guide, Privacy, Terms of sale. Business details come from `data/site.json`; anything missing
 shows a red "To be confirmed" marker, and Privacy/Terms show a "Draft" note until `legal_reviewed` is set to `true`.
 
-**Shared on every page:** category menu (counts come from the data; on product pages a category goes to that piece on the homepage), bag drawer saved in the browser, raised social keys, footer.
+**Shared on every page:** category menu (counts come from the data; on product pages a category goes to that piece on the homepage), bag drawer saved in the browser (with Undo after removing a piece, and a few available pieces when it's empty), raised social keys, footer.
+Pages cross-fade into each other, and a piece's hang-tag photo morphs into its product photo (View Transitions, in browsers that support them).
+Back returns you to where you were on the page. Skip link, current-page marking, 44px tap targets and screen-reader announcements for the bag throughout.
 
 ## Motion
 
@@ -93,6 +104,11 @@ shows a red "To be confirmed" marker, and Privacy/Terms show a "Draft" note unti
 | Social keys | Lift and tilt toward the cursor; press flush on click |
 | Every button | Sinks on press and springs back on release (mouse, touch and keyboard); primary buttons ripple from the point pressed |
 | Shop the look | Markers pop in one by one; cards open from their marker; the matching list row lights up |
+| Page to page | Cross-fade; hang tag morphs into the product photo |
+| Chapter rail | Active tick stretches; labels slide in on hover |
+| Bag | Whole look adds piece by piece; Undo toast rises in; a short vibration on add (Android) |
+
+Timings come from shared tokens: `--t-fast` / `--t-base` / `--t-slow` in CSS and `A88.T` in JS.
 
 `prefers-reduced-motion` turns all of it off. Revealed content fades with opacity only, so keyboard users can reach it before it scrolls into view.
 

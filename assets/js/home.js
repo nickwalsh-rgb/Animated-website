@@ -1,6 +1,6 @@
 /* Archive 88: homepage motion (needs site.js first) */
 (() => {
-  const { $, $$, site, motion, splitLines, splitWords } = window.A88;
+  const { $, $$, site, motion, splitLines, splitWords, T } = window.A88;
   const body = document.body;
 
   // Old links to #shop-<category> now live on the shop page.
@@ -9,11 +9,14 @@
     return;
   }
 
+  setupRail();
+
   if (!motion) {
     body.classList.remove("is-loading");
     const loader = $(".loader");
     if (loader) loader.remove();
     $(".field__video").removeAttribute("preload");
+    if (window.A88.restoreScroll) window.A88.restoreScroll();
     arriveFromHash();
     return;
   }
@@ -36,22 +39,22 @@
   if (firstVisit && $(".loader")) {
     gsap.set(loaderLetters, { y: 76 });
     intro
-      .to(loaderLetters, { y: 0, duration: 1.1, stagger: 0.06 }, 0.15)
+      .to(loaderLetters, { y: 0, duration: T.slower, stagger: 0.06 }, 0.15)
       .to(counter, {
-        v: 88, duration: 1.6, ease: "power2.inOut",
+        v: 88, duration: T.slowest, ease: "power2.inOut",
         onUpdate: () => ($(".js-count").textContent = String(Math.round(counter.v)).padStart(2, "0")),
       }, 0.15)
-      .to(loaderLetters, { y: -76, duration: 0.7, ease: "power3.in", stagger: 0.03 }, "+=0.15")
-      .to(".loader", { yPercent: -100, duration: 1.0, ease: "expo.inOut" }, "-=0.25")
-      .to(heroLetters, { y: 0, duration: 1.3, stagger: 0.055 }, "-=0.45");
+      .to(loaderLetters, { y: -76, duration: T.slow, ease: "power3.in", stagger: 0.03 }, "+=0.15")
+      .to(".loader", { yPercent: -100, duration: T.slower, ease: "expo.inOut" }, "-=0.25")
+      .to(heroLetters, { y: 0, duration: T.slowest, stagger: 0.055 }, "-=0.45");
   } else {
     const loader = $(".loader");
     if (loader) loader.remove();
-    intro.to(heroLetters, { y: 0, duration: 1.1, stagger: 0.045 }, 0.05);
+    intro.to(heroLetters, { y: 0, duration: T.slower, stagger: 0.045 }, 0.05);
   }
   intro
-    .to(heroFades, { autoAlpha: 1, y: 0, duration: 1, stagger: 0.08 }, "-=0.9")
-    .to(".nav", { autoAlpha: 1, y: 0, duration: 0.9 }, "<");
+    .to(heroFades, { autoAlpha: 1, y: 0, duration: T.slower, stagger: 0.08 }, "-=0.9")
+    .to(".nav", { autoAlpha: 1, y: 0, duration: T.slow }, "<");
 
   function afterIntro() {
     const loader = $(".loader");
@@ -60,6 +63,7 @@
     site.unlock();
     heroScroll();
     ScrollTrigger.refresh();
+    if (window.A88.restoreScroll) window.A88.restoreScroll();
     arriveFromHash();
   }
 
@@ -103,11 +107,11 @@
   })
     .fromTo(".field__frame",
       { clipPath: () => `inset(${smallInset()} round 4px)` },
-      { clipPath: "inset(0% 0% 0% 0% round 0px)", duration: 1, ease: "power2.inOut" }, 0)
-    .fromTo(".field__video", { scale: 1.18 }, { scale: 1, duration: 1.2 }, 0)
-    .to(".field__shade", { opacity: 1, duration: 0.5 }, 0.55)
-    .to(fieldLines, { yPercent: 0, duration: 0.5, stagger: 0.12, ease: "power3.out" }, 0.8)
-    .to({}, { duration: 0.3 }); // hold on the full frame before moving on
+      { clipPath: "inset(0% 0% 0% 0% round 0px)", duration: T.slower, ease: "power2.inOut" }, 0)
+    .fromTo(".field__video", { scale: 1.18 }, { scale: 1, duration: T.slowest }, 0)
+    .to(".field__shade", { opacity: 1, duration: T.base }, 0.55)
+    .to(fieldLines, { yPercent: 0, duration: T.base, stagger: 0.12, ease: "power3.out" }, 0.8)
+    .to({}, { duration: T.fast }); // hold on the full frame before moving on
 
   const video = $(".field__video");
   new IntersectionObserver(([entry]) => {
@@ -125,11 +129,11 @@
   const track = $(".archive__track");
   const tags = $$(".tag", track);
   const progress = $(".js-progress");
-  const swing = tags.map((t) => gsap.quickTo(t, "rotation", { duration: 0.9, ease: "elastic.out(1, 0.35)" }));
+  const swing = tags.map((t) => gsap.quickTo(t, "rotation", { duration: T.slow, ease: "elastic.out(1, 0.35)" }));
   const distance = () => Math.max(0, track.scrollWidth - window.innerWidth);
 
   gsap.from(tags, {
-    y: 80, opacity: 0, rotation: (i) => (i % 2 ? 6 : -6), duration: 1.2, ease: "expo.out", stagger: 0.08,
+    y: 80, opacity: 0, rotation: (i) => (i % 2 ? 6 : -6), duration: T.slowest, ease: "expo.out", stagger: 0.08,
     scrollTrigger: { trigger: ".archive", start: "top 65%" },
   });
 
@@ -158,7 +162,7 @@
   const woven = $(".js-tilt");
   const stage = $(".label__stage");
   gsap.from(woven, {
-    rotationX: 70, y: 80, autoAlpha: 0, duration: 1.4, ease: "expo.out",
+    rotationX: 70, y: 80, autoAlpha: 0, duration: T.slowest, ease: "expo.out",
     scrollTrigger: { trigger: stage, start: "top 75%" },
   });
   gsap.fromTo(".js-mono", { scale: 0.7, rotation: -8 }, {
@@ -166,8 +170,8 @@
     scrollTrigger: { trigger: ".label", start: "top bottom", end: "bottom top", scrub: true },
   });
   if (window.matchMedia("(hover: hover)").matches) {
-    const rx = gsap.quickTo(woven, "rotationX", { duration: 0.8, ease: "power3.out" });
-    const ry = gsap.quickTo(woven, "rotationY", { duration: 0.8, ease: "power3.out" });
+    const rx = gsap.quickTo(woven, "rotationX", { duration: T.slow, ease: "power3.out" });
+    const ry = gsap.quickTo(woven, "rotationY", { duration: T.slow, ease: "power3.out" });
     stage.addEventListener("pointermove", (e) => {
       const r = stage.getBoundingClientRect();
       ry(((e.clientX - r.left) / r.width - 0.5) * 28);
@@ -186,14 +190,78 @@
     onUpdate: (self) => {
       const v = self.getVelocity();
       if (Math.abs(v) > 50) dir = v > 0 ? 1 : -1;
-      gsap.to(marquee, { timeScale: dir * (1 + Math.min(Math.abs(v) / 400, 5)), duration: 0.2, overwrite: true });
-      gsap.to(marquee, { timeScale: dir, duration: 1, delay: 0.25 });
+      gsap.to(marquee, { timeScale: dir * (1 + Math.min(Math.abs(v) / 400, 5)), duration: T.fast, overwrite: true });
+      gsap.to(marquee, { timeScale: dir, duration: T.slower, delay: 0.25 });
     },
   });
 
   /* ======================================================================
      helpers
      ====================================================================== */
+
+  /* Chapter rail: shows where you are in the homepage story and jumps to any chapter.
+     Built from [data-chapter] sections, so it only lists chapters that exist. Desktop shows the
+     list down the right edge; phones get a thin progress line under the top bar instead. */
+  function setupRail() {
+    const chapters = $$("[data-chapter]");
+    if (chapters.length < 2) return;
+    const rail = document.createElement("nav");
+    rail.className = "rail";
+    rail.setAttribute("aria-label", "Page sections");
+    rail.innerHTML =
+      "<ol>" + chapters.map((s) =>
+        `<li><a href="#${s.id}" data-ch="${s.id}"><span class="rail__label">${s.dataset.chapter}</span><span class="rail__tick" aria-hidden="true"></span></a></li>`
+      ).join("") + '</ol><span class="rail__bar" aria-hidden="true"><span class="js-rail-bar"></span></span>';
+    body.appendChild(rail);
+    const links = $$("a", rail);
+    const bar = $(".js-rail-bar", rail);
+
+    links.forEach((a) => a.addEventListener("click", (e) => {
+      e.preventDefault();
+      site.scrollTo(a.getAttribute("href"));
+    }));
+
+    // Active chapter: the one crossing the middle of the screen.
+    let active = null;
+    const setActive = (id) => {
+      active = id;
+      links.forEach((a) => {
+        const on = a.dataset.ch === id;
+        a.classList.toggle("is-active", on);
+        if (on) a.setAttribute("aria-current", "location"); else a.removeAttribute("aria-current");
+      });
+      vis();
+    };
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => { if (en.isIntersecting) setActive(en.target.id); });
+    }, { rootMargin: "-48% 0px -50% 0px" });
+    chapters.forEach((s) => io.observe(s));
+
+    // Visible from the first chapter until the footer (not over the hero or the film).
+    let pastHero = false, atFooter = false;
+    function vis() { rail.classList.toggle("is-on", pastHero && !atFooter && !!active); }
+    new IntersectionObserver(([en]) => {
+      pastHero = !en.isIntersecting;
+      if (!pastHero) { active = null; links.forEach((a) => { a.classList.remove("is-active"); a.removeAttribute("aria-current"); }); }
+      vis();
+    }).observe($(".hero"));
+    new IntersectionObserver(([en]) => { atFooter = en.isIntersecting; vis(); }, { rootMargin: "0px 0px -30% 0px" }).observe($(".footer"));
+    // The film sits between the hero and the first chapter: no chapter is active there yet.
+    new IntersectionObserver(([en]) => {
+      if (en.isIntersecting && active === chapters[0].id) { active = null; links.forEach((a) => { a.classList.remove("is-active"); a.removeAttribute("aria-current"); }); vis(); }
+    }, { rootMargin: "-48% 0px -50% 0px" }).observe($(".field"));
+
+    // Progress line (phones).
+    let ticking = false;
+    const progress = () => {
+      ticking = false;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.transform = `scaleX(${max > 0 ? Math.min(1, window.scrollY / max) : 0})`;
+    };
+    const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(progress); } };
+    if (site.lenis) site.lenis.on("scroll", onScroll); else window.addEventListener("scroll", onScroll, { passive: true });
+    progress();
+  }
 
   /* Arriving from another page with a section anchor such as #returns or #join. */
   function arriveFromHash() {

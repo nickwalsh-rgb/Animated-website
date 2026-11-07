@@ -74,6 +74,8 @@
     ]
   }
   </script>
+  <!-- Page transitions: note whether this page arrived via a cross-page view transition -->
+  <script>addEventListener("pagereveal",function(e){if(e.viewTransition)document.documentElement.classList.add("vt-in")});</script>
 </head>
 <body data-nav="paper">
   <div class="grain" aria-hidden="true"></div>
@@ -97,6 +99,9 @@
       <symbol id="ico-facebook" viewBox="0 0 256 256"><path fill="currentColor" d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm8,191.63V152h24a8,8,0,0,0,0-16H136V112a16,16,0,0,1,16-16h16a8,8,0,0,0,0-16H152a32,32,0,0,0-32,32v24H96a8,8,0,0,0,0,16h24v63.63a88,88,0,1,1,16,0Z"/></symbol>
     </defs>
   </svg>
+
+  <a class="skip-link" href="#top">Skip to content</a>
+  <p class="sr-only js-bag-status" role="status" aria-live="polite"></p>
 
   <!-- ============ NAV ============ -->
   <header class="nav">
@@ -145,7 +150,7 @@
         <nav class="menu__links" aria-label="More">
           <a href="../lookbook/">Shop the look</a>
           <a href="../record/">The record</a>
-          <a href="../about/">About</a>
+          <a aria-current="page" href="../about/">About</a>
           <a href="../size-guide/">Size guide</a>
           <a href="../#returns">Returns</a>
           <a href="../contact/">Contact</a>
@@ -168,6 +173,7 @@
         <p>Your bag is empty.</p>
         <p class="cart__empty-sub">Every piece is one of one. When it's gone, it's gone.</p>
         <a href="../#archive" class="cart__browse js-cart-browse">Browse the archive</a>
+        <div class="cart__suggest"><p class="cart__suggest-title">Still in the archive</p><ul><li><a class="cart__sug" href="../products/waxed-hunting-coat/"><span class="cart__swatch" style="--sw-bg:var(--pine);--sw-fg:var(--bone)"><svg viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></span><span class="cart__sug-meta"><small>No. 005, size L</small><strong>Waxed Hunting Coat</strong></span><span class="cart__price">£210</span></a></li><li><a class="cart__sug" href="../products/field-overshirt/"><span class="cart__swatch" style="--sw-bg:var(--ink);--sw-fg:var(--bone)"><svg viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></span><span class="cart__sug-meta"><small>No. 004, size M</small><strong>Field Overshirt</strong></span><span class="cart__price">£120</span></a></li><li><a class="cart__sug" href="../products/selvedge-denim/"><span class="cart__swatch" style="--sw-bg:var(--bone);--sw-fg:var(--ink)"><svg viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></span><span class="cart__sug-meta"><small>No. 003, size W32 L32</small><strong>Selvedge Denim</strong></span><span class="cart__price">£160</span></a></li></ul></div>
       </div>
       <div class="cart__foot">
         <div class="cart__row"><span>Subtotal</span><span class="js-subtotal">£0</span></div>
@@ -224,7 +230,7 @@
           <li><a href="../shop/">Shop all</a></li>
           <li><a href="../lookbook/">Shop the look</a></li>
           <li><a href="../record/">The record</a></li>
-          <li><a href="../about/">About</a></li>
+          <li><a aria-current="page" href="../about/">About</a></li>
           <li><a href="../#join">Join the list</a></li>
         </ul>
         <ul>
