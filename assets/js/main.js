@@ -9,6 +9,7 @@
   $(".js-year").textContent = new Date().getFullYear();
 
   setupForm();
+  setupSocial();
 
   /* Shared helpers used by the menu, bag and returns (work with or without motion). */
   const site = {
@@ -277,7 +278,9 @@
   const footLetters = $$(".wordmark--footer .wm-l");
   gsap.from(footLetters, {
     y: 76, duration: 1.3, ease: "expo.out", stagger: 0.06,
-    scrollTrigger: { trigger: ".wordmark--footer", start: "top 92%" },
+    // Trigger off the footer itself: the wordmark sits so low that on phones
+    // "top 92%" could fall past the end of the page and never fire.
+    scrollTrigger: { trigger: ".footer", start: "top 70%" },
   });
 
   window.addEventListener("load", () => ScrollTrigger.refresh());
@@ -639,5 +642,31 @@ function setupForm() {
     // TODO: send input.value to your mailing-list provider here.
     note.textContent = "You're on the list. We'll be in touch before the next drop.";
     form.reset();
+  });
+}
+
+/* Social keys: tilt toward the pointer while raised; press state for touch. */
+function setupSocial() {
+  const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  document.querySelectorAll(".social__btn").forEach((btn) => {
+    const face = btn.querySelector(".social__face");
+    if (fine) {
+      btn.addEventListener("pointermove", (e) => {
+        const r = btn.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        face.style.setProperty("--ry", (px * 22).toFixed(1) + "deg");
+        face.style.setProperty("--rx", (py * -22).toFixed(1) + "deg");
+      });
+      btn.addEventListener("pointerleave", () => {
+        face.style.removeProperty("--rx");
+        face.style.removeProperty("--ry");
+      });
+    }
+    const up = () => btn.classList.remove("is-pressed");
+    btn.addEventListener("pointerdown", () => btn.classList.add("is-pressed"));
+    btn.addEventListener("pointerup", () => setTimeout(up, 90));
+    btn.addEventListener("pointercancel", up);
+    btn.addEventListener("pointerleave", up);
   });
 }

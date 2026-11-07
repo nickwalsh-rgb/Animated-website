@@ -266,7 +266,7 @@ body.menu-open .nav__count span { color: var(--ink); }
 
 /* Film grain over everything — keeps the flat colour feeling printed, not digital */
 .grain {
-  position: fixed; inset: -50%; z-index: 90; pointer-events: none;
+  position: fixed; inset: -50%; z-index: 40; pointer-events: none; /* under the nav, menu and bag */
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
   opacity: .09;
   animation: grain 1s steps(4) infinite;
@@ -491,7 +491,7 @@ body.menu-open .nav__count span { color: var(--ink); }
   font-size: 14px; color: var(--bone-soft);
   margin-bottom: clamp(64px, 12vh, 140px);
 }
-.footer__row p:last-child { text-align: right; }
+.footer__end p { text-align: right; }
 .footer__row nav { display: flex; gap: 28px; }
 .footer__row nav a {
   font-family: var(--font-display); font-weight: 500; font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: var(--bone);
@@ -501,7 +501,7 @@ body.menu-open .nav__count span { color: var(--ink); }
 
 @media (max-width: 720px) {
   .footer__row { grid-template-columns: 1fr; }
-  .footer__row p:last-child { text-align: left; }
+  .footer__end p { text-align: left; }
   .footer__row nav { flex-wrap: wrap; gap: 16px 24px; }
 }
 
@@ -716,6 +716,102 @@ body.menu-open .nav__count span { color: var(--ink); }
 }
 
 /* ==========================================================================
+   Social buttons — a raised key on a base: lifts toward you on hover,
+   presses down onto the base when clicked
+   ========================================================================== */
+.social {
+  --s: 38px;                 /* button size */
+  --rest: 3px;               /* how far the face sits above the base */
+  --lift: 7px;               /* hover lift */
+  --face: var(--ink); --icon: var(--bone); --base: #0b0e0c; --rim: rgba(255,255,255,.08);
+  display: flex; align-items: center; gap: 10px;
+}
+/* Light glyphs on dark sections */
+body[data-nav="ink"] .social--nav,
+body[data-nav="pine"] .social--nav,
+body[data-nav="film"] .social--nav,
+body.menu-open .social--nav,
+.social--menu,
+.social--footer { --face: var(--bone); --icon: var(--ink); --base: #9d998e; --rim: rgba(255,255,255,.55); }
+
+.social__btn {
+  position: relative; display: block;
+  width: var(--s); height: calc(var(--s) + var(--rest));
+  padding-top: var(--rest);
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+.social__base,
+.social__face {
+  position: absolute; left: 0; width: var(--s); height: var(--s); border-radius: 12px;
+}
+.social__base {
+  bottom: 0; background: var(--base);
+  box-shadow: 0 1px 2px rgba(0,0,0,.25);
+  transition: box-shadow .5s var(--ease-out);
+}
+.social__face {
+  bottom: var(--rest);
+  display: grid; place-items: center;
+  background: var(--face); color: var(--icon);
+  box-shadow:
+    inset 0 1px 0 var(--rim),
+    inset 0 -1px 0 rgba(0,0,0,.18),
+    0 calc(var(--rest) * 1.5) calc(var(--rest) * 3) -2px rgba(0,0,0,.25);
+  transform: perspective(260px) rotateX(0deg) rotateY(0deg) scale(1);
+  transition:
+    transform .55s cubic-bezier(.34, 1.56, .64, 1),
+    bottom .55s cubic-bezier(.34, 1.56, .64, 1),
+    box-shadow .55s var(--ease-out),
+    background-color .5s, color .5s;
+}
+.social__face svg { width: 50%; height: 50%; transition: transform .55s cubic-bezier(.34, 1.56, .64, 1); }
+
+/* Hover / keyboard focus: rises forward, tilts toward the pointer (set by JS), shadow grows */
+.social__btn:hover .social__face,
+.social__btn:focus-visible .social__face {
+  bottom: var(--lift);
+  transform: perspective(260px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) scale(1.06);
+}
+/* Cast shadow: its own soft layer under the key, grows as the key lifts */
+.social__btn { isolation: isolate; }
+.social__btn::after {
+  content: ""; position: absolute; z-index: -1;
+  left: 12%; right: 12%; bottom: -3px; height: 55%;
+  border-radius: 50%; background: rgba(0,0,0,.42); filter: blur(7px);
+  opacity: 0; transform: scale(.7);
+  transition: opacity .5s var(--ease-out), transform .55s cubic-bezier(.34, 1.56, .64, 1);
+  pointer-events: none;
+}
+.social__btn:hover::after,
+.social__btn:focus-visible::after { opacity: 1; transform: scale(1); }
+.social__btn:active::after,
+.social__btn.is-pressed::after { opacity: 0; transform: scale(.7); transition-duration: .08s; }
+.social__btn:hover .social__face svg { transform: scale(1.08); }
+.social__btn:focus-visible .social__base { box-shadow: 0 0 0 2px var(--face), 0 0 0 4px var(--base); }
+
+/* Pressed: face drops flush onto the base */
+.social__btn:active .social__face,
+.social__btn.is-pressed .social__face {
+  bottom: 0;
+  transform: perspective(260px) scale(.97);
+  box-shadow: inset 0 1px 0 var(--rim), inset 0 2px 6px rgba(0,0,0,.28);
+  transition-duration: .08s;
+}
+.social__btn:active .social__face svg { transform: scale(.94); transition-duration: .08s; }
+
+.social--footer { --s: 48px; --rest: 4px; --lift: 9px; gap: 14px; }
+.social--footer .social__base, .social--footer .social__face { border-radius: 14px; }
+.social--menu { --s: 40px; }
+
+.footer__end { display: flex; flex-direction: column; align-items: flex-end; gap: 18px; }
+
+@media (max-width: 720px) {
+  .social--nav { display: none; }      /* no room up top on phones: lives in the menu + footer */
+  .footer__end { align-items: flex-start; }
+}
+
+/* ==========================================================================
    Reduced motion: everything visible, no loader
    ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
@@ -728,4 +824,6 @@ body.menu-open .nav__count span { color: var(--ink); }
   .field__video { transform: none; }
   .field__shade { opacity: 1; }
   .field__meta { display: none; }
+  .social__face, .social__face svg { transition-duration: .01s !important; }
+  .social__btn:hover .social__face { transform: none; }
 }
