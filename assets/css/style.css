@@ -9,6 +9,13 @@
   --ink-soft: rgba(27, 33, 29, 0.7);   /* 5.3:1+ on paper and bone (WCAG AA) */
   --bone-soft: rgba(230, 227, 218, 0.7); /* 5.2:1+ on ink and pine */
 
+  /* Accent: burnt orange. Used sparingly, on light sections only (paper, bone):
+     signals (bag count, drop date, countdown, progress, markers, Sold stamps, focus)
+     plus ONE primary action per page. 5.5:1 on paper, 4.7:1 on bone, paper text on it 5.5:1.
+     Dark sections (ink, pine) keep bone and ink; the accent is too dark to read there. */
+  --accent: #a3471f;
+  --accent-deep: #8a3a18;  /* hover / pressed: 7.1:1 with paper text */
+
   --font-display: "Archivo Narrow", "Arial Narrow", sans-serif;
   --font-body: "Archivo", system-ui, sans-serif;
 
@@ -513,8 +520,9 @@ body.menu-open .nav__count span { color: var(--ink); }
 }
 .join__form button:hover { background: var(--pine); }
 .join__note { margin-top: 18px; font-size: 14px; color: var(--ink-soft); min-height: 1.5em; }
-.join.is-error .join__field { border-color: #8a3b2e; }
-.join.is-error .join__note { color: #8a3b2e; }
+.join.is-error .join__field { border-bottom: 2px solid var(--ink); margin-bottom: -1px; }
+.join.is-error .join__note { color: var(--ink); font-weight: 500; }
+.join.is-error .join__note::before { content: "! "; font-weight: 600; }
 
 /* ==========================================================================
    Footer
@@ -1114,9 +1122,9 @@ body:has(.shop), body:has(.record), body:has(.info) { background: var(--paper); 
 .info__table tbody tr { border-top: 1px solid rgba(27,33,29,.12); }
 .info__updated { font-size: 14px !important; color: var(--ink-soft); margin-bottom: 8px; }
 /* Visible markers for content still to be supplied */
-.tbc { padding: 1px 8px; border-radius: 4px; background: rgba(138,59,46,.1); color: #8a3b2e; font-size: .9em; font-weight: 500; }
-.tbc-block { padding: 16px 18px; border: 1px dashed #8a3b2e; border-radius: 4px; color: #8a3b2e !important; }
-.legal-note { padding: 14px 18px; margin-bottom: 8px; border-left: 3px solid #8a3b2e; background: rgba(138,59,46,.06); font-size: 15px !important; }
+.tbc { padding: 1px 8px; border-radius: 4px; border: 1px dashed var(--ink-soft); color: var(--ink); font-size: .9em; font-weight: 500; }
+.tbc-block { padding: 16px 18px; border: 1px dashed var(--ink-soft); border-radius: 4px; color: var(--ink-soft) !important; }
+.legal-note { padding: 14px 18px; margin-bottom: 8px; border-left: 3px solid var(--ink); background: rgba(27,33,29,.05); font-size: 15px !important; }
 @media (max-width: 720px) {
   .info__details div { grid-template-columns: 1fr; gap: 2px; }
   .info__table thead { display: none; }
@@ -1255,6 +1263,39 @@ body:has(.lookbook) { background: var(--paper); }
   .look.is-flipped { grid-template-columns: 1fr; }
   .look.is-flipped .look__figure { order: 0; }
 }
+
+/* ==========================================================================
+   Accent (burnt orange): signals + one primary action per page
+   ========================================================================== */
+/* Signals */
+::selection { background: var(--accent); color: var(--paper); }
+:focus-visible { outline-color: var(--accent); }
+[data-theme="ink"] :focus-visible, [data-theme="pine"] :focus-visible, [data-theme="film"] :focus-visible,
+.menu :focus-visible, .footer :focus-visible, .marquee :focus-visible { outline-color: currentColor; }
+body[data-nav="bone"]:not(.menu-open) .nav__count,
+body[data-nav="paper"]:not(.menu-open) .nav__count { background: var(--accent); }
+body[data-nav="bone"]:not(.menu-open) .nav__count span,
+body[data-nav="paper"]:not(.menu-open) .nav__count span { color: var(--paper); }
+.hero__drop { color: var(--accent); }
+.archive__progress span { background: var(--accent); }
+.cd__num { color: var(--accent); }
+.countdown__title a { color: var(--accent); }
+.pdp__sold { color: var(--accent); border-color: var(--accent); }
+.tag--paper .tag__stamp { color: var(--accent); }
+/* Lookbook markers: filled accent dot with a bone ring so it reads on any photo */
+.hotspot__dot { background: var(--accent); color: var(--paper); box-shadow: 0 0 0 2px var(--bone), 0 4px 14px rgba(0,0,0,.28); }
+.hotspot:hover .hotspot__dot, .hotspot.is-active .hotspot__dot, .hotspot.is-linked .hotspot__dot { background: var(--paper); color: var(--accent); }
+.hotspot.is-sold .hotspot__dot { background: var(--bone); color: var(--ink); }
+.look__piece.is-active .look__num, .look__piece.is-linked .look__num, .look__piece:hover .look__num { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+
+/* One primary action per page: homepage "Shop the archive", product "Add to bag",
+   lookbook card "Add to bag", bag "Checkout". Everything else stays ink. */
+.btn--accent { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+.btn--accent:hover { background: var(--accent-deep); border-color: var(--accent-deep); }
+.buy-btn, .look__add, .cart__checkout { background: var(--accent); color: var(--paper); }
+.buy-btn:hover, .look__add:hover, .cart__checkout:hover:not(:disabled) { background: var(--accent-deep); }
+.buy-btn .tag__cta { background: var(--paper); color: var(--accent); }
+.cart__checkout:disabled { background: var(--ink); }
 
 /* ==========================================================================
    Reduced motion: everything visible, no loader
