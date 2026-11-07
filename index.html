@@ -76,7 +76,7 @@
       },
       {
         "@type": "ItemList",
-        "name": "The archive",
+        "name": "Season one",
         "itemListElement": [
           {
             "@type": "ListItem",
@@ -175,12 +175,12 @@
       <div class="menu__col">
         <span class="eyebrow menu__eyebrow">Shop by category</span>
         <ul class="menu__cats">
-          <li><a href="#shop-all" data-cat="all" data-img="1" data-desc="Everything currently in the archive. One of each, numbered."><span class="menu__num">00</span><span class="menu__name"><span>All pieces</span></span><span class="menu__count">05</span><span class="menu__arrow" aria-hidden="true">→</span></a></li>
-          <li><a href="#shop-outerwear" data-cat="outerwear" data-img="2" data-desc="Chore coats, waxed jackets and field layers, built for weather."><span class="menu__num">01</span><span class="menu__name"><span>Outerwear</span></span><span class="menu__count">02</span><span class="menu__arrow" aria-hidden="true">→</span></a></li>
-          <li><a href="#shop-knitwear" data-cat="knitwear" data-img="3" data-desc="Heavy-gauge wool and cotton knits, softened by years of wear."><span class="menu__num">02</span><span class="menu__name"><span>Knitwear</span></span><span class="menu__count">01</span><span class="menu__arrow" aria-hidden="true">→</span></a></li>
-          <li><a href="#shop-denim" data-cat="denim" data-img="4" data-desc="Selvedge and rigid denim with honest fades."><span class="menu__num">03</span><span class="menu__name"><span>Denim</span></span><span class="menu__count">01</span><span class="menu__arrow" aria-hidden="true">→</span></a></li>
-          <li><a href="#shop-workwear" data-cat="workwear" data-img="5" data-desc="Overshirts and utility pieces made to be used."><span class="menu__num">04</span><span class="menu__name"><span>Workwear</span></span><span class="menu__count">01</span><span class="menu__arrow" aria-hidden="true">→</span></a></li>
-          <li><a href="#shop-jersey" data-cat="jersey" data-img="1" data-desc="Rugby shirts and heavyweight tops."><span class="menu__num">05</span><span class="menu__name"><span>Jersey</span></span><span class="menu__count">00</span><span class="menu__arrow" aria-hidden="true">→</span></a></li>
+          <li><a href="shop/" data-cat="all" data-img="1" data-desc="Everything available now. One of each, numbered."><span class="menu__num">00</span><span class="menu__name"><span>All pieces</span></span><span class="menu__count">05</span><span class="menu__arrow" aria-hidden="true">→</span></a></li>
+          <li><a href="shop/?cat=outerwear" data-cat="outerwear" data-img="2" data-desc="Chore coats, waxed jackets and field layers, built for weather."><span class="menu__num">01</span><span class="menu__name"><span>Outerwear</span></span><span class="menu__count">02</span><span class="menu__arrow" aria-hidden="true">→</span></a></li>
+          <li><a href="shop/?cat=knitwear" data-cat="knitwear" data-img="3" data-desc="Heavy-gauge wool and cotton knits, softened by years of wear."><span class="menu__num">02</span><span class="menu__name"><span>Knitwear</span></span><span class="menu__count">01</span><span class="menu__arrow" aria-hidden="true">→</span></a></li>
+          <li><a href="shop/?cat=denim" data-cat="denim" data-img="4" data-desc="Selvedge and rigid denim with honest fades."><span class="menu__num">03</span><span class="menu__name"><span>Denim</span></span><span class="menu__count">01</span><span class="menu__arrow" aria-hidden="true">→</span></a></li>
+          <li><a href="shop/?cat=workwear" data-cat="workwear" data-img="5" data-desc="Overshirts and utility pieces made to be used."><span class="menu__num">04</span><span class="menu__name"><span>Workwear</span></span><span class="menu__count">01</span><span class="menu__arrow" aria-hidden="true">→</span></a></li>
+          <li><a href="shop/?cat=jersey" data-cat="jersey" data-img="1" data-desc="Rugby shirts and heavyweight tops."><span class="menu__num">05</span><span class="menu__name"><span>Jersey</span></span><span class="menu__count">00</span><span class="menu__arrow" aria-hidden="true">→</span></a></li>
         </ul>
       </div>
 
@@ -189,15 +189,16 @@
           <img class="menu__img is-active" src="assets/img/menu-1.jpg" alt="" loading="lazy" />
           <img class="menu__img" src="assets/img/menu-1.jpg" alt="" loading="lazy" />
         </div>
-        <p class="menu__desc js-menu-desc">Everything currently in the archive. One of each, numbered.</p>
+        <p class="menu__desc js-menu-desc">Everything available now. One of each, numbered.</p>
       </div>
 
       <div class="menu__foot">
         <nav class="menu__links" aria-label="More">
-          <a href="#story">Story</a>
-          <a href="#label">Label</a>
+          <a href="record/">The record</a>
+          <a href="about/">About</a>
+          <a href="size-guide/">Size guide</a>
           <a href="#returns">Returns</a>
-          <a href="#join">Join the list</a>
+          <a href="contact/">Contact</a>
         </nav>
         <ul class="social social--menu" aria-label="Archive 88 on social media"><li><a class="social__btn" href="https://www.instagram.com/archive88/" target="_blank" rel="noopener noreferrer" aria-label="Instagram (opens in a new tab)"><span class="social__base" aria-hidden="true"></span><span class="social__face"><svg aria-hidden="true"><use href="#ico-instagram"/></svg></span></a></li><li><a class="social__btn" href="https://www.facebook.com/archive88" target="_blank" rel="noopener noreferrer" aria-label="Facebook (opens in a new tab)"><span class="social__base" aria-hidden="true"></span><span class="social__face"><svg aria-hidden="true"><use href="#ico-facebook"/></svg></span></a></li></ul>
       </div>
@@ -249,6 +250,7 @@
         <div class="field__frame">
           <video class="field__video" muted loop playsinline preload="metadata"
                  poster="assets/img/forest-poster.jpg" aria-hidden="true">
+            <source src="assets/video/forest-portrait.mp4" type="video/mp4" media="(max-width: 720px) and (orientation: portrait)" />
             <source src="assets/video/forest.mp4" type="video/mp4" />
           </video>
           <div class="field__shade"></div>
@@ -277,11 +279,14 @@
         <div class="archive__head">
           <span class="eyebrow">The archive</span>
           <h2 class="display">Season one,<br />one of each.</h2>
-          <div class="archive__progress" aria-hidden="true"><span class="js-progress"></span></div>
+          <div class="archive__side">
+            <div class="archive__progress" aria-hidden="true"><span class="js-progress"></span></div>
+            <a class="archive__all" href="shop/">Shop all <span aria-hidden="true">→</span></a>
+          </div>
         </div>
 
         <div class="archive__track">
-          <article class="tag tag--ink" data-cat="outerwear">
+          <article class="tag tag--ink" data-cat="outerwear" data-size="m" data-sold="0" data-price="185" data-no="001">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 001</span><span>M</span></div>
             <a class="tag__photo is-empty" href="products/chore-jacket/" tabindex="-1" aria-hidden="true"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
@@ -291,7 +296,7 @@
               <button class="tag__add js-add" type="button" data-id="001" data-name="Chore Jacket" data-cat="Outerwear" data-price="185" data-theme="tag--ink" data-img="" data-url="products/chore-jacket/"><span class="tag__price">£185</span><span class="tag__cta">Add to bag</span></button>
             </div>
           </article>
-          <article class="tag tag--pine" data-cat="knitwear">
+          <article class="tag tag--pine" data-cat="knitwear" data-size="l" data-sold="0" data-price="140" data-no="002">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 002</span><span>L</span></div>
             <a class="tag__photo is-empty" href="products/fisherman-knit/" tabindex="-1" aria-hidden="true"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
@@ -301,7 +306,7 @@
               <button class="tag__add js-add" type="button" data-id="002" data-name="Fisherman Knit" data-cat="Knitwear" data-price="140" data-theme="tag--pine" data-img="" data-url="products/fisherman-knit/"><span class="tag__price">£140</span><span class="tag__cta">Add to bag</span></button>
             </div>
           </article>
-          <article class="tag tag--paper" data-cat="denim">
+          <article class="tag tag--paper" data-cat="denim" data-size="w32-l32" data-sold="0" data-price="160" data-no="003">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 003</span><span>W32 L32</span></div>
             <a class="tag__photo is-empty" href="products/selvedge-denim/" tabindex="-1" aria-hidden="true"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
@@ -311,7 +316,7 @@
               <button class="tag__add js-add" type="button" data-id="003" data-name="Selvedge Denim" data-cat="Denim" data-price="160" data-theme="tag--paper" data-img="" data-url="products/selvedge-denim/"><span class="tag__price">£160</span><span class="tag__cta">Add to bag</span></button>
             </div>
           </article>
-          <article class="tag tag--ink" data-cat="workwear">
+          <article class="tag tag--ink" data-cat="workwear" data-size="m" data-sold="0" data-price="120" data-no="004">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 004</span><span>M</span></div>
             <a class="tag__photo is-empty" href="products/field-overshirt/" tabindex="-1" aria-hidden="true"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
@@ -321,7 +326,7 @@
               <button class="tag__add js-add" type="button" data-id="004" data-name="Field Overshirt" data-cat="Workwear" data-price="120" data-theme="tag--ink" data-img="" data-url="products/field-overshirt/"><span class="tag__price">£120</span><span class="tag__cta">Add to bag</span></button>
             </div>
           </article>
-          <article class="tag tag--pine" data-cat="outerwear">
+          <article class="tag tag--pine" data-cat="outerwear" data-size="l" data-sold="0" data-price="210" data-no="005">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 005</span><span>L</span></div>
             <a class="tag__photo is-empty" href="products/waxed-hunting-coat/" tabindex="-1" aria-hidden="true"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
@@ -331,7 +336,7 @@
               <button class="tag__add js-add" type="button" data-id="005" data-name="Waxed Hunting Coat" data-cat="Outerwear" data-price="210" data-theme="tag--pine" data-img="" data-url="products/waxed-hunting-coat/"><span class="tag__price">£210</span><span class="tag__cta">Add to bag</span></button>
             </div>
           </article>
-          <article class="tag tag--paper is-sold" data-cat="jersey">
+          <article class="tag tag--paper is-sold" data-cat="jersey" data-size="m" data-sold="1" data-price="95" data-no="006">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 006</span><span>M</span></div>
             <a class="tag__photo is-empty" href="products/rugby-shirt/" tabindex="-1" aria-hidden="true"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg><span class="tag__stamp">Sold</span></a>
@@ -427,7 +432,7 @@
     <section class="join" id="join" data-theme="paper">
       <span class="eyebrow">Join the list</span>
       <h2 class="display js-lines">First look at<br />every drop.</h2>
-      <p class="join__drop js-reveal js-drop" data-drop="2026-12-04T19:00:00+00:00">Next drop: <time datetime="2026-12-04T19:00:00+00:00">Friday 4 December, 7pm</time></p>
+      <div class="countdown js-countdown js-drop js-reveal" data-drop="2026-12-04T19:00:00+00:00" role="timer" aria-label="Time until Season two: Friday 4 December, 7pm"><p class="countdown__title">Season two drops Friday 4 December, 7pm</p><div class="countdown__units" aria-hidden="true"><span class="cd__unit"><span class="cd__num js-cd-d">00</span><span class="cd__label">Days</span></span><span class="cd__unit"><span class="cd__num js-cd-h">00</span><span class="cd__label">Hours</span></span><span class="cd__unit"><span class="cd__num js-cd-m">00</span><span class="cd__label">Minutes</span></span><span class="cd__unit"><span class="cd__num js-cd-s">00</span><span class="cd__label">Seconds</span></span></div></div>
       <form class="join__form js-reveal" novalidate>
         <label class="join__label" for="email">Email address</label>
         <div class="join__field">
@@ -443,12 +448,22 @@
   <footer class="footer" data-theme="ink">
     <div class="footer__row">
       <p>Curated pieces<br />Limited edition. Est. 1988</p>
-      <nav aria-label="Footer">
-        <a href="#archive">Archive</a>
-        <a href="#story">Story</a>
-        <a href="#label">Label</a>
-        <a href="#returns">Returns</a>
-        <a href="#join">Join</a>
+      <nav class="footer__nav" aria-label="Footer">
+        <ul>
+          <li><a href="shop/">Shop all</a></li>
+          <li><a href="record/">The record</a></li>
+          <li><a href="about/">About</a></li>
+          <li><a href="#join">Join the list</a></li>
+        </ul>
+        <ul>
+          <li><a href="size-guide/">Size guide</a></li>
+          <li><a href="#returns">Returns</a></li>
+          <li><a href="contact/">Contact</a></li>
+        </ul>
+        <ul>
+          <li><a href="privacy/">Privacy</a></li>
+          <li><a href="terms/">Terms of sale</a></li>
+        </ul>
       </nav>
       <div class="footer__end">
         <ul class="social social--footer" aria-label="Archive 88 on social media"><li><a class="social__btn" href="https://www.instagram.com/archive88/" target="_blank" rel="noopener noreferrer" aria-label="Instagram (opens in a new tab)"><span class="social__base" aria-hidden="true"></span><span class="social__face"><svg aria-hidden="true"><use href="#ico-instagram"/></svg></span></a></li><li><a class="social__btn" href="https://www.facebook.com/archive88" target="_blank" rel="noopener noreferrer" aria-label="Facebook (opens in a new tab)"><span class="social__base" aria-hidden="true"></span><span class="social__face"><svg aria-hidden="true"><use href="#ico-facebook"/></svg></span></a></li></ul>

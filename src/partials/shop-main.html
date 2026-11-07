@@ -1,0 +1,41 @@
+  <main id="top" class="shop" data-theme="paper">
+    <header class="shop__head">
+      <h1 class="display js-lines">Shop all</h1>
+      <p class="shop__count" aria-live="polite"><span class="js-shop-count">{{count}}</span> <span class="js-shop-noun">pieces</span>, one of each.</p>
+    </header>
+
+    <!-- Filters: plain buttons, state mirrored to the URL (?cat=knitwear&size=m&sold=1) -->
+    <div class="filters" role="group" aria-label="Filter pieces">
+      <div class="filters__row">
+        <span class="filters__label" id="f-cat">Category</span>
+        <div class="filters__chips" role="group" aria-labelledby="f-cat">
+{{cat_chips}}
+        </div>
+      </div>
+      <div class="filters__row">
+        <span class="filters__label" id="f-size">Size</span>
+        <div class="filters__chips" role="group" aria-labelledby="f-size">
+{{size_chips}}
+        </div>
+      </div>
+      <label class="filters__sold">
+        <input type="checkbox" class="js-show-sold" />
+        <span class="switch" aria-hidden="true"></span>
+        Include sold pieces
+      </label>
+    </div>
+
+    <h2 class="sr-only">Pieces</h2>
+    <div class="shop__grid js-grid">
+{{grid}}
+    </div>
+
+    <div class="shop__empty js-empty" hidden>
+      <p class="shop__empty-title">Nothing here right now.</p>
+      <p>Every piece is one of one, so sizes come and go. {{join_note}}</p>
+      <div class="shop__empty-actions">
+        <button class="btn js-clear" type="button">Clear filters</button>
+        <a class="btn btn--ink" href="{{home}}#join">Join the list</a>
+      </div>
+    </div>
+  </main>

@@ -3,8 +3,11 @@
   const { $, $$, site, motion, splitLines, splitWords } = window.A88;
   const body = document.body;
 
-  // Menu categories scroll the archive track here instead of navigating.
-  window.A88.onCategory = scrollToCategory;
+  // Old links to #shop-<category> now live on the shop page.
+  if (window.location.hash.startsWith("#shop-")) {
+    window.location.replace(`shop/?cat=${encodeURIComponent(window.location.hash.slice(6))}`);
+    return;
+  }
 
   if (!motion) {
     body.classList.remove("is-loading");
@@ -192,30 +195,12 @@
      helpers
      ====================================================================== */
 
-  /* Scroll to the first piece of a category inside the pinned horizontal track. */
-  function scrollToCategory(cat) {
-    const tag = cat === "all" ? $(".tag") : $(`.archive .tag[data-cat="${cat}"]`);
-    const track = $(".archive__track");
-    const st = window.ScrollTrigger && ScrollTrigger.getById("archive");
-    if (!tag) return site.scrollTo("#archive");
-    const pad = parseFloat(getComputedStyle(track).paddingLeft) || 0;
-    const left = tag.getBoundingClientRect().left - track.getBoundingClientRect().left - pad;
-    if (st) {
-      const maxX = Math.max(1, track.scrollWidth - window.innerWidth);
-      const x = gsap.utils.clamp(0, maxX, left);
-      site.scrollTo(st.start + (x / maxX) * (st.end - st.start) + 2);
-    } else {
-      site.scrollTo("#archive");
-      $(".archive__pin").scrollLeft = left;
-    }
-    if (motion) gsap.fromTo(tag, { y: 0 }, { y: -22, duration: 0.45, ease: "power2.out", yoyo: true, repeat: 1, delay: 1.7 });
-  }
-
-  /* Arriving from a product page: #shop-<category> or a section anchor such as #returns. */
+  /* Arriving from another page with a section anchor such as #returns or #join. */
   function arriveFromHash() {
     const h = window.location.hash;
-    if (!h) return;
-    const go = () => (h.startsWith("#shop-") ? scrollToCategory(h.slice(6)) : site.scrollTo(h));
-    setTimeout(go, motion ? 150 : 0);
+    let target = null;
+    try { target = h && document.querySelector(h); } catch (e) { /* not a valid selector */ }
+    if (!target) return;
+    setTimeout(() => site.scrollTo(h), motion ? 150 : 0);
   }
 })();
