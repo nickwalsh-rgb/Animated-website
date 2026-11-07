@@ -21,6 +21,7 @@
         <div class="field__frame">
           <video class="field__video" muted loop playsinline preload="metadata"
                  poster="assets/img/forest-poster.jpg" aria-hidden="true">
+            <source src="assets/video/forest-portrait.mp4" type="video/mp4" media="(max-width: 720px) and (orientation: portrait)" />
             <source src="assets/video/forest.mp4" type="video/mp4" />
           </video>
           <div class="field__shade"></div>
@@ -48,8 +49,11 @@
       <div class="archive__pin">
         <div class="archive__head">
           <span class="eyebrow">The archive</span>
-          <h2 class="display">Season one,<br />one of each.</h2>
-          <div class="archive__progress" aria-hidden="true"><span class="js-progress"></span></div>
+          <h2 class="display">{{drop_name}},<br />one of each.</h2>
+          <div class="archive__side">
+            <div class="archive__progress" aria-hidden="true"><span class="js-progress"></span></div>
+            <a class="archive__all" href="shop/">Shop all <span aria-hidden="true">→</span></a>
+          </div>
         </div>
 
         <div class="archive__track">
@@ -121,7 +125,7 @@
     <section class="join" id="join" data-theme="paper">
       <span class="eyebrow">Join the list</span>
       <h2 class="display js-lines">First look at<br />every drop.</h2>
-      {{next_drop_join}}
+      {{countdown}}
       <form class="join__form js-reveal" novalidate>
         <label class="join__label" for="email">Email address</label>
         <div class="join__field">

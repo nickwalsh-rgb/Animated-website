@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://nickwalsh-rgb.github.io/Animated-website/</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://nickwalsh-rgb.github.io/Animated-website/products/chore-jacket/</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://nickwalsh-rgb.github.io/Animated-website/products/fisherman-knit/</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://nickwalsh-rgb.github.io/Animated-website/products/selvedge-denim/</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://nickwalsh-rgb.github.io/Animated-website/products/field-overshirt/</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://nickwalsh-rgb.github.io/Animated-website/products/waxed-hunting-coat/</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://nickwalsh-rgb.github.io/Animated-website/products/rugby-shirt/</loc><lastmod>2026-11-07</lastmod></url>
+  <url><loc>https://nickwalsh-rgb.github.io/Animated-website/</loc></url>
+  <url><loc>https://nickwalsh-rgb.github.io/Animated-website/shop/</loc></url>
+  <url><loc>https://nickwalsh-rgb.github.io/Animated-website/record/</loc></url>
+  <url><loc>https://nickwalsh-rgb.github.io/Animated-website/about/</loc></url>
+  <url><loc>https://nickwalsh-rgb.github.io/Animated-website/contact/</loc></url>
+  <url><loc>https://nickwalsh-rgb.github.io/Animated-website/privacy/</loc></url>
+  <url><loc>https://nickwalsh-rgb.github.io/Animated-website/size-guide/</loc></url>
+  <url><loc>https://nickwalsh-rgb.github.io/Animated-website/terms/</loc></url>
+  <url><loc>https://nickwalsh-rgb.github.io/Animated-website/products/chore-jacket/</loc></url>
+  <url><loc>https://nickwalsh-rgb.github.io/Animated-website/products/fisherman-knit/</loc></url>
+  <url><loc>https://nickwalsh-rgb.github.io/Animated-website/products/selvedge-denim/</loc></url>
+  <url><loc>https://nickwalsh-rgb.github.io/Animated-website/products/field-overshirt/</loc></url>
+  <url><loc>https://nickwalsh-rgb.github.io/Animated-website/products/waxed-hunting-coat/</loc></url>
+  <url><loc>https://nickwalsh-rgb.github.io/Animated-website/products/rugby-shirt/</loc></url>
 </urlset>

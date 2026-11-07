@@ -1,0 +1,68 @@
+# Rebuilds the site from data/ and src/ so you can edit products, photos or settings
+# straight on GitHub (no Python needed on your computer).
+#
+# Runs when:
+#   - data, templates, the build script or product photos change on main
+#   - every hour, so a scheduled drop goes live on time (it only commits if something changed)
+#   - you press "Run workflow" under the Actions tab
+name: Build site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "data/**"
+      - "src/**"
+      - "build.py"
+      - "assets/products/**"
+      - "!assets/products/*/web/**"
+  schedule:
+    - cron: "7 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: build-site
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Pillow (photo resizing)
+        run: pip install --quiet "pillow>=10"
+
+      - name: Build
+        run: python build.py
+
+      - name: Commit generated files
+        id: commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nothing changed."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "Rebuild site"
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Commits pushed by this workflow don't always start a Pages build on their own,
+      # so ask for one explicitly.
+      - name: Publish to GitHub Pages
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds" || echo "Pages build request skipped"

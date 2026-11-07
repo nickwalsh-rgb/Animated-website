@@ -5,7 +5,8 @@
     "Photos: put JPG/PNG/WebP files in assets/products/<handle>/ named 01.jpg, 02.jpg ... (4:5 portrait, 1600x2000 ideal).",
     "They are picked up automatically by the build. Until then, labelled photo slots are shown.",
     "available: false marks a piece as sold. It stays on the site with a Sold stamp.",
-    "tag: hang-tag colour on the site, one of ink | pine | paper."
+    "tag: hang-tag colour on the site, one of ink | pine | paper.",
+    "drop: which drop the piece belongs to (a handle from drops.list in site.json)."
   ],
   "products": [
     {
@@ -16,14 +17,22 @@
       "price": 185,
       "available": true,
       "final_sale": false,
+      "drop": "season-one",
       "tag": "ink",
       "era": "c. 1988",
       "size": "M",
       "material": "Cotton canvas, corduroy collar",
       "condition": "Excellent",
       "condition_notes": "Soft, even fade across the body. Cleaned and pressed.",
-      "flaws": ["Small repaired tear at the left cuff"],
-      "measurements_cm": { "Pit to pit": 58, "Length": 72, "Shoulder": 48, "Sleeve": 63 },
+      "flaws": [
+        "Small repaired tear at the left cuff"
+      ],
+      "measurements_cm": {
+        "Pit to pit": 58,
+        "Length": 72,
+        "Shoulder": 48,
+        "Sleeve": 63
+      },
       "description": "A four-pocket chore jacket in faded canvas with a corduroy collar. Cut boxy, made for layering."
     },
     {
@@ -34,14 +43,22 @@
       "price": 140,
       "available": true,
       "final_sale": false,
+      "drop": "season-one",
       "tag": "pine",
       "era": "c. 1979",
       "size": "L",
       "material": "Wool",
       "condition": "Very good",
       "condition_notes": "Dense cable knit with a little natural pilling. Hand washed.",
-      "flaws": ["Light pilling under the arms"],
-      "measurements_cm": { "Pit to pit": 60, "Length": 68, "Shoulder": 52, "Sleeve": 60 },
+      "flaws": [
+        "Light pilling under the arms"
+      ],
+      "measurements_cm": {
+        "Pit to pit": 60,
+        "Length": 68,
+        "Shoulder": 52,
+        "Sleeve": 60
+      },
       "description": "A heavy cable-knit jumper in undyed wool. Warm enough for the coast in winter."
     },
     {
@@ -52,6 +69,7 @@
       "price": 160,
       "available": true,
       "final_sale": false,
+      "drop": "season-one",
       "tag": "paper",
       "era": "c. 1991",
       "size": "W32 L32",
@@ -59,7 +77,12 @@
       "condition": "Excellent",
       "condition_notes": "Honest wear at the knees and pockets. Hems intact.",
       "flaws": [],
-      "measurements_cm": { "Waist (flat)": 41, "Rise": 29, "Inseam": 81, "Leg opening": 21 },
+      "measurements_cm": {
+        "Waist (flat)": 41,
+        "Rise": 29,
+        "Inseam": 81,
+        "Leg opening": 21
+      },
       "description": "Straight-leg jeans in rigid selvedge denim with a natural fade."
     },
     {
@@ -70,14 +93,22 @@
       "price": 120,
       "available": true,
       "final_sale": false,
+      "drop": "season-one",
       "tag": "ink",
       "era": "c. 1985",
       "size": "M",
       "material": "Cotton twill",
       "condition": "Very good",
       "condition_notes": "Faded at the seams and collar. All buttons original.",
-      "flaws": ["Faint mark on the back hem"],
-      "measurements_cm": { "Pit to pit": 56, "Length": 74, "Shoulder": 47, "Sleeve": 62 },
+      "flaws": [
+        "Faint mark on the back hem"
+      ],
+      "measurements_cm": {
+        "Pit to pit": 56,
+        "Length": 74,
+        "Shoulder": 47,
+        "Sleeve": 62
+      },
       "description": "A two-pocket overshirt in sturdy twill. Wear it open over a knit or buttoned as a light jacket."
     },
     {
@@ -88,14 +119,23 @@
       "price": 210,
       "available": true,
       "final_sale": true,
+      "drop": "season-one",
       "tag": "pine",
       "era": "c. 1982",
       "size": "L",
       "material": "Waxed cotton, tartan lining",
       "condition": "Good",
       "condition_notes": "Re-waxed this season. Lining has been repaired at one pocket.",
-      "flaws": ["Creasing at the elbows", "Repaired lining at the right pocket"],
-      "measurements_cm": { "Pit to pit": 62, "Length": 80, "Shoulder": 50, "Sleeve": 64 },
+      "flaws": [
+        "Creasing at the elbows",
+        "Repaired lining at the right pocket"
+      ],
+      "measurements_cm": {
+        "Pit to pit": 62,
+        "Length": 80,
+        "Shoulder": 50,
+        "Sleeve": 64
+      },
       "description": "A waxed cotton hunting coat with a tartan lining and game pocket. Re-proofed and ready for rain."
     },
     {
@@ -106,6 +146,7 @@
       "price": 95,
       "available": false,
       "final_sale": false,
+      "drop": "season-one",
       "tag": "paper",
       "era": "c. 1988",
       "size": "M",
@@ -113,7 +154,12 @@
       "condition": "Very good",
       "condition_notes": "Rubber buttons and twill collar intact.",
       "flaws": [],
-      "measurements_cm": { "Pit to pit": 57, "Length": 73, "Shoulder": 49, "Sleeve": 61 },
+      "measurements_cm": {
+        "Pit to pit": 57,
+        "Length": 73,
+        "Shoulder": 49,
+        "Sleeve": 61
+      },
       "description": "A heavyweight striped rugby shirt with a white twill collar."
     }
   ]

@@ -26,6 +26,7 @@ The CSV import only fills metafields that already have a definition.
 | Measurements | `archive.measurements` | JSON |
 | Tag colour | `archive.tag_colour` | Single line text (ink, pine or paper) |
 | Final sale | `archive.final_sale` | True or false |
+| Drop | `archive.drop` | Single line text (e.g. Season one) |
 
 ## 2. Import the products
 
@@ -42,6 +43,7 @@ What the CSV sets:
 | `handle` | Handle (also the product URL: `/products/<handle>`) |
 | `title`, `description` | Title, Description |
 | `category` | Product type + a tag |
+| `drop` | `archive.drop` metafield + a tag (use it for the drop collection) |
 | `price` | Variant price (GBP) |
 | `available` | Inventory quantity 1 (available) or 0 (sold); "continue selling when out of stock" is off |
 | `number` | SKU `A88-<number>` + metafield |
@@ -69,6 +71,9 @@ in bulk. It helps Google and Meta catalogues.
 | `src/partials/home-main.html` | `templates/index.json` made of sections: `hero`, `film`, `story`, `archive-track` (loops over a collection), `label`, `marquee`, `returns`, `newsletter` |
 | `src/partials/product-main.html` | `sections/main-product.liquid` + `templates/product.json` |
 | the hang tag in `build.py` (`tag_card`) | `snippets/hang-tag.liquid` |
+| `src/partials/shop-main.html` + `assets/js/shop.js` | `templates/collection.json` (the "all" collection); filters can stay client-side, or use Shopify's Search & Discovery filters |
+| `src/partials/record-main.html` | a page template looping over all products (including sold) grouped by the `archive.drop` metafield |
+| `src/pages/*.html` | Shopify pages; Privacy and Terms go in **Settings > Policies** |
 | `data/site.json` values | theme settings (`config/settings_schema.json`): drop date, social links, shipping text, returns FAQ blocks |
 | `assets/css`, `assets/js`, `assets/fonts`, `assets/vendor` | theme `assets/` (flat folder; update paths with `asset_url`) |
 

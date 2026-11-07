@@ -68,6 +68,7 @@
   const A88 = (window.A88 = { $, $$, ROOT, site, motion, reduced, D, splitLines, splitWords, onCategory: null });
 
   $$(".js-year").forEach((el) => (el.textContent = new Date().getFullYear()));
+  setupCountdowns(); // before expireDropDates so a just-passed drop shows "live" instead of vanishing
   expireDropDates();
   setupForm();
   setupSocial();
@@ -121,8 +122,35 @@
      Drop dates are written at build time; hide them once the date has passed
      ====================================================================== */
   function expireDropDates() {
-    $$(".js-drop[data-drop]").forEach((el) => {
+    $$(".js-drop[data-drop]:not(.js-countdown)").forEach((el) => {
       if (new Date(el.dataset.drop) < new Date()) el.remove();
+    });
+  }
+
+  /* Live countdown to the next drop. At zero it says the drop is live and links to the shop
+     (the site rebuilds itself within the hour to show the new pieces). */
+  function setupCountdowns() {
+    $$(".js-countdown").forEach((el) => {
+      const target = new Date(el.dataset.drop).getTime();
+      const out = { d: $(".js-cd-d", el), h: $(".js-cd-h", el), m: $(".js-cd-m", el), s: $(".js-cd-s", el) };
+      const pad = (n) => String(n).padStart(2, "0");
+      let timer = null;
+      const tick = () => {
+        let secs = Math.floor((target - Date.now()) / 1000);
+        if (secs <= 0) {
+          clearInterval(timer);
+          el.classList.add("is-live");
+          el.setAttribute("aria-label", "The drop is live");
+          $(".countdown__title", el).innerHTML = `The drop is live. <a href="${ROOT}shop/">Shop it now</a>`;
+          return;
+        }
+        const d = Math.floor(secs / 86400); secs -= d * 86400;
+        const h = Math.floor(secs / 3600); secs -= h * 3600;
+        const m = Math.floor(secs / 60);
+        out.d.textContent = pad(d); out.h.textContent = pad(h); out.m.textContent = pad(m); out.s.textContent = pad(secs - m * 60);
+      };
+      tick();
+      timer = setInterval(tick, 1000);
     });
   }
 

@@ -2,16 +2,26 @@
   <footer class="footer" data-theme="ink">
     <div class="footer__row">
       <p>Curated pieces<br />Limited edition. Est. 1988</p>
-      <nav aria-label="Footer">
-        <a href="{{home}}#archive">Archive</a>
-        <a href="{{home}}#story">Story</a>
-        <a href="{{home}}#label">Label</a>
-        <a href="{{home}}#returns">Returns</a>
-        <a href="{{home}}#join">Join</a>
+      <nav class="footer__nav" aria-label="Footer">
+        <ul>
+          <li><a href="{{root}}shop/">Shop all</a></li>
+          <li><a href="{{root}}record/">The record</a></li>
+          <li><a href="{{root}}about/">About</a></li>
+          <li><a href="{{home}}#join">Join the list</a></li>
+        </ul>
+        <ul>
+          <li><a href="{{root}}size-guide/">Size guide</a></li>
+          <li><a href="{{home}}#returns">Returns</a></li>
+          <li><a href="{{root}}contact/">Contact</a></li>
+        </ul>
+        <ul>
+          <li><a href="{{root}}privacy/">Privacy</a></li>
+          <li><a href="{{root}}terms/">Terms of sale</a></li>
+        </ul>
       </nav>
       <div class="footer__end">
         {{social:footer}}
-        <p>© <span class="js-year">{{year}}</span> Archive 88</p>
+        <p>© <span class="js-year">{{year}}</span> {{biz:trading_name}}</p>
       </div>
     </div>
     <svg class="wordmark wordmark--footer" viewBox="0 0 640 68" role="img" aria-label="Archive 88">{{wm}}</svg>
