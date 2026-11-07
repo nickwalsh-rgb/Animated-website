@@ -60,7 +60,22 @@ The wordmark is the exact vector from Figma, split into one SVG symbol per lette
 - **Bag** (top right): each piece is 1 of 1, so it can only be added once. The bag is saved in the browser (`localStorage`).
 - **Returns**: steps + FAQ accordion, linked from the menu and footer.
 
+- **Social keys** (Instagram, Facebook): top right on desktop, in the menu on phones, and in the footer.
+  Each is a raised key on a base: it lifts and tilts toward the cursor on hover, and presses flush when clicked
+  (touch too). Links open in a new tab.
+
+## Meta / SEO
+
+`index.html` `<head>` has: title, description, canonical, robots, theme colour, Open Graph (incl. 1200×630
+`assets/img/og-image.jpg` with alt text), Twitter/X large card, favicon (SVG + PNG), Apple touch icon,
+`site.webmanifest`, and JSON-LD (Organization with `sameAs` social profiles + WebSite).
+
 ## To do before launch
+
+- **Site URL:** canonical, `og:url`, `og:image` and JSON-LD use `https://nickwalsh-rgb.github.io/Animated-website/`
+  (this repo's GitHub Pages address). Replace it everywhere if the site lives on its own domain. Share images must be absolute URLs.
+- **Social handles are placeholders:** `instagram.com/archive88/` and `facebook.com/archive88`. Replace with the real
+  profiles (they appear in the nav, menu, footer and JSON-LD; one search-and-replace covers all).
 
 - **Copy and pieces are placeholders.** The six hang tags (names, eras, categories) and the story text
   should be replaced with the real drop.
