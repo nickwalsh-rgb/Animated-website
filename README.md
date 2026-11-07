@@ -104,6 +104,13 @@ shows a red "To be confirmed" marker, and Privacy/Terms show a "Draft" note unti
 | Bone | `#E6E3DA` |
 | Pine | `#2F3D33` |
 | Paper | `#F5F4F0` |
+| Accent: burnt orange | `#A3471F` (hover `#8A3A18`) |
+
+**Accent rules:** light sections only (paper, bone); it's too dark to read on ink or pine.
+It marks *signals* (bag count, next drop date, countdown, archive progress, lookbook markers, Sold stamps,
+focus rings, text selection) and **one primary action per page**: "Shop the archive" on the homepage, "Add to bag"
+on product pages and lookbook cards, "Checkout" in the bag. Every other button stays ink. Errors and placeholders
+use ink (dashed outline / "!"), never the accent, so orange always means "look here".
 
 Type: **Archivo Narrow** (wordmark, display) and **Archivo** (body), self-hosted. Instagram/Facebook icons are from Phosphor Icons (MIT).
 The film (`assets/video/forest.mp4`) is the supplied clip, graded warm and muted, crossfade-looped, no audio.
