@@ -10,7 +10,7 @@
     <div class="pdp__grid">
       <!-- Gallery: real photos from assets/products/{{handle}}/, or labelled slots until they exist -->
       <div class="pdp__gallery" aria-label="Photos of the {{title_lower}}">
-        <div class="pdp__slides js-slides">
+        <div class="pdp__slides js-slides" tabindex="0" role="region" aria-label="Photos, scroll sideways for more">
 {{gallery}}
         </div>
         <div class="pdp__pager js-pager" aria-hidden="true">{{pager}}</div>

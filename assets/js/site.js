@@ -170,7 +170,14 @@
     let front = 0;
     let current = null;
 
-    [1, 2, 3, 4, 5].forEach((i) => { const im = new Image(); im.src = imgSrc(i); });
+    // Warm the preview images only when someone heads for the menu (saves ~500 KB per page view).
+    let warmed = false;
+    const warm = () => {
+      if (warmed) return;
+      warmed = true;
+      [1, 2, 3, 4, 5].forEach((i) => { const im = new Image(); im.src = imgSrc(i); });
+    };
+    ["pointerenter", "focus", "touchstart"].forEach((ev) => btn.addEventListener(ev, warm, { once: true, passive: true }));
 
     function activate(a, hovering = true) {
       list.classList.toggle("is-hovering", hovering);
@@ -196,6 +203,7 @@
     function show() {
       if (open) return;
       open = true;
+      warm();
       menu.hidden = false;
       body.classList.add("menu-open");
       btn.setAttribute("aria-expanded", "true");

@@ -6,8 +6,8 @@
   --bone: #e6e3da;
   --pine: #2f3d33;
   --paper: #f5f4f0;
-  --ink-soft: rgba(27, 33, 29, 0.6);
-  --bone-soft: rgba(230, 227, 218, 0.62);
+  --ink-soft: rgba(27, 33, 29, 0.7);   /* 5.3:1+ on paper and bone (WCAG AA) */
+  --bone-soft: rgba(230, 227, 218, 0.7); /* 5.2:1+ on ink and pine */
 
   --font-display: "Archivo Narrow", "Arial Narrow", sans-serif;
   --font-body: "Archivo", system-ui, sans-serif;
@@ -166,7 +166,8 @@ body.menu-open .nav__count span { color: var(--ink); }
 @media (max-width: 720px) {
   .nav__join { display: none; }
   .nav__logo { width: 108px; }
-  .nav__menu .nav__swap { display: none; }
+  /* Hide the word visually on phones but keep it as the button's accessible name */
+  .nav__menu .nav__swap { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .nav__cart { padding-left: 12px; }
 }
 
