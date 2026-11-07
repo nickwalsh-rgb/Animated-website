@@ -1,3 +1,6 @@
+  <a class="skip-link" href="#top">Skip to content</a>
+  <p class="sr-only js-bag-status" role="status" aria-live="polite"></p>
+
   <!-- ============ NAV ============ -->
   <header class="nav">
     <button class="nav__menu js-menu-btn" type="button" aria-expanded="false" aria-controls="menu">
@@ -63,6 +66,7 @@
         <p>Your bag is empty.</p>
         <p class="cart__empty-sub">Every piece is one of one. When it's gone, it's gone.</p>
         <a href="{{home}}#archive" class="cart__browse js-cart-browse">Browse the archive</a>
+        {{cart_suggest}}
       </div>
       <div class="cart__foot">
         <div class="cart__row"><span>Subtotal</span><span class="js-subtotal">£0</span></div>

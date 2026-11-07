@@ -115,6 +115,8 @@
     ]
   }
   </script>
+  <!-- Page transitions: note whether this page arrived via a cross-page view transition -->
+  <script>addEventListener("pagereveal",function(e){if(e.viewTransition)document.documentElement.classList.add("vt-in")});</script>
 </head>
 <body class="is-loading" data-nav="bone">
   <div class="grain" aria-hidden="true"></div>
@@ -151,13 +153,16 @@
     </div>
   </div>
 
+  <a class="skip-link" href="#top">Skip to content</a>
+  <p class="sr-only js-bag-status" role="status" aria-live="polite"></p>
+
   <!-- ============ NAV ============ -->
   <header class="nav">
     <button class="nav__menu js-menu-btn" type="button" aria-expanded="false" aria-controls="menu">
       <span class="nav__burger" aria-hidden="true"><i></i><i></i></span>
       <span class="nav__swap"><span>Menu</span><span aria-hidden="true">Close</span></span>
     </button>
-    <a href="" class="nav__logo" aria-label="Archive 88 home">
+    <a aria-current="page" href="" class="nav__logo" aria-label="Archive 88 home">
       <svg viewBox="0 0 640 68" aria-hidden="true"><use href="#wm-A" class="wm-l"/><use href="#wm-R" class="wm-l"/><use href="#wm-C" class="wm-l"/><use href="#wm-H" class="wm-l"/><use href="#wm-I" class="wm-l"/><use href="#wm-V" class="wm-l"/><use href="#wm-E" class="wm-l"/><use href="#wm-8a" class="wm-l"/><use href="#wm-8b" class="wm-l"/></svg>
     </a>
     <div class="nav__right">
@@ -221,6 +226,7 @@
         <p>Your bag is empty.</p>
         <p class="cart__empty-sub">Every piece is one of one. When it's gone, it's gone.</p>
         <a href="#archive" class="cart__browse js-cart-browse">Browse the archive</a>
+        <div class="cart__suggest"><p class="cart__suggest-title">Still in the archive</p><ul><li><a class="cart__sug" href="products/waxed-hunting-coat/"><span class="cart__swatch" style="--sw-bg:var(--pine);--sw-fg:var(--bone)"><svg viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></span><span class="cart__sug-meta"><small>No. 005, size L</small><strong>Waxed Hunting Coat</strong></span><span class="cart__price">£210</span></a></li><li><a class="cart__sug" href="products/field-overshirt/"><span class="cart__swatch" style="--sw-bg:var(--ink);--sw-fg:var(--bone)"><svg viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></span><span class="cart__sug-meta"><small>No. 004, size M</small><strong>Field Overshirt</strong></span><span class="cart__price">£120</span></a></li><li><a class="cart__sug" href="products/selvedge-denim/"><span class="cart__swatch" style="--sw-bg:var(--bone);--sw-fg:var(--ink)"><svg viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></span><span class="cart__sug-meta"><small>No. 003, size W32 L32</small><strong>Selvedge Denim</strong></span><span class="cart__price">£160</span></a></li></ul></div>
       </div>
       <div class="cart__foot">
         <div class="cart__row"><span>Subtotal</span><span class="js-subtotal">£0</span></div>
@@ -265,7 +271,7 @@
     </section>
 
     <!-- ============ STORY ============ -->
-    <section class="manifesto" id="story" data-theme="ink">
+    <section class="manifesto" id="story" data-theme="ink" data-chapter="Story">
       <div class="manifesto__inner">
         <span class="eyebrow">Story</span>
         <p class="manifesto__text js-words">
@@ -277,7 +283,7 @@
     </section>
 
     <!-- ============ ARCHIVE (horizontal, generated from data/products.json) ============ -->
-    <section class="archive" id="archive" data-theme="paper">
+    <section class="archive" id="archive" data-theme="paper" data-chapter="Archive">
       <div class="archive__pin">
         <div class="archive__head">
           <span class="eyebrow">The archive</span>
@@ -292,7 +298,7 @@
           <article class="tag tag--ink" data-cat="outerwear" data-size="m" data-sold="0" data-price="185" data-no="001">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 001</span><span>M</span></div>
-            <a class="tag__photo is-empty" href="products/chore-jacket/" tabindex="-1" aria-hidden="true"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
+            <a class="tag__photo is-empty" href="products/chore-jacket/" tabindex="-1" aria-hidden="true" style="view-transition-name: piece-chore-jacket"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
             <div class="tag__body">
               <h3><a class="tag__link" href="products/chore-jacket/">Chore Jacket</a></h3>
               <dl><dt>Category</dt><dd>Outerwear</dd><dt>Era</dt><dd>c. 1988</dd></dl>
@@ -302,7 +308,7 @@
           <article class="tag tag--pine" data-cat="knitwear" data-size="l" data-sold="0" data-price="140" data-no="002">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 002</span><span>L</span></div>
-            <a class="tag__photo is-empty" href="products/fisherman-knit/" tabindex="-1" aria-hidden="true"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
+            <a class="tag__photo is-empty" href="products/fisherman-knit/" tabindex="-1" aria-hidden="true" style="view-transition-name: piece-fisherman-knit"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
             <div class="tag__body">
               <h3><a class="tag__link" href="products/fisherman-knit/">Fisherman Knit</a></h3>
               <dl><dt>Category</dt><dd>Knitwear</dd><dt>Era</dt><dd>c. 1979</dd></dl>
@@ -312,7 +318,7 @@
           <article class="tag tag--paper" data-cat="denim" data-size="w32-l32" data-sold="0" data-price="160" data-no="003">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 003</span><span>W32 L32</span></div>
-            <a class="tag__photo is-empty" href="products/selvedge-denim/" tabindex="-1" aria-hidden="true"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
+            <a class="tag__photo is-empty" href="products/selvedge-denim/" tabindex="-1" aria-hidden="true" style="view-transition-name: piece-selvedge-denim"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
             <div class="tag__body">
               <h3><a class="tag__link" href="products/selvedge-denim/">Selvedge Denim</a></h3>
               <dl><dt>Category</dt><dd>Denim</dd><dt>Era</dt><dd>c. 1991</dd></dl>
@@ -322,7 +328,7 @@
           <article class="tag tag--ink" data-cat="workwear" data-size="m" data-sold="0" data-price="120" data-no="004">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 004</span><span>M</span></div>
-            <a class="tag__photo is-empty" href="products/field-overshirt/" tabindex="-1" aria-hidden="true"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
+            <a class="tag__photo is-empty" href="products/field-overshirt/" tabindex="-1" aria-hidden="true" style="view-transition-name: piece-field-overshirt"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
             <div class="tag__body">
               <h3><a class="tag__link" href="products/field-overshirt/">Field Overshirt</a></h3>
               <dl><dt>Category</dt><dd>Workwear</dd><dt>Era</dt><dd>c. 1985</dd></dl>
@@ -332,7 +338,7 @@
           <article class="tag tag--pine" data-cat="outerwear" data-size="l" data-sold="0" data-price="210" data-no="005">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 005</span><span>L</span></div>
-            <a class="tag__photo is-empty" href="products/waxed-hunting-coat/" tabindex="-1" aria-hidden="true"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
+            <a class="tag__photo is-empty" href="products/waxed-hunting-coat/" tabindex="-1" aria-hidden="true" style="view-transition-name: piece-waxed-hunting-coat"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
             <div class="tag__body">
               <h3><a class="tag__link" href="products/waxed-hunting-coat/">Waxed Hunting Coat</a></h3>
               <dl><dt>Category</dt><dd>Outerwear</dd><dt>Era</dt><dd>c. 1982</dd></dl>
@@ -342,7 +348,7 @@
           <article class="tag tag--paper is-sold" data-cat="jersey" data-size="m" data-sold="1" data-price="95" data-no="006">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 006</span><span>M</span></div>
-            <a class="tag__photo is-empty" href="products/rugby-shirt/" tabindex="-1" aria-hidden="true"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg><span class="tag__stamp">Sold</span></a>
+            <a class="tag__photo is-empty" href="products/rugby-shirt/" tabindex="-1" aria-hidden="true" style="view-transition-name: piece-rugby-shirt"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg><span class="tag__stamp">Sold</span></a>
             <div class="tag__body">
               <h3><a class="tag__link" href="products/rugby-shirt/">Rugby Shirt</a></h3>
               <dl><dt>Category</dt><dd>Jersey</dd><dt>Era</dt><dd>c. 1988</dd></dl>
@@ -354,7 +360,7 @@
     </section>
 
     <!-- ============ LABEL ============ -->
-    <section class="label" id="label" data-theme="pine">
+    <section class="label" id="label" data-theme="pine" data-chapter="Label">
       <div class="label__grid">
         <div class="label__copy">
           <h2 class="display js-lines">Stitched in.<br />Numbered.<br />Kept on record.</h2>
@@ -392,7 +398,7 @@
     </div>
 
     <!-- ============ SHOP THE LOOK (first look from data/lookbook.json) ============ -->
-    <section class="lookfeat" id="look" data-theme="bone" aria-label="Shop the look">
+    <section class="lookfeat" id="look" data-theme="bone" data-chapter="Look" aria-label="Shop the look">
       <article class="look" id="look-f-the-long-way-round" aria-labelledby="look-title-f-the-long-way-round">
         <figure class="look__figure is-empty js-look">
           <div class="look__slot" aria-hidden="true"><svg viewBox="0 0 146 68"><use href="#mono"/></svg><p>Editorial photo to come<small>Full length, portrait 4:5</small></p></div>
@@ -437,13 +443,14 @@
             <li class="look__piece" data-spot="2"><span class="look__num" aria-hidden="true">2</span><a class="look__name" href="products/fisherman-knit/">Fisherman Knit<small>No. 002, size L</small></a><span class="look__price">£140</span></li>
             <li class="look__piece" data-spot="3"><span class="look__num" aria-hidden="true">3</span><a class="look__name" href="products/selvedge-denim/">Selvedge Denim<small>No. 003, size W32 L32</small></a><span class="look__price">£160</span></li>
           </ol>
+          <button class="btn btn--ink look__whole js-add-look" type="button" data-ids="001,002,003" data-title="The long way round"><span class="js-look-label">Add the whole look</span> <span class="look__whole-price">£485</span></button>
           <a class="archive__all look__more" href="lookbook/">See every look <span aria-hidden="true">→</span></a>
         </div>
       </article>
     </section>
 
     <!-- ============ RETURNS ============ -->
-    <section class="returns" id="returns" data-theme="paper">
+    <section class="returns" id="returns" data-theme="paper" data-chapter="Returns">
       <div class="returns__grid">
         <div class="returns__intro">
           <h2 class="display js-lines">Returns,<br />kept simple.</h2>
@@ -483,7 +490,7 @@
     </section>
 
     <!-- ============ JOIN (shares the Returns colour band) ============ -->
-    <section class="join" id="join" data-theme="paper">
+    <section class="join" id="join" data-theme="paper" data-chapter="Join">
       <span class="eyebrow">Join the list</span>
       <h2 class="display js-lines">First look at<br />every drop.</h2>
       <div class="countdown js-countdown js-drop js-reveal" data-drop="2026-12-04T19:00:00+00:00" role="timer" aria-label="Time until Season two: Friday 4 December, 7pm"><p class="countdown__title">Season two drops Friday 4 December, 7pm</p><div class="countdown__units" aria-hidden="true"><span class="cd__unit"><span class="cd__num js-cd-d">00</span><span class="cd__label">Days</span></span><span class="cd__unit"><span class="cd__num js-cd-h">00</span><span class="cd__label">Hours</span></span><span class="cd__unit"><span class="cd__num js-cd-m">00</span><span class="cd__label">Minutes</span></span><span class="cd__unit"><span class="cd__num js-cd-s">00</span><span class="cd__label">Seconds</span></span></div></div>

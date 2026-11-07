@@ -124,6 +124,8 @@
     ]
   }
   </script>
+  <!-- Page transitions: note whether this page arrived via a cross-page view transition -->
+  <script>addEventListener("pagereveal",function(e){if(e.viewTransition)document.documentElement.classList.add("vt-in")});</script>
 </head>
 <body data-nav="paper" class="">
   <div class="grain" aria-hidden="true"></div>
@@ -147,6 +149,9 @@
       <symbol id="ico-facebook" viewBox="0 0 256 256"><path fill="currentColor" d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm8,191.63V152h24a8,8,0,0,0,0-16H136V112a16,16,0,0,1,16-16h16a8,8,0,0,0,0-16H152a32,32,0,0,0-32,32v24H96a8,8,0,0,0,0,16h24v63.63a88,88,0,1,1,16,0Z"/></symbol>
     </defs>
   </svg>
+
+  <a class="skip-link" href="#top">Skip to content</a>
+  <p class="sr-only js-bag-status" role="status" aria-live="polite"></p>
 
   <!-- ============ NAV ============ -->
   <header class="nav">
@@ -218,6 +223,7 @@
         <p>Your bag is empty.</p>
         <p class="cart__empty-sub">Every piece is one of one. When it's gone, it's gone.</p>
         <a href="../../#archive" class="cart__browse js-cart-browse">Browse the archive</a>
+        <div class="cart__suggest"><p class="cart__suggest-title">Still in the archive</p><ul><li><a class="cart__sug" href="../../products/waxed-hunting-coat/"><span class="cart__swatch" style="--sw-bg:var(--pine);--sw-fg:var(--bone)"><svg viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></span><span class="cart__sug-meta"><small>No. 005, size L</small><strong>Waxed Hunting Coat</strong></span><span class="cart__price">£210</span></a></li><li><a class="cart__sug" href="../../products/field-overshirt/"><span class="cart__swatch" style="--sw-bg:var(--ink);--sw-fg:var(--bone)"><svg viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></span><span class="cart__sug-meta"><small>No. 004, size M</small><strong>Field Overshirt</strong></span><span class="cart__price">£120</span></a></li><li><a class="cart__sug" href="../../products/selvedge-denim/"><span class="cart__swatch" style="--sw-bg:var(--bone);--sw-fg:var(--ink)"><svg viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></span><span class="cart__sug-meta"><small>No. 003, size W32 L32</small><strong>Selvedge Denim</strong></span><span class="cart__price">£160</span></a></li></ul></div>
       </div>
       <div class="cart__foot">
         <div class="cart__row"><span>Subtotal</span><span class="js-subtotal">£0</span></div>
@@ -240,7 +246,7 @@
       <!-- Gallery: real photos from assets/products/fisherman-knit/, or labelled slots until they exist -->
       <div class="pdp__gallery" aria-label="Photos of the fisherman knit">
         <div class="pdp__slides js-slides" tabindex="0" role="region" aria-label="Photos, scroll sideways for more">
-          <figure class="pdp__slide is-empty tag--pine"><svg viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg><figcaption>Front<small>Photo to come</small></figcaption></figure>
+          <figure style="view-transition-name: piece-fisherman-knit" class="pdp__slide is-empty tag--pine"><svg viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg><figcaption>Front<small>Photo to come</small></figcaption></figure>
           <figure class="pdp__slide is-empty tag--pine"><svg viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg><figcaption>Back<small>Photo to come</small></figcaption></figure>
           <figure class="pdp__slide is-empty tag--pine"><svg viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg><figcaption>Label<small>Photo to come</small></figcaption></figure>
           <figure class="pdp__slide is-empty tag--pine"><svg viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg><figcaption>Detail<small>Photo to come</small></figcaption></figure>
@@ -271,7 +277,7 @@
         <div class="pdp__details js-pdp-in">
           <div class="acc js-acc">
             <button class="acc__q" type="button" aria-expanded="true" aria-controls="pd-1" id="pd-q1"><span>Measurements</span><i aria-hidden="true"></i></button>
-            <div class="acc__a" id="pd-1" role="region" aria-labelledby="pd-q1"><div class="acc__body"><table class="pdp__measure"><caption>Measured flat, in centimetres. Labelled size: L. <a href="../../size-guide/">How we measure</a>.</caption><tbody><tr><th scope="row">Pit to pit</th><td>60 cm</td></tr><tr><th scope="row">Length</th><td>68 cm</td></tr><tr><th scope="row">Shoulder</th><td>52 cm</td></tr><tr><th scope="row">Sleeve</th><td>60 cm</td></tr></tbody></table></div></div>
+            <div class="acc__a" id="pd-1" role="region" aria-labelledby="pd-q1"><div class="acc__body"><table class="pdp__measure"><caption>Measured flat, in centimetres. Labelled size: L. <a href="../../size-guide/">How we measure</a>.</caption><tbody><tr><th scope="row">Pit to pit</th><td>60 cm</td></tr><tr><th scope="row">Length</th><td>68 cm</td></tr><tr><th scope="row">Shoulder</th><td>52 cm</td></tr><tr><th scope="row">Sleeve</th><td>60 cm</td></tr></tbody></table><form class="fit js-fit" novalidate><p class="fit__title">Check the fit</p><p class="fit__help">Lay something you own that fits well flat, measure it the same way, and compare.</p><div class="fit__row"><label class="fit__field"><span>Measurement</span><select class="js-fit-key"><option value="Pit to pit" data-cm="60">Pit to pit</option><option value="Length" data-cm="68">Length</option><option value="Shoulder" data-cm="52">Shoulder</option><option value="Sleeve" data-cm="60">Sleeve</option></select></label><label class="fit__field"><span>Yours, in cm</span><input class="js-fit-val" type="number" inputmode="decimal" min="1" max="250" step="0.5" placeholder="e.g. 56" /></label></div><div class="fit__scale js-fit-scale" aria-hidden="true" hidden><i class="fit__mark fit__mark--piece"></i><i class="fit__mark fit__mark--you"></i></div><p class="fit__out js-fit-out" role="status" aria-live="polite"></p></form></div></div>
           </div>
           <div class="acc js-acc">
             <button class="acc__q" type="button" aria-expanded="false" aria-controls="pd-2" id="pd-q2"><span>Condition</span><i aria-hidden="true"></i></button>
@@ -299,7 +305,7 @@
           <article class="tag tag--ink tag--grid js-reveal" data-cat="outerwear" data-size="m" data-sold="0" data-price="185" data-no="001">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 001</span><span>M</span></div>
-            <a class="tag__photo is-empty" href="../../products/chore-jacket/" tabindex="-1" aria-hidden="true"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
+            <a class="tag__photo is-empty" href="../../products/chore-jacket/" tabindex="-1" aria-hidden="true" style="view-transition-name: piece-chore-jacket"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
             <div class="tag__body">
               <h3><a class="tag__link" href="../../products/chore-jacket/">Chore Jacket</a></h3>
               <dl><dt>Category</dt><dd>Outerwear</dd><dt>Era</dt><dd>c. 1988</dd></dl>
@@ -309,7 +315,7 @@
           <article class="tag tag--paper tag--grid js-reveal" data-cat="denim" data-size="w32-l32" data-sold="0" data-price="160" data-no="003">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 003</span><span>W32 L32</span></div>
-            <a class="tag__photo is-empty" href="../../products/selvedge-denim/" tabindex="-1" aria-hidden="true"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
+            <a class="tag__photo is-empty" href="../../products/selvedge-denim/" tabindex="-1" aria-hidden="true" style="view-transition-name: piece-selvedge-denim"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
             <div class="tag__body">
               <h3><a class="tag__link" href="../../products/selvedge-denim/">Selvedge Denim</a></h3>
               <dl><dt>Category</dt><dd>Denim</dd><dt>Era</dt><dd>c. 1991</dd></dl>
@@ -319,7 +325,7 @@
           <article class="tag tag--ink tag--grid js-reveal" data-cat="workwear" data-size="m" data-sold="0" data-price="120" data-no="004">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 004</span><span>M</span></div>
-            <a class="tag__photo is-empty" href="../../products/field-overshirt/" tabindex="-1" aria-hidden="true"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
+            <a class="tag__photo is-empty" href="../../products/field-overshirt/" tabindex="-1" aria-hidden="true" style="view-transition-name: piece-field-overshirt"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
             <div class="tag__body">
               <h3><a class="tag__link" href="../../products/field-overshirt/">Field Overshirt</a></h3>
               <dl><dt>Category</dt><dd>Workwear</dd><dt>Era</dt><dd>c. 1985</dd></dl>
@@ -328,6 +334,7 @@
           </article>
       </div>
     </section>
+<div class="buybar js-buybar" inert><div class="buybar__meta"><strong>Fisherman Knit</strong><span>No. 002, size L</span></div><button class="buy-btn buy-btn--bar js-add" type="button" data-id="002" data-name="Fisherman Knit" data-cat="Knitwear" data-price="140" data-theme="tag--pine" data-img="" data-url="products/fisherman-knit/"><span class="tag__price">£140</span><span class="tag__cta">Add to bag</span></button></div>
   </main>
 
   <!-- ============ FOOTER ============ -->

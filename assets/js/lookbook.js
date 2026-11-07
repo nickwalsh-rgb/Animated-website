@@ -2,7 +2,7 @@
    Mouse: hover a number to preview, click to pin. Touch: tap to open, tap again or outside to close.
    Keyboard: Enter opens, Tab moves into the card, Esc closes. The piece list mirrors the markers. */
 (() => {
-  const { $, $$, motion } = window.A88;
+  const { $, $$, motion, T } = window.A88;
   const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   const gs = window.gsap && motion;
   let current = null; // { fig, spot, pop, pinned }
@@ -57,9 +57,9 @@
     current = { fig, spot, pop, pinned };
     if (gs) {
       gsap.killTweensOf([pop, ...pop.querySelectorAll(".pop__body > *")]);
-      gsap.fromTo(pop, { opacity: 0, scale: 0.9, y: 8 }, { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: "expo.out" });
+      gsap.fromTo(pop, { opacity: 0, scale: 0.9, y: 8 }, { opacity: 1, scale: 1, y: 0, duration: T.base, ease: "expo.out" });
       gsap.fromTo(pop.querySelectorAll(".pop__body > *"), { opacity: 0, y: 8 },
-        { opacity: 1, y: 0, duration: 0.45, ease: "expo.out", stagger: 0.04, delay: 0.05 });
+        { opacity: 1, y: 0, duration: T.base, ease: "expo.out", stagger: 0.04, delay: 0.05 });
     }
   }
 
@@ -74,7 +74,7 @@
     const piece = pieceFor(fig, spot.dataset.spot);
     if (piece) piece.classList.remove("is-active");
     if (gs && !immediate) {
-      gsap.to(pop, { opacity: 0, scale: 0.95, y: 4, duration: 0.2, ease: "power2.in", onComplete: () => { pop.hidden = true; } });
+      gsap.to(pop, { opacity: 0, scale: 0.95, y: 4, duration: T.fast, ease: "power2.in", onComplete: () => { pop.hidden = true; } });
     } else {
       pop.hidden = true;
     }
@@ -138,11 +138,11 @@
       // fromTo with explicit end values: on the homepage the intro refreshes ScrollTrigger
       // mid-setup, and a plain from() could then record "invisible" as its end state.
       gsap.fromTo(spots, { scale: 0, opacity: 0 }, {
-        scale: 1, opacity: 1, duration: 0.8, ease: "back.out(2.2)", stagger: 0.12, clearProps: "transform,opacity",
+        scale: 1, opacity: 1, duration: T.slow, ease: "back.out(2.2)", stagger: 0.12, clearProps: "transform,opacity",
         scrollTrigger: { trigger: fig, start: "top 70%", once: true },
       });
       gsap.fromTo($$(".look__piece", look), { opacity: 0, x: 20 }, {
-        opacity: 1, x: 0, duration: 0.8, ease: "expo.out", stagger: 0.07, clearProps: "transform,opacity",
+        opacity: 1, x: 0, duration: T.slow, ease: "expo.out", stagger: 0.07, clearProps: "transform,opacity",
         scrollTrigger: { trigger: look, start: "top 70%", once: true },
       });
     }

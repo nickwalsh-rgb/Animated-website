@@ -11,6 +11,8 @@
   const hasGsap = !!window.gsap;
   const motion = hasGsap && !reduced;
   const D = motion ? 1 : 0; // duration multiplier: 0 makes every tween instant
+  // Motion steps (seconds). Every GSAP tween uses one of these so the site keeps one rhythm.
+  const T = { fast: 0.3, base: 0.5, slow: 0.8, slower: 1.1, slowest: 1.4 };
 
   if (hasGsap && window.ScrollTrigger) gsap.registerPlugin(ScrollTrigger);
 
@@ -33,7 +35,7 @@
     scrollTo(target, offset = 0) {
       if (typeof target === "string") target = target === "#top" ? 0 : $(target);
       if (target === null || target === undefined) return;
-      if (this.lenis) this.lenis.scrollTo(target, { duration: 1.6, offset });
+      if (this.lenis) this.lenis.scrollTo(target, { duration: T.slowest, offset });
       else {
         const y = typeof target === "number" ? target : target.getBoundingClientRect().top + window.scrollY + offset;
         window.scrollTo({ top: y, behavior: reduced ? "auto" : "smooth" });
@@ -47,7 +49,7 @@
   };
 
   if (motion && window.Lenis) {
-    const lenis = new Lenis({ duration: 1.15, smoothWheel: true });
+    const lenis = new Lenis({ duration: T.slowest, smoothWheel: true });
     site.lenis = lenis;
     lenis.on("scroll", ScrollTrigger.update);
     gsap.ticker.add((t) => lenis.raf(t * 1000));
@@ -65,7 +67,7 @@
     return $$(".line > span", el);
   }
 
-  const A88 = (window.A88 = { $, $$, ROOT, site, motion, reduced, D, splitLines, splitWords, onCategory: null });
+  const A88 = (window.A88 = { $, $$, ROOT, site, motion, reduced, D, T, splitLines, splitWords, onCategory: null });
 
   $$(".js-year").forEach((el) => (el.textContent = new Date().getFullYear()));
   setupCountdowns(); // before expireDropDates so a just-passed drop shows "live" instead of vanishing
@@ -79,10 +81,21 @@
     setupAccordions();
   }
   setupNavTheme();
+  setupScrollMemory();
+
+  // Skip link: move keyboard focus to the page content, not just the scroll position.
+  const skip = $(".skip-link");
+  if (skip) skip.addEventListener("click", (e) => {
+    e.preventDefault();
+    const main = $("main");
+    main.setAttribute("tabindex", "-1");
+    main.focus({ preventScroll: true });
+    site.scrollTo(main);
+  });
 
   // Same-page anchors scroll smoothly (menu and bag links close their overlay first).
   $$('a[href^="#"]').forEach((a) => {
-    if (a.closest(".menu, .cart")) return;
+    if (a.closest(".menu, .cart") || a.classList.contains("skip-link")) return;
     a.addEventListener("click", (e) => {
       e.preventDefault();
       site.scrollTo(a.getAttribute("href"));
@@ -93,7 +106,7 @@
     $$(".js-lines").forEach((el) => {
       const lines = splitLines(el);
       gsap.from(lines, {
-        yPercent: 110, duration: 1.1, ease: "expo.out", stagger: 0.09,
+        yPercent: 110, duration: T.slower, ease: "expo.out", stagger: 0.09,
         scrollTrigger: { trigger: el, start: "top 82%" },
       });
     });
@@ -102,17 +115,17 @@
     ScrollTrigger.batch(".js-reveal", {
       start: "top 90%",
       once: true,
-      onEnter: (batch) => gsap.to(batch, { opacity: 1, y: 0, duration: 1, ease: "expo.out", stagger: 0.1 }),
+      onEnter: (batch) => gsap.to(batch, { opacity: 1, y: 0, duration: T.slower, ease: "expo.out", stagger: 0.1 }),
     });
     // Anything that receives keyboard focus before it has scrolled into view shows at once.
     document.addEventListener("focusin", (e) => {
       const el = e.target.closest(".js-reveal, .tag");
-      if (el && +getComputedStyle(el).opacity < 1) gsap.to(el, { opacity: 1, y: 0, duration: 0.3, overwrite: "auto" });
+      if (el && +getComputedStyle(el).opacity < 1) gsap.to(el, { opacity: 1, y: 0, duration: T.fast, overwrite: "auto" });
     });
     // Footer wordmark rises letter by letter. Triggered off the footer itself so it
     // still fires on phones, where the wordmark sits right at the end of the page.
     gsap.from($$(".wordmark--footer .wm-l"), {
-      y: 76, duration: 1.3, ease: "expo.out", stagger: 0.06,
+      y: 76, duration: T.slowest, ease: "expo.out", stagger: 0.06,
       scrollTrigger: { trigger: ".footer", start: "top 70%" },
     });
     window.addEventListener("load", () => ScrollTrigger.refresh());
@@ -153,6 +166,31 @@
       tick();
       timer = setInterval(tick, 1000);
     });
+  }
+
+  /* ======================================================================
+     SCROLL MEMORY: Back returns you to where you were on the page.
+     Pages call A88.restoreScroll() once their layout is final (home after its intro).
+     ====================================================================== */
+  function setupScrollMemory() {
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    const key = () => `a88-scroll:${location.pathname}${location.search}`;
+    const save = () => { try { sessionStorage.setItem(key(), String(Math.round(window.scrollY))); } catch (e) { /* private mode */ } };
+    window.addEventListener("pagehide", save);
+    document.addEventListener("click", (e) => { if (e.target.closest("a[href]")) save(); }, true);
+    A88.restoreScroll = () => {
+      const nav = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+      if (!nav || nav.type !== "back_forward") return;
+      let y = 0;
+      try { y = +sessionStorage.getItem(key()) || 0; } catch (e) { /* private mode */ }
+      if (!y) return;
+      if (site.lenis) site.lenis.scrollTo(y, { immediate: true, force: true });
+      else window.scrollTo(0, y);
+      if (window.ScrollTrigger) ScrollTrigger.update();
+    };
+    if (html.dataset.page !== "home") {
+      window.addEventListener("load", () => requestAnimationFrame(() => A88.restoreScroll()));
+    }
   }
 
   /* ======================================================================
@@ -218,13 +256,13 @@
       gsap.set(imgs[front], { zIndex: 1 });
       gsap.fromTo(next,
         { zIndex: 2, clipPath: "inset(100% 0% 0% 0%)", scale: 1.15 },
-        { clipPath: "inset(0% 0% 0% 0%)", scale: 1, duration: 1 * D, ease: "expo.out", overwrite: true });
+        { clipPath: "inset(0% 0% 0% 0%)", scale: 1, duration: T.slower * D, ease: "expo.out", overwrite: true });
       front = 1 - front;
       gsap.to(desc, {
-        autoAlpha: 0, y: -6, duration: 0.18 * D, overwrite: true,
+        autoAlpha: 0, y: -6, duration: T.fast * D, overwrite: true,
         onComplete: () => {
           desc.textContent = a.dataset.desc;
-          gsap.fromTo(desc, { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: 0.5 * D, ease: "expo.out" });
+          gsap.fromTo(desc, { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: T.base * D, ease: "expo.out" });
         },
       });
     }
@@ -241,9 +279,9 @@
       activate(links[0], false);
       gsap.killTweensOf([bg, ...names, ...extras]);
       gsap.timeline()
-        .fromTo(bg, { clipPath: "inset(0% 0% 100% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.9 * D, ease: "expo.inOut" })
-        .fromTo(names, { yPercent: 110 }, { yPercent: 0, duration: 1.1 * D, ease: "expo.out", stagger: 0.05 * D }, 0.45 * D)
-        .fromTo(extras, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.8 * D, ease: "expo.out", stagger: 0.02 * D }, 0.6 * D)
+        .fromTo(bg, { clipPath: "inset(0% 0% 100% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: T.slow * D, ease: "expo.inOut" })
+        .fromTo(names, { yPercent: 110 }, { yPercent: 0, duration: T.slower * D, ease: "expo.out", stagger: 0.05 * D }, 0.45 * D)
+        .fromTo(extras, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: T.slow * D, ease: "expo.out", stagger: 0.02 * D }, 0.6 * D)
         .add(() => links[0].focus({ preventScroll: true }), 0.5 * D);
     }
 
@@ -261,9 +299,9 @@
           if (after) after(); else btn.focus({ preventScroll: true });
         },
       })
-        .to(extras, { autoAlpha: 0, duration: 0.25 * D }, 0)
-        .to(names, { yPercent: -110, duration: 0.5 * D, ease: "power3.in", stagger: 0.025 * D }, 0)
-        .to(bg, { clipPath: "inset(0% 0% 100% 0%)", duration: 0.8 * D, ease: "expo.inOut" }, 0.25 * D);
+        .to(extras, { autoAlpha: 0, duration: T.fast * D }, 0)
+        .to(names, { yPercent: -110, duration: T.base * D, ease: "power3.in", stagger: 0.025 * D }, 0)
+        .to(bg, { clipPath: "inset(0% 0% 100% 0%)", duration: T.slow * D, ease: "expo.inOut" }, 0.25 * D);
     }
 
     btn.addEventListener("click", () => (open ? hide() : show()));
@@ -311,6 +349,14 @@
     let items = load();
     let open = false;
     let lastFocus = null;
+    const status = $(".js-bag-status");
+    const pieces = (n) => `${n} ${n === 1 ? "piece" : "pieces"}`;
+    // Screen readers hear the whole change, without focus moving.
+    const announce = (msg) => {
+      if (!status) return;
+      status.textContent = "";
+      setTimeout(() => { status.textContent = msg; }, 60);
+    };
 
     function load() {
       try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { return []; }
@@ -344,11 +390,16 @@
         $(".tag__cta", b).textContent = inBag ? "In bag" : "Add to bag";
         b.setAttribute("aria-label", `${inBag ? "In bag" : "Add to bag"}: ${b.dataset.name}, ${money(+b.dataset.price)}`);
       });
+      $$(".js-add-look").forEach((b) => {
+        const all = b.dataset.ids.split(",").every((id) => items.some((i) => i.id === id));
+        b.classList.toggle("is-added", all);
+        $(".js-look-label", b).textContent = all ? "Whole look in bag" : "Add the whole look";
+      });
     }
 
     function bump() {
       if (!D) return;
-      gsap.fromTo(countEl, { scale: 1.45 }, { scale: 1, duration: 0.7, ease: "elastic.out(1, 0.4)" });
+      gsap.fromTo(countEl, { scale: 1.45 }, { scale: 1, duration: T.slow, ease: "elastic.out(1, 0.4)" });
     }
 
     function fly(from, done) {
@@ -362,7 +413,7 @@
       const x1 = b.left + b.width / 2, y1 = b.top + b.height / 2;
       const p = { t: 0 };
       gsap.to(p, {
-        t: 1, duration: 0.85, ease: "power2.inOut",
+        t: 1, duration: T.slow, ease: "power2.inOut",
         onUpdate: () => {
           const x = x0 + (x1 - x0) * p.t;
           const y = y0 + (y1 - y0) * p.t - Math.sin(Math.PI * p.t) * 120; // gentle arc
@@ -372,24 +423,84 @@
       });
     }
 
-    function add(b) {
+    // A short tap on phones that support it (Android), never under reduced motion.
+    const haptic = () => { if (!reduced && navigator.vibrate) try { navigator.vibrate(12); } catch (e) { /* not allowed */ } };
+
+    function add(b, from = b, quiet = false) {
       const id = b.dataset.id;
-      if (items.some((i) => i.id === id)) return show();
+      if (items.some((i) => i.id === id)) return quiet ? null : show();
       const d = b.dataset;
       items.push({ id, name: d.name, cat: d.cat, price: +d.price, theme: d.theme, img: d.img || "", url: d.url || "" });
       save();
       $(".nav").classList.remove("is-hidden"); // bring the bag into view for the hand-off
       $(".tag__cta", b).textContent = "Added";
-      fly(b, () => { render(); bump(); });
+      haptic();
+      fly(from, () => { render(); bump(); });
+      if (!quiet) announce(`${d.name} added to your bag. ${pieces(items.length)} in your bag.`);
     }
+
+    // "Add the whole look": every piece in the look that isn't in the bag yet, one after another.
+    function addLook(btn) {
+      const look = btn.closest(".look") || document;
+      const todo = btn.dataset.ids.split(",").filter((id) => !items.some((i) => i.id === id))
+        .map((id) => $(`.js-add[data-id="${id}"]`, look) || $(`.js-add[data-id="${id}"]`)).filter(Boolean);
+      if (!todo.length) return show();
+      const gap = 160 * (D || 0);
+      todo.forEach((b, k) => setTimeout(() => add(b, btn, true), k * gap));
+      setTimeout(() => announce(`${btn.dataset.title}: ${pieces(todo.length)} added. ${pieces(items.length)} in your bag.`), todo.length * gap);
+    }
+
+    /* Undo: removing shows "Removed X. Undo" for a few seconds (paused while hovered or focused). */
+    const undo = document.createElement("div");
+    undo.className = "cart__undo";
+    undo.hidden = true;
+    undo.innerHTML = '<span class="js-undo-text"></span><button type="button" class="cart__undo-btn">Undo</button>';
+    $(".cart__foot", cart).before(undo);
+    let undoTimer = null, undone = null, undoHold = false;
+    const hideUndo = () => { clearTimeout(undoTimer); undo.hidden = true; undone = null; };
+    const armUndo = () => { clearTimeout(undoTimer); if (!undoHold) undoTimer = setTimeout(hideUndo, 6000); };
+    const hold = (on) => () => { undoHold = on; if (on) clearTimeout(undoTimer); else armUndo(); };
+    undo.addEventListener("pointerenter", hold(true));
+    undo.addEventListener("pointerleave", hold(false));
+    undo.addEventListener("focusin", hold(true));
+    undo.addEventListener("focusout", hold(false));
+    $(".cart__undo-btn", undo).addEventListener("click", () => {
+      if (!undone) return;
+      const { item, at } = undone;
+      if (!items.some((i) => i.id === item.id)) items.splice(Math.min(at, items.length), 0, item);
+      undoHold = false;
+      save(); render(); hideUndo();
+      announce(`${item.name} is back in your bag. ${pieces(items.length)} in your bag.`);
+      const back = $(`.cart__item[data-id="${item.id}"]`, listEl);
+      if (back) {
+        if (D) gsap.from(back, { opacity: 0, x: 40, duration: T.base, ease: "expo.out" });
+        $(".cart__remove", back).focus({ preventScroll: true });
+      }
+    });
 
     function remove(id) {
       const li = $(`.cart__item[data-id="${id}"]`, listEl);
-      const finish = () => { items = items.filter((i) => i.id !== id); save(); render(); };
+      const gone = items.find((i) => i.id === id);
+      const at = items.findIndex((i) => i.id === id);
+      // Keyboard users only (a mouse click doesn't show focus), so the toast can still time out for others.
+      const hadFocus = !!li && li.contains(document.activeElement) && document.activeElement.matches(":focus-visible");
+      const finish = () => {
+        items = items.filter((i) => i.id !== id); save(); render();
+        announce(`${gone ? gone.name : "Piece"} removed. ${pieces(items.length)} in your bag. Undo is available.`);
+        if (!gone) return;
+        undone = { item: gone, at };
+        $(".js-undo-text", undo).textContent = `Removed ${gone.name}.`;
+        undo.hidden = false;
+        // Opacity, not autoAlpha: it must stay focusable while it fades in.
+        if (D) gsap.fromTo(undo, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: T.fast, ease: "power2.out" });
+        // Focus would otherwise fall to the page: keep it in the bag, on Undo.
+        if (hadFocus) $(".cart__undo-btn", undo).focus({ preventScroll: true });
+        armUndo();
+      };
       if (!li || !D) return finish();
       gsap.timeline({ onComplete: finish })
-        .to(li, { x: 40, autoAlpha: 0, duration: 0.35, ease: "power2.in" })
-        .to(li, { height: 0, paddingTop: 0, paddingBottom: 0, borderWidth: 0, duration: 0.4, ease: "power3.inOut" });
+        .to(li, { x: 40, autoAlpha: 0, duration: T.base, ease: "power2.in" })
+        .to(li, { height: 0, paddingTop: 0, paddingBottom: 0, borderWidth: 0, duration: T.base, ease: "power3.inOut" });
     }
 
     function show() {
@@ -402,16 +513,17 @@
       render();
       gsap.killTweensOf([panel, scrim]);
       gsap.timeline()
-        .fromTo(scrim, { opacity: 0 }, { opacity: 1, duration: 0.5 * D })
-        .fromTo(panel, { xPercent: 100 }, { xPercent: 0, duration: 0.9 * D, ease: "expo.out" }, 0)
+        .fromTo(scrim, { opacity: 0 }, { opacity: 1, duration: T.base * D })
+        .fromTo(panel, { xPercent: 100 }, { xPercent: 0, duration: T.slow * D, ease: "expo.out" }, 0)
         .fromTo($$(".cart__head, .cart__item, .cart__empty > *, .cart__foot", cart),
-          { autoAlpha: 0, x: 30 }, { autoAlpha: 1, x: 0, duration: 0.8 * D, ease: "expo.out", stagger: 0.05 * D }, 0.15 * D);
+          { autoAlpha: 0, x: 30 }, { autoAlpha: 1, x: 0, duration: T.slow * D, ease: "expo.out", stagger: 0.05 * D }, 0.15 * D);
       $(".cart__close", cart).focus({ preventScroll: true });
     }
 
     function hide(after) {
       if (!open) return;
       open = false;
+      hideUndo();
       btn.setAttribute("aria-expanded", "false");
       gsap.killTweensOf([panel, scrim]);
       gsap.timeline({
@@ -421,8 +533,8 @@
           if (after) after(); else if (lastFocus) lastFocus.focus({ preventScroll: true });
         },
       })
-        .to(panel, { xPercent: 100, duration: 0.6 * D, ease: "expo.in" })
-        .to(scrim, { opacity: 0, duration: 0.4 * D }, 0.2 * D);
+        .to(panel, { xPercent: 100, duration: T.slow * D, ease: "expo.in" })
+        .to(scrim, { opacity: 0, duration: T.base * D }, 0.2 * D);
     }
 
     btn.addEventListener("click", show);
@@ -437,6 +549,7 @@
       if (r) remove(r.dataset.id);
     });
     $$(".js-add").forEach((b) => b.addEventListener("click", () => add(b)));
+    $$(".js-add-look").forEach((b) => b.addEventListener("click", () => addLook(b)));
     checkout.addEventListener("click", () => {
       // TODO (Shopify): POST `items` to /cart/add.js then go to /checkout, or build a cart permalink.
       note.textContent = "Checkout isn't open yet. Your bag is saved on this device.";
@@ -466,16 +579,16 @@
         gsap.killTweensOf([a, inner]);
         if (isOpen) {
           gsap.to(a, {
-            height: 0, duration: 0.5 * D, ease: "power3.inOut",
+            height: 0, duration: T.base * D, ease: "power3.inOut",
             onComplete: () => { a.hidden = true; gsap.set(a, { clearProps: "height" }); refresh(); },
           });
         } else {
           a.hidden = false;
           gsap.fromTo(a, { height: 0 }, {
-            height: "auto", duration: 0.7 * D, ease: "expo.out",
+            height: "auto", duration: T.slow * D, ease: "expo.out",
             onComplete: () => { gsap.set(a, { clearProps: "height" }); refresh(); },
           });
-          gsap.fromTo(inner, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.7 * D, delay: 0.08 * D, ease: "expo.out" });
+          gsap.fromTo(inner, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: T.slow * D, delay: 0.08 * D, ease: "expo.out" });
         }
       });
     });
@@ -497,16 +610,54 @@
     if (!form) return;
     const note = $(".js-note");
     const section = $(".join");
-    form.addEventListener("submit", (e) => {
+    const input = $("input", form);
+    const button = $("button", form);
+    const label = $("span", button);
+    const DEFAULT = note.textContent;
+    const valid = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+    let busy = false;
+
+    const state = (name, msg) => {
+      section.classList.remove("is-error", "is-busy", "is-done");
+      if (name) section.classList.add(`is-${name}`);
+      input.setAttribute("aria-invalid", String(name === "error"));
+      // aria-disabled, not disabled: keeps keyboard focus on the button while it works.
+      button.setAttribute("aria-disabled", String(name === "busy"));
+      label.textContent = name === "busy" ? "Joining" : name === "done" ? "Joined" : "Join";
+      if (msg != null) note.textContent = msg;
+    };
+    const BAD = "That email doesn't look right. Please check it and try again.";
+
+    // Check once they leave the field (not while typing), and clear the error as soon as it's fixed.
+    input.addEventListener("blur", () => { if (input.value.trim() && !valid(input.value)) state("error", BAD); });
+    input.addEventListener("input", () => {
+      if (section.classList.contains("is-error") && valid(input.value)) state(null, DEFAULT);
+      if (section.classList.contains("is-done")) state(null, DEFAULT);
+    });
+
+    /* Hook for the real sign-up. Return a promise that resolves on success and rejects on failure.
+       TODO (Shopify): POST to /contact#contact_form with form_type=customer and contact[email],
+       or call your email provider here. Until then it succeeds locally. */
+    const subscribe = (email) => (window.A88.subscribe ? window.A88.subscribe(email) : new Promise((res) => setTimeout(res, 300, email)));
+
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const input = $("input", form);
-      const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value.trim());
-      section.classList.toggle("is-error", !ok);
-      input.setAttribute("aria-invalid", String(!ok));
-      if (!ok) { note.textContent = "That email doesn't look right. Please check it and try again."; input.focus(); return; }
-      // TODO (Shopify): post to /contact#contact_form with form_type=customer, or your email provider.
-      note.textContent = "You're on the list. We'll be in touch before the next drop.";
-      form.reset();
+      if (busy) return;
+      if (!valid(input.value)) { state("error", BAD); input.focus(); return; }
+      busy = true;
+      state("busy", "Adding you to the list…");
+      const started = performance.now();
+      let ok = true;
+      try { await subscribe(input.value.trim()); } catch (err) { ok = false; }
+      // Hold "Joining" for at least 600ms so it reads as a step, not a flicker.
+      await new Promise((r) => setTimeout(r, Math.max(0, 600 - (performance.now() - started))));
+      busy = false;
+      if (ok) {
+        state("done", "You're on the list. We'll be in touch before the next drop.");
+        form.reset();
+      } else {
+        state("error", "Something went wrong on our side. Please try again in a moment.");
+      }
     });
   }
 
@@ -520,7 +671,7 @@
     if (reduced || !Element.prototype.animate) return;
     // [selector, how far it sinks]
     const kinds = [
-      [".btn, .buy-btn, .tag__add, .cart__checkout, .join__form button, .nav__cart, .hotspot, .look__add", 0.94],
+      [".btn, .buy-btn, .tag__add, .cart__checkout, .join__form button, .nav__cart, .hotspot, .look__add, .zoom__btn, .pdp__zoom", 0.94],
       [".chip, .nav__menu, .cart__close, .cart__remove, .cart__browse, .nav__join, .archive__all, .look__piece", 0.95],
       [".acc__q, .menu__cats a, .menu__links a, .filters__sold", 0.985],
     ];

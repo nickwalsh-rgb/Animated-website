@@ -3,7 +3,7 @@
    (?cat=knitwear&size=m&sold=1) so filtered views can be shared and linked from the menu.
    Tags glide to their new places with GSAP Flip. */
 (() => {
-  const { $, $$, motion, site } = window.A88;
+  const { $, $$, motion, site, T } = window.A88;
   const grid = $(".js-grid");
   const tags = $$(".tag", grid);
   const countEl = $(".js-shop-count");
@@ -66,9 +66,9 @@
     syncUrl();
     if (flipState) {
       Flip.from(flipState, {
-        duration: 0.7, ease: "expo.out", absolute: true, nested: true,
-        onEnter: (els) => gsap.fromTo(els, { opacity: 0, y: 30, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: "expo.out", stagger: 0.04 }),
-        onLeave: (els) => gsap.to(els, { opacity: 0, scale: 0.94, duration: 0.3, ease: "power2.in" }),
+        duration: T.slow, ease: "expo.out", absolute: true, nested: true,
+        onEnter: (els) => gsap.fromTo(els, { opacity: 0, y: 30, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: T.slow, ease: "expo.out", stagger: 0.04 }),
+        onLeave: (els) => gsap.to(els, { opacity: 0, scale: 0.94, duration: T.fast, ease: "power2.in" }),
         onComplete: () => window.ScrollTrigger && ScrollTrigger.refresh(),
       });
     }
@@ -90,8 +90,8 @@
 
   if (motion) {
     gsap.from(tags.filter((t) => !t.hidden), {
-      opacity: 0, y: 50, rotation: (i) => (i % 2 ? 3 : -3), duration: 1.1, ease: "expo.out", stagger: 0.06, delay: 0.15,
+      opacity: 0, y: 50, rotation: (i) => (i % 2 ? 3 : -3), duration: T.slower, ease: "expo.out", stagger: 0.06, delay: 0.15,
     });
-    gsap.from(".filters", { opacity: 0, y: 16, duration: 0.9, ease: "expo.out", delay: 0.1 });
+    gsap.from(".filters", { opacity: 0, y: 16, duration: T.slow, ease: "expo.out", delay: 0.1 });
   }
 })();

@@ -49,4 +49,6 @@
   <script type="application/ld+json">
 {{jsonld}}
   </script>
+  <!-- Page transitions: note whether this page arrived via a cross-page view transition -->
+  <script>addEventListener("pagereveal",function(e){if(e.viewTransition)document.documentElement.classList.add("vt-in")});</script>
 </head>

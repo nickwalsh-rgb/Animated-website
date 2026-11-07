@@ -77,6 +77,8 @@
     ]
   }
   </script>
+  <!-- Page transitions: note whether this page arrived via a cross-page view transition -->
+  <script>addEventListener("pagereveal",function(e){if(e.viewTransition)document.documentElement.classList.add("vt-in")});</script>
 </head>
 <body data-nav="paper">
   <div class="grain" aria-hidden="true"></div>
@@ -100,6 +102,9 @@
       <symbol id="ico-facebook" viewBox="0 0 256 256"><path fill="currentColor" d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm8,191.63V152h24a8,8,0,0,0,0-16H136V112a16,16,0,0,1,16-16h16a8,8,0,0,0,0-16H152a32,32,0,0,0-32,32v24H96a8,8,0,0,0,0,16h24v63.63a88,88,0,1,1,16,0Z"/></symbol>
     </defs>
   </svg>
+
+  <a class="skip-link" href="#top">Skip to content</a>
+  <p class="sr-only js-bag-status" role="status" aria-live="polite"></p>
 
   <!-- ============ NAV ============ -->
   <header class="nav">
@@ -127,7 +132,7 @@
       <div class="menu__col">
         <span class="eyebrow menu__eyebrow">Shop by category</span>
         <ul class="menu__cats">
-          <li><a href="../shop/" data-cat="all" data-img="1" data-desc="Everything available now. One of each, numbered."><span class="menu__num">00</span><span class="menu__name"><span>All pieces</span></span><span class="menu__count">05</span><span class="menu__arrow" aria-hidden="true">→</span></a></li>
+          <li><a aria-current="page" href="../shop/" data-cat="all" data-img="1" data-desc="Everything available now. One of each, numbered."><span class="menu__num">00</span><span class="menu__name"><span>All pieces</span></span><span class="menu__count">05</span><span class="menu__arrow" aria-hidden="true">→</span></a></li>
           <li><a href="../shop/?cat=outerwear" data-cat="outerwear" data-img="2" data-desc="Chore coats, waxed jackets and field layers, built for weather."><span class="menu__num">01</span><span class="menu__name"><span>Outerwear</span></span><span class="menu__count">02</span><span class="menu__arrow" aria-hidden="true">→</span></a></li>
           <li><a href="../shop/?cat=knitwear" data-cat="knitwear" data-img="3" data-desc="Heavy-gauge wool and cotton knits, softened by years of wear."><span class="menu__num">02</span><span class="menu__name"><span>Knitwear</span></span><span class="menu__count">01</span><span class="menu__arrow" aria-hidden="true">→</span></a></li>
           <li><a href="../shop/?cat=denim" data-cat="denim" data-img="4" data-desc="Selvedge and rigid denim with honest fades."><span class="menu__num">03</span><span class="menu__name"><span>Denim</span></span><span class="menu__count">01</span><span class="menu__arrow" aria-hidden="true">→</span></a></li>
@@ -171,6 +176,7 @@
         <p>Your bag is empty.</p>
         <p class="cart__empty-sub">Every piece is one of one. When it's gone, it's gone.</p>
         <a href="../#archive" class="cart__browse js-cart-browse">Browse the archive</a>
+        <div class="cart__suggest"><p class="cart__suggest-title">Still in the archive</p><ul><li><a class="cart__sug" href="../products/waxed-hunting-coat/"><span class="cart__swatch" style="--sw-bg:var(--pine);--sw-fg:var(--bone)"><svg viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></span><span class="cart__sug-meta"><small>No. 005, size L</small><strong>Waxed Hunting Coat</strong></span><span class="cart__price">£210</span></a></li><li><a class="cart__sug" href="../products/field-overshirt/"><span class="cart__swatch" style="--sw-bg:var(--ink);--sw-fg:var(--bone)"><svg viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></span><span class="cart__sug-meta"><small>No. 004, size M</small><strong>Field Overshirt</strong></span><span class="cart__price">£120</span></a></li><li><a class="cart__sug" href="../products/selvedge-denim/"><span class="cart__swatch" style="--sw-bg:var(--bone);--sw-fg:var(--ink)"><svg viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></span><span class="cart__sug-meta"><small>No. 003, size W32 L32</small><strong>Selvedge Denim</strong></span><span class="cart__price">£160</span></a></li></ul></div>
       </div>
       <div class="cart__foot">
         <div class="cart__row"><span>Subtotal</span><span class="js-subtotal">£0</span></div>
@@ -220,7 +226,7 @@
           <article class="tag tag--pine tag--grid" data-cat="outerwear" data-size="l" data-sold="0" data-price="210" data-no="005">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 005</span><span>L</span></div>
-            <a class="tag__photo is-empty" href="../products/waxed-hunting-coat/" tabindex="-1" aria-hidden="true"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
+            <a class="tag__photo is-empty" href="../products/waxed-hunting-coat/" tabindex="-1" aria-hidden="true" style="view-transition-name: piece-waxed-hunting-coat"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
             <div class="tag__body">
               <h3><a class="tag__link" href="../products/waxed-hunting-coat/">Waxed Hunting Coat</a></h3>
               <dl><dt>Category</dt><dd>Outerwear</dd><dt>Era</dt><dd>c. 1982</dd></dl>
@@ -230,7 +236,7 @@
           <article class="tag tag--ink tag--grid" data-cat="workwear" data-size="m" data-sold="0" data-price="120" data-no="004">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 004</span><span>M</span></div>
-            <a class="tag__photo is-empty" href="../products/field-overshirt/" tabindex="-1" aria-hidden="true"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
+            <a class="tag__photo is-empty" href="../products/field-overshirt/" tabindex="-1" aria-hidden="true" style="view-transition-name: piece-field-overshirt"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
             <div class="tag__body">
               <h3><a class="tag__link" href="../products/field-overshirt/">Field Overshirt</a></h3>
               <dl><dt>Category</dt><dd>Workwear</dd><dt>Era</dt><dd>c. 1985</dd></dl>
@@ -240,7 +246,7 @@
           <article class="tag tag--paper tag--grid" data-cat="denim" data-size="w32-l32" data-sold="0" data-price="160" data-no="003">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 003</span><span>W32 L32</span></div>
-            <a class="tag__photo is-empty" href="../products/selvedge-denim/" tabindex="-1" aria-hidden="true"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
+            <a class="tag__photo is-empty" href="../products/selvedge-denim/" tabindex="-1" aria-hidden="true" style="view-transition-name: piece-selvedge-denim"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
             <div class="tag__body">
               <h3><a class="tag__link" href="../products/selvedge-denim/">Selvedge Denim</a></h3>
               <dl><dt>Category</dt><dd>Denim</dd><dt>Era</dt><dd>c. 1991</dd></dl>
@@ -250,7 +256,7 @@
           <article class="tag tag--pine tag--grid" data-cat="knitwear" data-size="l" data-sold="0" data-price="140" data-no="002">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 002</span><span>L</span></div>
-            <a class="tag__photo is-empty" href="../products/fisherman-knit/" tabindex="-1" aria-hidden="true"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
+            <a class="tag__photo is-empty" href="../products/fisherman-knit/" tabindex="-1" aria-hidden="true" style="view-transition-name: piece-fisherman-knit"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
             <div class="tag__body">
               <h3><a class="tag__link" href="../products/fisherman-knit/">Fisherman Knit</a></h3>
               <dl><dt>Category</dt><dd>Knitwear</dd><dt>Era</dt><dd>c. 1979</dd></dl>
@@ -260,7 +266,7 @@
           <article class="tag tag--ink tag--grid" data-cat="outerwear" data-size="m" data-sold="0" data-price="185" data-no="001">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 001</span><span>M</span></div>
-            <a class="tag__photo is-empty" href="../products/chore-jacket/" tabindex="-1" aria-hidden="true"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
+            <a class="tag__photo is-empty" href="../products/chore-jacket/" tabindex="-1" aria-hidden="true" style="view-transition-name: piece-chore-jacket"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg></a>
             <div class="tag__body">
               <h3><a class="tag__link" href="../products/chore-jacket/">Chore Jacket</a></h3>
               <dl><dt>Category</dt><dd>Outerwear</dd><dt>Era</dt><dd>c. 1988</dd></dl>
@@ -270,7 +276,7 @@
           <article class="tag tag--paper is-sold tag--grid" data-cat="jersey" data-size="m" data-sold="1" data-price="95" data-no="006">
             <span class="tag__hole"></span>
             <div class="tag__top"><span>No. 006</span><span>M</span></div>
-            <a class="tag__photo is-empty" href="../products/rugby-shirt/" tabindex="-1" aria-hidden="true"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg><span class="tag__stamp">Sold</span></a>
+            <a class="tag__photo is-empty" href="../products/rugby-shirt/" tabindex="-1" aria-hidden="true" style="view-transition-name: piece-rugby-shirt"><svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg><span class="tag__stamp">Sold</span></a>
             <div class="tag__body">
               <h3><a class="tag__link" href="../products/rugby-shirt/">Rugby Shirt</a></h3>
               <dl><dt>Category</dt><dd>Jersey</dd><dt>Era</dt><dd>c. 1988</dd></dl>
@@ -295,7 +301,7 @@
       <p>Curated pieces<br />Limited edition. Est. 1988</p>
       <nav class="footer__nav" aria-label="Footer">
         <ul>
-          <li><a href="../shop/">Shop all</a></li>
+          <li><a aria-current="page" href="../shop/">Shop all</a></li>
           <li><a href="../lookbook/">Shop the look</a></li>
           <li><a href="../record/">The record</a></li>
           <li><a href="../about/">About</a></li>
