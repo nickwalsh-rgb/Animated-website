@@ -21,6 +21,7 @@ automatically within the hour of its date. You can run it any time from the **Ac
 | Product photos | add files to `assets/products/<handle>/` (see that folder's README) | `python3 build.py` |
 | Drops (names and dates), social links, business details, shipping text, returns FAQ, categories | `data/site.json` | `python3 build.py` |
 | About, Contact, Size guide, Privacy, Terms | `src/pages/*.html` | `python3 build.py` |
+| Shop the look (looks, markers, photos) | `data/lookbook.json` + photos in `assets/lookbook/<handle>.jpg` | `python3 build.py` |
 | Page layout and copy | `src/partials/*.html` | `python3 build.py` |
 | Styles / motion | `assets/css/style.css`, `assets/js/*.js` | refresh |
 
@@ -65,6 +66,12 @@ category, and lists any pieces that are still waiting for photos.
 **Shop all** `shop/`: every available piece in a grid. Filter by category and size, include sold pieces; filters are kept in the
 address (`shop/?cat=knitwear&size=l`) so the menu and breadcrumbs link straight to a filtered view. Tags glide into place (GSAP Flip).
 
+**Shop the look** `lookbook/` (first look also featured on the homepage): editorial photos with numbered markers on each
+garment. Hover (mouse) or tap (touch) a marker to open a card with the piece, its price, **Add to bag** and a link to it; click pins
+the card, Esc or clicking elsewhere closes it, and on phones the card docks on the side of the photo away from the marker.
+The list beside each photo mirrors the markers. Looks, markers (x/y in % of the photo) and captions live in `data/lookbook.json`;
+until a photo exists a labelled slot is shown. Pieces from future drops are left out automatically.
+
 **The record** `record/`: every piece ever released, grouped by drop, with sold pieces kept on the list.
 
 **Info pages:** About, Contact, Size guide, Privacy, Terms of sale. Business details come from `data/site.json`; anything missing
@@ -84,6 +91,8 @@ shows a red "To be confirmed" marker, and Privacy/Terms show a "Draft" note unti
 | Product page | First photo unmasks upward, details rise in; later photos unmask on scroll |
 | Menu / bag / accordions | Wipe, slide and measured-height animations |
 | Social keys | Lift and tilt toward the cursor; press flush on click |
+| Every button | Sinks on press and springs back on release (mouse, touch and keyboard); primary buttons ripple from the point pressed |
+| Shop the look | Markers pop in one by one; cards open from their marker; the matching list row lights up |
 
 `prefers-reduced-motion` turns all of it off. Revealed content fades with opacity only, so keyboard users can reach it before it scrolls into view.
 
@@ -105,8 +114,10 @@ All product data is **sample data**: names, prices, sizes, measurements, materia
 
 - [ ] Real pieces in `data/products.json`, photos in `assets/products/<handle>/`
 - [ ] Real drops and dates in `data/site.json` (samples: Season one 2 October 2026, Season two 4 December 2026, 7pm)
-- [ ] Business details in `data/site.json` (trading/registered name, address, email; company and VAT numbers if you have them)
-- [ ] Your story in `src/pages/about.html`, and the providers list in `src/pages/privacy.html`
+- [ ] Business details in `data/site.json`: currently **placeholders** (fictional company, Ofcom drama phone number, `.example` email)
+- [ ] The About story in `src/pages/about.html` is a **draft** written from the site's look: edit it to your real story
+- [ ] The providers list in `src/pages/privacy.html`
+- [ ] Lookbook photos in `assets/lookbook/` and marker positions in `data/lookbook.json` (looks are placeholders)
 - [ ] Privacy and Terms reviewed, then set `"legal_reviewed": true` in `data/site.json`
 - [ ] Real Instagram/Facebook URLs in `data/site.json`
 - [ ] Real shipping wording in `data/site.json`
@@ -130,6 +141,8 @@ assets/js/site.js        shared: smooth scroll, nav, menu, bag, accordions, form
 assets/js/home.js        homepage motion
 assets/js/product.js     product page gallery + motion
 assets/js/shop.js        shop filters
+assets/js/lookbook.js    Shop the look markers and cards
+data/lookbook.json       looks, markers and captions
 assets/products/         product photos (one folder per piece)
 assets/fonts/            self-hosted fonts
 docs/SHOPIFY.md          how this maps onto Shopify

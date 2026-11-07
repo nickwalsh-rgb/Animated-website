@@ -72,6 +72,7 @@
   expireDropDates();
   setupForm();
   setupSocial();
+  setupPress();
   if (hasGsap) {
     setupMenu();
     setupCart();
@@ -507,6 +508,81 @@
       note.textContent = "You're on the list. We'll be in touch before the next drop.";
       form.reset();
     });
+  }
+
+  /* ======================================================================
+     PRESS MOTION: every button sinks on press and springs back on release.
+     Uses the individual CSS `scale` property (Web Animations API), so it never
+     fights hover transforms or GSAP. Primary buttons also get a ripple from
+     the exact point pressed. Mouse, touch and keyboard (Space / Enter).
+     ====================================================================== */
+  function setupPress() {
+    if (reduced || !Element.prototype.animate) return;
+    // [selector, how far it sinks]
+    const kinds = [
+      [".btn, .buy-btn, .tag__add, .cart__checkout, .join__form button, .nav__cart, .hotspot, .look__add", 0.94],
+      [".chip, .nav__menu, .cart__close, .cart__remove, .cart__browse, .nav__join, .archive__all, .look__piece", 0.95],
+      [".acc__q, .menu__cats a, .menu__links a, .filters__sold", 0.985],
+    ];
+    const RIPPLE = ".btn, .buy-btn, .tag__add, .cart__checkout, .join__form button, .chip, .nav__cart, .look__add";
+    const SEL = kinds.map((k) => k[0]).join(", ");
+    const depth = (el) => kinds.find(([s]) => el.matches(s))[1];
+    let active = null;
+
+    function press(el, x, y) {
+      if (el.disabled || el.getAttribute("aria-disabled") === "true") return;
+      active = el;
+      el.classList.add("is-pressing");
+      el.getAnimations().forEach((a) => a.id === "press" && a.cancel());
+      const a = el.animate([{ scale: getComputedStyle(el).scale === "none" ? "1" : getComputedStyle(el).scale }, { scale: String(depth(el)) }],
+        { duration: 110, easing: "cubic-bezier(.3, 0, .2, 1)", fill: "forwards" });
+      a.id = "press";
+      if (el.matches(RIPPLE)) ripple(el, x, y);
+    }
+
+    function release() {
+      const el = active;
+      if (!el) return;
+      active = null;
+      el.classList.remove("is-pressing");
+      el.getAnimations().forEach((a) => a.id === "press" && a.cancel());
+      const d = depth(el);
+      // Spring back: a little past rest, then settle.
+      const a = el.animate([{ scale: String(d) }, { scale: "1.025" }, { scale: "0.995" }, { scale: "1" }],
+        { duration: 520, easing: "cubic-bezier(.2, .8, .2, 1)", fill: "none" });
+      a.id = "press";
+    }
+
+    function ripple(el, x, y) {
+      const r = el.getBoundingClientRect();
+      const cx = x === undefined ? r.width / 2 : x - r.left;
+      const cy = y === undefined ? r.height / 2 : y - r.top;
+      const size = Math.hypot(Math.max(cx, r.width - cx), Math.max(cy, r.height - cy)) * 2;
+      const dot = document.createElement("span");
+      dot.className = "ripple";
+      dot.style.cssText = `width:${size}px;height:${size}px;left:${cx - size / 2}px;top:${cy - size / 2}px`;
+      el.appendChild(dot);
+      dot.animate([{ transform: "scale(0)", opacity: 0.32 }, { transform: "scale(1)", opacity: 0 }],
+        { duration: 650, easing: "cubic-bezier(.2, .8, .2, 1)" }).onfinish = () => dot.remove();
+    }
+
+    document.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0) return;
+      const el = e.target.closest(SEL);
+      if (el) press(el, e.clientX, e.clientY);
+    }, { passive: true });
+    ["pointerup", "pointercancel", "dragstart"].forEach((t) => document.addEventListener(t, release, { passive: true }));
+    window.addEventListener("blur", release);
+    // Leaving the button while held releases it, like a real key.
+    document.addEventListener("pointerout", (e) => { if (active && e.target === active && !active.contains(e.relatedTarget)) release(); });
+
+    document.addEventListener("keydown", (e) => {
+      if ((e.key === " " || e.key === "Enter") && !e.repeat) {
+        const el = document.activeElement && document.activeElement.closest(SEL);
+        if (el && el === document.activeElement) press(el);
+      }
+    });
+    document.addEventListener("keyup", (e) => { if (e.key === " " || e.key === "Enter") release(); });
   }
 
   /* ======================================================================

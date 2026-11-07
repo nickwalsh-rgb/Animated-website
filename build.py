@@ -45,7 +45,7 @@ TAGS = {"ink", "pine", "paper"}
 WEB_WIDTHS = (480, 960, 1600)
 # Info page slugs become top-level folders that the build deletes and regenerates,
 # so they must never collide with real folders.
-RESERVED = {"assets", "data", "src", "docs", "shopify", "products", "shop", "record", "github", "node_modules"}
+RESERVED = {"assets", "data", "src", "docs", "shopify", "products", "shop", "record", "lookbook", "github", "node_modules"}
 WM = "".join(f'<use href="#wm-{c}" class="wm-l"/>' for c in ["A", "R", "C", "H", "I", "V", "E", "8a", "8b"])
 SCRIPTS = ["assets/vendor/gsap.min.js", "assets/vendor/ScrollTrigger.min.js", "assets/vendor/lenis.min.js",
            "assets/js/site.js"]
@@ -251,9 +251,12 @@ def validate(site, products):
             sys.exit(f"products.json: '{p['handle']}' tag must be one of {sorted(TAGS)}")
         if not photo_sources(p["handle"]):
             warnings.append(f"no photos yet for {p['handle']} (assets/products/{p['handle']}/)")
-    missing = [k for k in ("legal_name", "address", "email") if not (site.get("business") or {}).get(k)]
+    b = site.get("business") or {}
+    missing = [k for k in ("legal_name", "address", "email") if not b.get(k)]
     if missing:
         warnings.append(f"business details still to add in site.json: {', '.join(missing)}")
+    if "placeholder" in (b.get("legal_name", "") + b.get("address", "")).lower() or b.get("email", "").endswith(".example"):
+        warnings.append("business details in site.json are PLACEHOLDERS: replace them before launch")
 
 
 # ---------------------------------------------------------------- shared markup
@@ -399,7 +402,7 @@ def breadcrumbs_ld(site, items):
 
 # ---------------------------------------------------------------- pages
 
-def build_home(site, products, current, nxt):
+def build_home(site, products, current, nxt, looks=()):
     root = ""
     ctx = base_ctx(site, products, root, "home")
     faq = accordion([(f["q"], f'<p>{e(f["a"])}</p>') for f in site["returns_faq"]], "acc")
@@ -420,9 +423,11 @@ def build_home(site, products, current, nxt):
         "next_drop_hero": (f' <span class="hero__drop js-drop"{drop_attr}>Next drop: {e(nxt["label"])}.</span>'
                            if nxt else ""),
         "countdown": countdown(nxt, "js-reveal"),
+        "lookbook_feature": ("    <section class=\"lookfeat\" id=\"look\" data-theme=\"bone\" aria-label=\"Shop the look\">\n"
+                             + look_html(looks[0], 0, site, root, feature=True) + "\n    </section>") if looks else "",
     })
     body = "\n".join(fill(partial(n), ctx) for n in ["loader", "header", "home-main", "footer"])
-    write("index.html", page(ctx, 'class="is-loading" data-nav="bone"', body, ["assets/js/home.js"]))
+    write("index.html", page(ctx, 'class="is-loading" data-nav="bone"', body, ["assets/js/home.js", "assets/js/lookbook.js"]))
 
 
 def build_product(site, products, p, nxt):
@@ -597,6 +602,127 @@ def build_info_pages(site, products):
     return built
 
 
+# ---------------------------------------------------------------- lookbook (Shop the look)
+
+def look_photo(handle):
+    for ext in (".jpg", ".jpeg", ".png", ".webp"):
+        f = ROOT / "assets" / "lookbook" / f"{handle}{ext}"
+        if f.exists():
+            if Image is not None:
+                targets, jpg = make_web_copies(f)
+                return {"orig": rel(f), "src": rel(jpg), "srcset": ", ".join(f"{rel(t)} {w}w" for w, t in targets.items())}
+            return {"orig": rel(f), "src": rel(f), "srcset": ""}
+    return None
+
+
+def load_looks(products):
+    """Looks with their spots resolved to released products (unknown/unreleased pieces are skipped)."""
+    path = ROOT / "data" / "lookbook.json"
+    if not path.exists():
+        return []
+    by_handle = {p["handle"]: p for p in products}
+    looks = []
+    for lk in json.loads(path.read_text())["looks"]:
+        if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", lk["handle"]):
+            sys.exit(f"lookbook: handle '{lk['handle']}' must be lowercase-with-dashes")
+        spots = []
+        for sp in lk["spots"]:
+            p = by_handle.get(sp["product"])
+            if not p:
+                warnings.append(f"lookbook '{lk['handle']}': '{sp['product']}' isn't a released piece; marker skipped")
+                continue
+            if not (0 <= sp["x"] <= 100 and 0 <= sp["y"] <= 100):
+                sys.exit(f"lookbook '{lk['handle']}': x and y must be between 0 and 100")
+            spots.append({**sp, "p": p})
+        if spots:
+            photo = look_photo(lk["handle"])
+            if not photo:
+                warnings.append(f"no lookbook photo yet for '{lk['handle']}' (assets/lookbook/{lk['handle']}.jpg)")
+            looks.append({**lk, "spots": spots, "photo": photo})
+    return looks
+
+
+def look_spot(sp, n, hid, site, root):
+    p = sp["p"]
+    photos = PHOTOS[p["handle"]]
+    sold = not p["available"]
+    url = f'{root}products/{p["handle"]}/'
+    thumb = (img_tag(photos[0], root, "", "96px") if photos else
+             '<svg viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg>')
+    if sold:
+        action = '<span class="look__sold">Sold</span>'
+    else:
+        action = add_button(p, site, "look__add", photos).replace(
+            '<span class="tag__price">', '<span class="tag__price sr-only">', 1)
+    pid = f"pop-{hid}-{n}"
+    label = f'{p["title"]}, {"sold" if sold else money(p["price"], site)}'
+    button = (f'          <button class="hotspot{" is-sold" if sold else ""}" type="button" '
+              f'style="--x:{sp["x"]}%;--y:{sp["y"]}%" data-spot="{n}" aria-expanded="false" aria-controls="{pid}" '
+              f'aria-label="{e(label)}"><span class="hotspot__ring" aria-hidden="true"></span>'
+              f'<span class="hotspot__dot" aria-hidden="true">{n}</span></button>')
+    pop = (f'          <div class="pop" id="{pid}" role="group" aria-label="{e(p["title"])}" data-spot="{n}" hidden>\n'
+           f'            <a class="pop__thumb tag--{p["tag"]}" href="{url}" tabindex="-1" aria-hidden="true">{thumb}</a>\n'
+           f'            <div class="pop__body">\n'
+           f'              <p class="pop__meta">No. {e(p["number"])} <span>Size {e(p["size"])}</span></p>\n'
+           f'              <p class="pop__name"><a href="{url}">{e(p["title"])}</a></p>\n'
+           f'              <p class="pop__price">{"Sold" if sold else money(p["price"], site)}</p>\n'
+           f'              <div class="pop__actions">{action}<a class="pop__view" href="{url}">View</a></div>\n'
+           f'            </div>\n'
+           f'          </div>')
+    piece = (f'            <li class="look__piece{" is-sold" if sold else ""}" data-spot="{n}">'
+             f'<span class="look__num" aria-hidden="true">{n}</span>'
+             f'<a class="look__name" href="{url}">{e(p["title"])}<small>No. {e(p["number"])}, size {e(p["size"])}</small></a>'
+             f'<span class="look__price">{"Sold" if sold else money(p["price"], site)}</span></li>')
+    return button + "\n" + pop, piece
+
+
+def look_html(lk, i, site, root, feature=False):
+    """One look: photo (or labelled slot) with hotspots + popovers, and the list of pieces."""
+    hid = ("f-" if feature else "") + lk["handle"]
+    if lk["photo"]:
+        figure_img = img_tag(lk["photo"], root, f'{lk["title"]}. {lk["caption"]}', "(max-width: 900px) 100vw, 60vw",
+                             cls="look__img")
+        empty = ""
+    else:
+        figure_img = ('<div class="look__slot" aria-hidden="true"><svg viewBox="0 0 146 68"><use href="#mono"/></svg>'
+                      '<p>Editorial photo to come<small>Full length, portrait 4:5</small></p></div>')
+        empty = " is-empty"
+    parts = [look_spot(sp, n, hid, site, root) for n, sp in enumerate(lk["spots"], 1)]
+    spots = "\n".join(a for a, _ in parts)
+    pieces = "\n".join(b for _, b in parts)
+    flipped = " is-flipped" if (i % 2 and not feature) else ""
+    eyebrow = "Shop the look" if feature else f"Look {i + 1:02d}"
+    more = (f'\n          <a class="archive__all look__more" href="{root}lookbook/">See every look <span aria-hidden="true">→</span></a>'
+            if feature else "")
+    return (f'      <article class="look{flipped}" id="look-{hid}" aria-labelledby="look-title-{hid}">\n'
+            f'        <figure class="look__figure{empty} js-look">\n'
+            f'          {figure_img}\n{spots}\n'
+            f'        </figure>\n'
+            f'        <div class="look__panel">\n'
+            f'          <p class="look__eyebrow">{eyebrow}</p>\n'
+            f'          <h2 class="look__title" id="look-title-{hid}">{e(lk["title"])}</h2>\n'
+            f'          <p class="look__caption">{e(lk["caption"])}</p>\n'
+            f'          <p class="look__hint">Hover or tap a number to shop that piece.</p>\n'
+            f'          <ol class="look__pieces">\n{pieces}\n          </ol>{more}\n'
+            f'        </div>\n'
+            f'      </article>')
+
+
+def build_lookbook(site, products, looks):
+    root = "../"
+    ctx = base_ctx(site, products, root, "lookbook")
+    ctx.update({
+        "title": "Shop the look - Archive 88",
+        "description": e("Editorial looks from Archive 88. Tap each piece to see it and add it to your bag."),
+        "canonical": site["url"] + "lookbook/",
+        "jsonld": ld_json([org_ld(site), {"@type": "CollectionPage", "name": "Shop the look",
+                                          "url": site["url"] + "lookbook/"}]),
+        "looks": "\n".join(look_html(lk, i, site, root) for i, lk in enumerate(looks)),
+    })
+    body = "\n".join(fill(partial(n), ctx) for n in ["header", "lookbook-main", "footer"])
+    write("lookbook/index.html", page(ctx, 'data-nav="paper"', body, ["assets/js/lookbook.js"]))
+
+
 # ---------------------------------------------------------------- Shopify CSV
 
 def build_shopify_csv(site, products, drops):
@@ -678,15 +804,20 @@ def main():
             sys.exit(f"src/pages/{f.name}: '{f.stem}' can't be used as a page name")
         shutil.rmtree(ROOT / f.stem, ignore_errors=True)
 
-    build_home(site, products, current, nxt)
+    looks = load_looks(products)
+    build_home(site, products, current, nxt, looks)
     for p in products:
         build_product(site, products, p, nxt)
     build_shop(site, products, nxt)
     build_record(site, products, drops)
+    shutil.rmtree(ROOT / "lookbook", ignore_errors=True)
+    if looks:
+        build_lookbook(site, products, looks)
     info = build_info_pages(site, products)
     build_shopify_csv(site, all_products, drops)
 
     urls = ([site["url"], site["url"] + "shop/", site["url"] + "record/"]
+            + ([site["url"] + "lookbook/"] if looks else [])
             + [f'{site["url"]}{s}/' for s in info]
             + [f'{site["url"]}products/{p["handle"]}/' for p in products])
     write("sitemap.xml",

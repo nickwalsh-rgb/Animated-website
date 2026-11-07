@@ -74,6 +74,7 @@ in bulk. It helps Google and Meta catalogues.
 | `src/partials/shop-main.html` + `assets/js/shop.js` | `templates/collection.json` (the "all" collection); filters can stay client-side, or use Shopify's Search & Discovery filters |
 | `src/partials/record-main.html` | a page template looping over all products (including sold) grouped by the `archive.drop` metafield |
 | `src/pages/*.html` | Shopify pages; Privacy and Terms go in **Settings > Policies** |
+| `data/lookbook.json` + `assets/js/lookbook.js` | a `lookbook` metaobject (image, title, caption, list of spots: product reference + x + y) rendered by a section; the quick-add buttons post to `/cart/add.js` like the bag |
 | `data/site.json` values | theme settings (`config/settings_schema.json`): drop date, social links, shipping text, returns FAQ blocks |
 | `assets/css`, `assets/js`, `assets/fonts`, `assets/vendor` | theme `assets/` (flat folder; update paths with `asset_url`) |
 
