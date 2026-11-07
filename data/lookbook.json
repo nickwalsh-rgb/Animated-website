@@ -1,0 +1,40 @@
+{
+  "_readme": [
+    "Shop the look. One entry per editorial photo. ALL LOOKS ARE PLACEHOLDERS until real photos exist.",
+    "Photo: put it at assets/lookbook/<handle>.jpg (portrait 4:5, 1600 x 2000 ideal). Until then a labelled slot is shown.",
+    "spots: one per garment worn. product = a handle from products.json. x / y = where the marker sits, in % of the photo",
+    "(0,0 is top left, 100,100 bottom right). Put it on the garment itself, roughly where you'd point.",
+    "Pieces from a drop that hasn't happened yet are left out automatically. The first look is featured on the homepage."
+  ],
+  "looks": [
+    {
+      "handle": "the-long-way-round",
+      "title": "The long way round",
+      "caption": "Chore jacket over the fisherman knit, with selvedge denim.",
+      "spots": [
+        { "product": "chore-jacket", "x": 34, "y": 38 },
+        { "product": "fisherman-knit", "x": 52, "y": 27 },
+        { "product": "selvedge-denim", "x": 45, "y": 72 }
+      ]
+    },
+    {
+      "handle": "weather-coming-in",
+      "title": "Weather coming in",
+      "caption": "Waxed hunting coat over the field overshirt.",
+      "spots": [
+        { "product": "waxed-hunting-coat", "x": 60, "y": 42 },
+        { "product": "field-overshirt", "x": 47, "y": 30 },
+        { "product": "selvedge-denim", "x": 50, "y": 76 }
+      ]
+    },
+    {
+      "handle": "after-the-match",
+      "title": "After the match",
+      "caption": "The rugby shirt with selvedge denim.",
+      "spots": [
+        { "product": "rugby-shirt", "x": 46, "y": 33 },
+        { "product": "selvedge-denim", "x": 44, "y": 70 }
+      ]
+    }
+  ]
+}

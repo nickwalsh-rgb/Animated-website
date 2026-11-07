@@ -13,14 +13,14 @@
     "facebook": "https://www.facebook.com/archive88"
   },
   "business": {
-    "_note": "PLACEHOLDERS. UK distance-selling rules require your trading name, a geographic address and a way to contact you. Fill these in; empty values show as 'To be confirmed'.",
+    "_note": "PLACEHOLDER details, safe to publish while testing: the phone number is from Ofcom's range reserved for TV and film (020 7946 0xxx), the email uses the reserved .example domain, and the address, company and VAT numbers are fictional. Replace all of them before launch: UK distance-selling rules require your real trading name, a geographic address and a way to contact you.",
     "trading_name": "Archive 88",
-    "legal_name": "",
-    "address": "",
-    "email": "",
-    "phone": "",
-    "company_number": "",
-    "vat_number": ""
+    "legal_name": "Placeholder Trading Ltd",
+    "address": "1 Placeholder Yard\nLondon\nAB1 2CD",
+    "email": "hello@archive88.example",
+    "phone": "020 7946 0088",
+    "company_number": "00000000",
+    "vat_number": "GB 000 0000 00"
   },
   "legal_reviewed": false,
   "drops": {
