@@ -105,34 +105,29 @@ def swatch_list(p: dict, *, limit: int = 5) -> str:
 # ---------------------------------------------------------------------------------------------------------------------
 
 
-TAG_TONES = ("ink", "pine", "paper")
-
-
-def tag_tone(p: dict) -> str:
-    """Hang-tag colour: from the data if set, otherwise cycled by style number so neighbours differ."""
-    return p.get("tag") or TAG_TONES[int(p["style"].split("-")[-1]) % 3]
-
-
-def size_range(p: dict) -> str:
-    return p["sizes"][0] if len(p["sizes"]) == 1 else f'{p["sizes"][0]}–{p["sizes"][-1]}'
+def colour_count(p: dict) -> str:
+    n = len(p["colours"])
+    return f"{n} colours" if n > 1 else p["colours"][0]["name"]
 
 
 def product_card(p: dict, root: str, sym: str, *, eager: bool = False, quick_add: bool = True) -> str:
-    """The product card, drawn as an Archive 88 hang tag. Hover (fine pointers only) swaps the photo to the alternate
-    angle instantly; the second image is already loaded in the same frame, so there's no flash. Data attributes drive
-    filtering, sorting and quick add."""
+    """The product card: image on a quiet ground, then name, colour and price. Hover (fine pointers only) swaps the
+    photo to the alternate angle instantly; the second image is already loaded in the same frame, so there's no
+    flash. Quick add sits along the bottom of the image. Data attributes drive filtering, sorting and quick add."""
     first = p["colours"][0]
     v = p["media"][first["handle"]]
     url = f'{root}products/{p["handle"]}/'
     alt_front = f'{p["title"]} in {first["name"]}, front'
     alt_back = f'{p["title"]} in {first["name"]}, alternate view'
     badges = []
-    if p.get("new"):
-        badges.append(badge("New"))
-    if p["low_stock"]:
-        badges.append(badge("Few left", "signal"))
     if p["sold_out"]:
         badges.append(badge("Sold out", "muted"))
+    elif p["low_stock"]:
+        badges.append(badge("Selling fast", "signal"))
+    elif p.get("new"):
+        badges.append(badge("New"))
+    elif p.get("best"):
+        badges.append(badge("Bestseller"))
     filter_data = {
         "data-cat": p["category"],
         "data-price": p["price"],
@@ -150,11 +145,7 @@ def product_card(p: dict, root: str, sym: str, *, eager: bool = False, quick_add
         qa = (f'<div class="quick-add" data-quick-add>'
               f'<p class="quick-add__label">Quick add <span class="quick-add__colour">{e(first["name"])}</span></p>'
               f'<div class="quick-add__sizes"></div></div>')
-    number = p["style"].split("-")[-1]
-    cta = "Sold out" if p["sold_out"] else "Choose size"
-    return f'''<article class="card tag tag--{tag_tone(p)}{" is-soldout" if p["sold_out"] else ""}" data-product="{e(p["handle"])}" data-title="{e(p["title"])}" data-style="{e(p["style"])}" data-sil="{e(p["silhouette"])}" data-url="{e(url)}" data-colours="{colours_json}" {attrs}>
-  <span class="tag__hole" aria-hidden="true"></span>
-  <p class="tag__top"><span>No. {e(number)}</span><span>{e(size_range(p))}</span></p>
+    return f'''<article class="card{" is-soldout" if p["sold_out"] else ""}" data-product="{e(p["handle"])}" data-title="{e(p["title"])}" data-style="{e(p["style"])}" data-sil="{e(p["silhouette"])}" data-url="{e(url)}" data-colours="{colours_json}" {attrs}>
   <div class="card__media">
     <a class="card__link" href="{e(url)}" tabindex="-1" aria-hidden="true">
       {frame(media(v[0], alt_front, eager=eager, cls="media__item--primary") + media(v[1], alt_back, cls="media__item--alt"), "media--hover")}
@@ -164,10 +155,28 @@ def product_card(p: dict, root: str, sym: str, *, eager: bool = False, quick_add
   </div>
   <div class="card__body">
     <h3 class="card__title"><a href="{e(url)}">{e(p["title"])}</a></h3>
+    {price(p, sym)}
+    <p class="card__colour" data-card-colour>{e(first["name"])}</p>
     {swatch_list(p)}
-    <div class="tag__add">{price(p, sym)}<span class="tag__cta" aria-hidden="true">{cta}</span></div>
   </div>
 </article>'''
+
+
+def rail(rid: str, title: str, cards: str, *, link: tuple[str, str] | None = None, eyebrow: str = "") -> str:
+    """A horizontal product rail: native scroll-snap (swipe, trackpad, keyboard) with previous/next buttons on
+    fine pointers. Works without JS; store.js wires the buttons and their disabled state."""
+    more = f'<a class="link-arrow" href="{e(link[1])}">{e(link[0])} {icon("arrow")}</a>' if link else ""
+    eb = f'<p class="eyebrow">{e(eyebrow)}</p>' if eyebrow else ""
+    return f'''<section class="rail" aria-labelledby="{rid}-title" data-rail>
+  <div class="section-head">
+    <div>{eb}<h2 class="section-title" id="{rid}-title">{e(title)}</h2></div>
+    <div class="section-head__end">{more}
+      <div class="rail__ctrl"><button type="button" class="icon-btn" data-rail-prev aria-label="Previous {e(title)}" disabled>{icon("chevron")}</button>
+      <button type="button" class="icon-btn" data-rail-next aria-label="Next {e(title)}">{icon("chevron")}</button></div>
+    </div>
+  </div>
+  <div class="rail__track" data-rail-track tabindex="0" role="region" aria-label="{e(title)}, scroll sideways">{cards}</div>
+</section>'''
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -271,13 +280,13 @@ def accordion(title: str, body: str, aid: str, open_: bool = False) -> str:
 
 
 def sticky_atc(p: dict, sym: str) -> str:
-    """Phones/tablets: a floating pill pinned to the bottom while the main Add to bag button is off screen."""
+    """Phones/tablets: a bar pinned to the bottom while the main Add to bag button is off screen."""
     return f'''<div class="sticky-atc" data-sticky-atc hidden>
   <div class="sticky-atc__info">
     <p class="sticky-atc__title">{e(p["title"])}</p>
     <p class="sticky-atc__meta"><span data-sticky-variant>{e(p["colours"][0]["name"])}</span> · {money(p["price"], sym)}</p>
   </div>
-  <button type="button" class="buy-btn buy-btn--bar" data-sticky-btn><span class="tag__cta" data-sticky-label>Select size</span></button>
+  <button type="button" class="buy-btn buy-btn--bar" data-sticky-btn><span data-sticky-label>Select size</span></button>
 </div>'''
 
 
