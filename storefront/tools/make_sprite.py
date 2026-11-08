@@ -22,6 +22,8 @@ ICONS = {
     "post": '<path d="M4 9h16v11H4z"/><path d="M4 9l2-4h12l2 4M12 9v11M9 13h6"/>',
     "play": '<path d="M8 5v14l11-7z"/>',
     "pause": '<path d="M8 5v14M16 5v14"/>',
+    "search": '<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.4-4.4"/>',
+    "user": '<circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
     "trash": '<path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/>',
 }
 

@@ -1,94 +1,108 @@
 # Archive 88 storefront: brand and design system
 
 The storefront is the high-volume side of Archive 88: a **permanent collection** of 100 styles (1,830 size × colour
-variants in the sample data). It wears **the main site's identity unchanged** (Figma "05 Quiet Caps") and adds the
-architecture a large, sized range needs: variant matrix, filterable listings, quick add and a bag drawer.
+variants in the sample data). It keeps **the main site's identity** (palette, Archivo Narrow + Archivo, the wordmark
+and the A88 mark) and uses a **clean retail layout** built for range and conversion: announcement bar, mega-menu,
+search, full-bleed campaign imagery, product rails, plain product cards and a calm footer.
 
-> Same brand, more range. The hang tag, the pills, the uppercase type and the one orange action per page carry over,
-> so the archive and the permanent collection read as one house.
+> The layout patterns were studied from leading streetwear and sportswear stores (inverting header over imagery,
+> two-link campaign heroes, editorial splits, bestseller rails, category grid, service bar, newsletter in the
+> footer). Only the patterns are borrowed. Every name, image, colour and word on the site is Archive 88's own.
 
-Built with the `ui-ux-pro-max` skill (design-system search: *luxury fashion e-commerce, minimal editorial*; style
-**Minimalism & Swiss**, variance 3, motion 3, density 4) for structure and UX rules. The visual layer is the
+Built with the `ui-ux-pro-max` skill (design-system search: *premium clothing e-commerce, minimal editorial*; style
+**Minimalism & Swiss**, variance 3, motion 3, density 5) for structure and UX rules. The visual layer is the
 existing brand, not the skill's generated palette and fonts.
 
 ---
 
 ## 1. Brand (shared with the main site)
 
-Brand assets are **shared, not copied**: the wordmark letters and social icons come from `src/partials/defs.html`,
-fonts from `assets/fonts/`, and social links from `data/site.json`. Change them there and both sites follow.
+Brand assets are **shared, not copied**: the wordmark letters, A88 mark and social icons come from
+`src/partials/defs.html`, fonts from `assets/fonts/`, and social links from `data/site.json`. Change them there and
+both sites follow.
 
 | | |
 | --- | --- |
 | Positioning | Considered clothing in natural fibres, kept in the range season after season. |
 | Tagline | The permanent collection |
 | Voice | Plain, specific, unhurried. Say what it is made of and how it fits. |
-| Signature elements | Centred wordmark nav (Menu / Bag pill), hang-tag product cards with a punched hole and a number, pill buttons and chips, full-screen ink menu, film grain over flat colour |
+| Signature elements | Wordmark header that turns see-through over imagery, the graded forest film, square controls in ink, the woven orange stripe (gift card), the A88 mark that closes every page |
 
 ### Colour
 
 | Token | Hex | Use |
 | --- | --- | --- |
-| Ink | `#1B211D` | Text, dark tags, footer, menu, selected chips |
-| Bone | `#E6E3DA` | Home background, light tags, behind product photos |
-| Paper | `#F5F4F0` | Shop and product page background, bag |
-| Pine | `#2F3D33` | Green tags, hover on ink, *in stock* / *added* states |
-| Burnt orange | `#A3471F` (hover `#8A3A18`) | **One primary action per page** (hero CTA, Add to bag, Checkout) and **signals** (bag count, low stock, delivery meter, active filter counts, focus ring) |
+| Ink | `#1B211D` | Text, primary buttons (Add to bag, Checkout, Subscribe), announcement bar, footer, selected chips |
+| White | `#FBFAF8` | Page background |
+| Paper | `#F5F4F0` | Newsletter band, type on ink |
+| Mist | `#ECEBE6` | Behind every product image (lighter than bone so garments read) |
+| Pine | `#2F3D33` | Hover on ink, *in stock* and *added* states, the posted gift card |
+| Burnt orange | `#A3471F` (deep `#8A3A18`) | **Signals only**: bag count, *Selling fast*, low-stock dots, delivery meter, sale price, focus ring, search highlight |
 
-Accent rules are the main site's: light surfaces only; every other button stays ink. Text contrast: ink-soft
-5.3:1+, orange 5.5:1 on paper and 4.7:1 on bone, paper on orange 5.5:1.
+Primary actions are solid ink, as shoppers expect from retail; orange is kept for signals so it always means
+*look here*. Text contrast: muted text 5.1:1+ on white and paper, orange 5.5:1 on paper, paper on ink 15:1.
 
 ### Typography
 
 | Role | Face | Where |
 | --- | --- | --- |
-| Display | **Archivo Narrow** 500, uppercase, tracked (0.04em titles, 0.2em labels) | Wordmark, page and product titles, tag titles, nav, buttons, chips, labels |
-| Body | **Archivo** 300 / 400 / 500 | Descriptions, prices in running text, form messages |
+| Display | **Archivo Narrow** 600, sentence case | Hero and banner headlines, page, section and product titles |
+| UI + body | **Archivo** 400 / 500 | Navigation, buttons, cards, prices, forms, body copy |
 
-Self-hosted with metric-matched fallbacks, so text doesn't shift when fonts load.
+Sentence case throughout (no tracked uppercase): quieter, faster to read in a dense grid. Type scale is in tokens
+(`--fs-xs` 12 to `--fs-hero`, fluid). Self-hosted with metric-matched fallbacks, so text doesn't shift when fonts load.
 
-### Product card = hang tag
-Ink, pine or bone tag (cycled by style number unless `tag` is set in the data), clipped corners and a punched hole,
-`No. 042` and the size range on top, the 4:5 photo, the title over a rule, colour swatches, then the price pill.
-Desktop hover: the tag tilts slightly, the photo switches to the alternate angle instantly, the price pill
-inverts, and quick-add sizes appear over the photo.
+### Product card
+Image on the mist ground (strict 4:5) with one small badge at most (*Selling fast*, *New*, *Bestseller* or *Sold out*),
+then name and price on one line, the colour name, and swatches. Desktop hover swaps the photo to the alternate angle
+instantly and reveals quick-add sizes along the bottom of the image. The whole card is one link target; swatches and
+quick add sit above it.
 
 ---
 
 ## 2. Token architecture (`assets/css/tokens.css`)
 
-1. **Primitive**: the brand palette (identical to `assets/css/style.css`), fonts, tracking, motion speeds.
-2. **Semantic**: what a value is for: `--color-text`, `--color-primary` (the one orange action), `--color-signal`, `--color-media`, `--color-error`.
-3. **Component**: values a component owns: `--media-ratio: 4 / 5`, `--tag-clip`, `--pill`, `--sidebar-w`, `--drawer-w`, `--tap: 44px`.
+1. **Primitive**: the brand palette, fonts, type scale, motion speeds.
+2. **Semantic**: what a value is for: `--color-text`, `--color-primary` (ink), `--color-signal` (orange), `--color-media`, `--color-on-dark`, `--color-error`, `--color-focus`.
+3. **Component**: values a component owns: `--media-ratio: 4 / 5`, `--bar-h`, `--nav-h`, `--sidebar-w`, `--drawer-w`, `--radius: 0`, `--tap: 44px`.
 
 Components read layers 2 and 3 only. To restyle, change a semantic token; no component CSS changes.
 
-Motion tokens are the main site's: `--t-press` 80ms, `--t-fast` 300ms (hovers, exits), `--t-base` 500ms (drawers,
-state changes), `--t-slow` 1s (menu reveal, grain), plus `--t-instant` 0ms for the card angle swap. `prefers-reduced-motion` removes movement
-but keeps every state change.
+Motion: `--t-press` 80ms, `--t-fast` 200ms (hovers), `--t-base` 350ms (drawers, menus), `--t-slow` 700ms (section
+reveals), plus `--t-instant` 0ms for the card angle swap. `prefers-reduced-motion` removes movement but keeps every
+state change.
 
 ---
 
 ## 3. Components
 
-Markup is generated by `components.py` (one function per component); styles live in `assets/css/store.css`
-under the same name; behaviour lives in `assets/js/`.
+Markup is generated by `components.py` / `build.py` (one function per component); styles live in
+`assets/css/store.css` under the same name; behaviour lives in `assets/js/`.
 
 | Component | Python | CSS | JS | Notes |
 | --- | --- | --- | --- | --- |
+| Announcement bar | `announce_bar()` | `.announce` | `store.js` | Messages from `store.json` → `announcements`. Rotates every 6s; pauses on hover/focus; prev/next and a pause button; starts paused with reduced motion. |
+| Header | `header()` | `.nav` | `store.js` | Wordmark, Shop (mega-menu), New in, Outerwear, Knitwear, Gift cards; Search and Bag. Phones: search, bag and menu icons. |
+| Mega-menu | `mega()` | `.mega` | `store.js` | Desktop. Featured, categories with counts, shop by size (links pre-filter the grid), two editorial tiles. Click or hover; Esc returns focus to Shop. |
+| Search | `search_drawer()`, `search_index()` | `.search`, `.search-hit` | `store.js` | Panel from the top. `search.json` (~20 KB) loads on first open; every word must match name, category, colour or cloth; name matches rank first; Enter opens the top hit. |
+| Menu | `menu_drawer()` | `.menu__*` | `store.js` (`Drawer`) | Phones/tablets: every category with counts, sizes, help links. |
+| Rail | `rail()` | `.rail` | `store.js` | Sideways product row: native scroll-snap (swipe, trackpad, keyboard) plus previous/next buttons on desktop. New in, Bestsellers, *You may also like*. |
 | Media frame | `media()`, `frame()` | `.media` | – | The only way an image is drawn. Strict 4:5. |
-| Product card (hang tag) | `product_card()` | `.card.tag` | `store.js` | Used on PLP, home, PDP recommendations. |
-| Swatches | `swatch_list()` | `.swatch` | `store.js` | Recolour the card in place; link keeps `?colour=`. |
+| Product card | `product_card()` | `.card` | `store.js` | Used on PLP, rails and search. |
+| Swatches | `swatch_list()` | `.swatch` | `store.js` | Recolour the card in place and update the colour name; link keeps `?colour=`. |
 | Quick add | inside `product_card()` | `.quick-add` | `store.js` | Fine pointers only. Sizes for the shown colour; sold-out struck through. |
-| Badge | `badge()` | `.badge` | – | *New*, *Few left* (signal), *Sold out*. Max two. |
+| Badge | `badge()` | `.badge` | – | One per card, in priority order. |
+| Category pills | inline in `plp()` | `.pills` | – | Phones/tablets (where the sidebar is a drawer): sideways row of categories. |
 | Filter group | `filter_group()` | `.filter` | `plp.js` | `<details>`; shows a count of active choices. |
 | Size chips / colour options | `size_chips()`, `colour_filters()` | `.chip`, `.colour-opt` | `plp.js` | Real checkboxes, 44px targets. |
-| Drawer | `drawer()` | `.drawer`, `.drawer--menu` | `store.js` (`Drawer`) | One controller for bag, full-screen menu, mobile filters, size sheet. |
+| Drawer | `drawer()` | `.drawer--right/left/top/bottom` | `store.js` (`Drawer`) | One controller for bag, menu, search, mobile filters, size sheet. |
 | Colour / size selectors | `colour_selector()`, `size_selector()` | `.option`, `.size-opt` | `pdp.js` | Real radios. Sold-out sizes disabled and struck; low stock gets an orange dot. |
 | Variant matrix | `variant_matrix()` | `.matrix` | – | Full size × colour availability table (PDP, *Availability*). |
-| Buy pill | inline in `pdp()` | `.buy-btn` | `pdp.js` | Price left, inset *Add to bag* pill right. Orange. |
-| Sticky Add to bag | `sticky_atc()` | `.sticky-atc` | `pdp.js` | Floating pill, phones/tablets only. |
+| Add to bag | inline in `pdp()` | `.buy-btn` | `pdp.js` | Full-width ink button. |
+| Sticky Add to bag | `sticky_atc()` | `.sticky-atc` | `pdp.js` | Bar pinned to the bottom, phones/tablets only. |
 | Accordion | `accordion()` | `.accordion` | – | Native `<details>`. |
+| Promises, sign-up, footer | `promises()`, `signup()`, `footer()` | `.promises`, `.signup`, `.footer` | `store.js` | Service bar, newsletter (inline validation; hook `window.A88S.subscribe(email)` to your email provider), four link columns, legal row, A88 mark. |
+| Form field | `field()` | `.field` | `gift.js` | Visible label, hint, error under the field. |
 
 ### Scaling the catalogue
 - Data shape: one style per entry; `stock[colour][size]` **is** the variant matrix. SKUs are derived
@@ -97,7 +111,7 @@ under the same name; behaviour lives in `assets/js/`.
   size × colour) and stops with a clear message if anything is wrong.
 - Listing pages are server-rendered (complete without JS, crawlable) and enhanced client-side. Filtering and sorting
   work on in-memory card data, so they are instant; "Load more" pages through 24 at a time (`page_size` in
-  `store.json`). Gzipped, the 100-style *All clothing* page is ~24 KB.
+  `store.json`).
 - Past roughly 500 styles per listing, move cards to a JSON index rendered client-side, or paginate listings into
   `/shop/<category>/page/2/` at build time. The card component and filter logic don't change.
 - Shopify: add `shopify_domain` in `store.json` and `shopify_variant_ids` (`"colour/size": id`) per style; the
@@ -112,83 +126,79 @@ centre-crops every uploaded photo to exactly 4:5 and writes 480 / 960 / 1600px W
 upload can't distort the grid or shift layout. Until photos exist, placeholder art in the same frame is shown.
 
 **Instant alternate angle on hover.** Both angles are in the frame from the start; on hover (or keyboard focus) the
-second shows with a 0ms transition, so there is no fade and no load delay. Only on `(hover: hover) and (pointer: fine)`:
-touch devices never get stuck hover states, and they reach every angle on the PDP.
+second shows with a 0ms transition. Only on `(hover: hover) and (pointer: fine)`: touch devices never get stuck
+hover states, and they reach every angle on the PDP.
 
 **Slide-out bag drawer.** Every add opens the drawer (right side) with the new line highlighted. Focus is trapped,
 Esc / scrim / close dismiss it, focus returns to the button that opened it, and the page behind is `inert`.
-The drawer shows a free-delivery meter, quantity steppers capped at real stock, remove, subtotal and one primary action.
+The drawer shows a free-delivery meter, quantity steppers capped at real stock, remove, subtotal and Checkout.
 
 **PLP sticky sidebar.** From 1000px, the filter column is sticky with its own scroll; the toolbar (count, active
 filter chips, sort) is sticky under the header. Below 1000px, the same form becomes a left drawer with a live
-*Show N styles* button. Size and colour filters combine per variant (a style matches *M + green* only if it has a
-green colourway in stock in M), and matching cards switch to that colourway. Filters and sort live in the URL.
+*Show N styles* button, and category pills sit under the title. Size and colour filters combine per variant (a style
+matches *M + green* only if it has a green colourway in stock in M), and matching cards switch to that colourway.
+Filters and sort live in the URL, so the mega-menu's size links open a pre-filtered grid.
 
 **PDP variant matrix.** Choosing a colour updates the gallery, which sizes are available, low-stock dots and the
 stock message. If the chosen size is sold out in the new colour, it is cleared with a message saying so. Submitting
 without a size shows the error next to the sizes and moves focus there. `?colour=&size=` deep-links a variant.
+Desktop: photos in a two-column grid beside a sticky buy column. Phones: a swipeable row with a counter.
 
 **Mobile sticky Add to bag.** Whenever the main button is off screen, a bar pins to the bottom (safe-area aware)
 with the product, chosen colour/size and price. With no size chosen it reads *Select size* and opens a bottom sheet
 of sizes; picking one adds to the bag. Page padding grows so the bar never covers the footer.
 
-**Accessibility.** AA contrast on every text/background pair; visible focus ring (orange) on everything; real form
-controls for every option; 44px minimum targets; live regions announce result counts, stock and bag changes;
-skip link; `prefers-reduced-motion` respected.
+**Accessibility.** AA contrast on every text/background pair; visible focus ring on everything (light on dark
+sections); real form controls for every option; 44px minimum targets; live regions announce result counts, search
+results, stock and bag changes; skip link; auto-rotating content can be paused; `prefers-reduced-motion` respected.
 
 ---
 
-## 4b. Homepage motion (homepage only)
+## 4b. Header and homepage
 
-The homepage carries the main site's motion; listing and product pages deliberately don't (no animation libraries
-are loaded there, so 100-style grids stay fast and still). `assets/js/home.js`, using the vendored
-GSAP + ScrollTrigger + Lenis in `/assets/vendor/`:
+**Inverting header (site-wide).** Any section marked `data-nav="dark"` flips the header while the header sits over
+it. Sections that also carry `data-nav-clear` (the film hero, the editorial split, the banner) make it see-through
+with light type, so the imagery runs behind it; other dark sections (the footer) give a solid ink bar. Everywhere
+else it is a solid light bar. `store.js` checks which section is under the middle of the header as you scroll
+(measured where the header really is, below the announcement bar at the top). Opening the mega-menu always brings
+the solid light bar back.
 
-| Moment | What happens |
+**Homepage, top to bottom.**
+
+| Section | Pattern |
 | --- | --- |
-| Film hero | Graded forest film behind the wordmark; the nav is transparent over it and turns solid once you scroll past |
-| Smooth scroll | Lenis on the homepage; paused whenever the bag, menu or any drawer is open |
-| Intro loader | First visit per session: wordmark letters rise, a counter runs to the number of styles, the ink panel lifts away. Later visits get a short rise. Any click or key skips it |
-| Hero | Wordmark letters rise in; on scroll they drift apart at different speeds while the hero fades |
-| New in | Pinned sideways track of hang tags driven by page scroll; tags swing with scroll speed (elastic) and settle; orange progress line. Tabbing into a tag scrolls it into view |
-| Marquee | Ink band that drifts, speeds up and flips direction with scroll |
-| Categories | Tiles rise in with a stagger |
+| Film hero | Graded forest film full-bleed under the header; headline and two text links (*Shop all*, *New in*) centred low. Muted, pauses off screen, Pause/Play button, poster only with reduced motion. |
+| New in | Product rail, *See all* link. |
+| Editorial split | Two campaign images side by side (stacked on phones), headline and link over the lower edge. |
+| Bestsellers | Product rail (top-ranked styles that aren't new). |
+| Shop by category | Six tiles, product art on mist, name and count. |
+| Banner | Full-bleed image with a short brand story and link. |
+| Brand copy | Two short paragraphs (also useful for search engines). |
+| Promises, sign-up, footer | Shared by every page. |
 
-With `prefers-reduced-motion`, no JS, or if the libraries fail to load: no loader, no pinning, and the New in track
-is a normal sideways-scrolling row. Everything is reachable either way.
+Motion is deliberately calm: no loader, no pinned or scroll-driven sections, no animation libraries. Sections fade up
+16px once as they arrive (`home.js`); with reduced motion or without JS everything is simply visible.
 
-## 4c. Nav tone and gift cards
+## 4c. Gift cards
 
-**Inverting nav (site-wide).** Any section marked `data-nav="dark"` (the homepage film hero, the marquee, the
-footer) flips the header while the header sits over it: a dark bar with bone type, wordmark and Bag pill (fully
-see-through over sections that also carry `data-nav-clear`, i.e. the film hero). Everywhere
-else it is a solid light bar with ink type. `store.js` watches a 1px line through the middle of the nav, and CSS
-cross-fades between the two (300ms). To make a new section invert the nav, add `data-nav="dark"` to it.
-
-**Homepage film hero.** The main site's graded forest film runs full-bleed behind the wordmark (portrait cut on
-phones). It is muted, pauses when off screen, has a visible Pause / Play button, and does not autoplay with reduced
-motion (the poster shows instead).
-
-**Gift cards** (`/gift-cards/`, `gift()` in build.py, `assets/js/gift.js`, settings in `store.json` → `gift_cards`):
-amount chips, then two buttons, **Email a gift card** and **Post a gift card**. Each opens its own form (email:
-name, email, your name, message, send date; post: name, address, UK postcode, your name, message). A live card
-preview shows the amount and recipient. Fields validate when you leave them and on submit, with the error under the
-field. The card goes in the bag as a normal line with the recipient details attached, and does not count toward
-free delivery. `?send=email|post` deep-links a method.
+`/gift-cards/` (`gift()` in build.py, `assets/js/gift.js`, settings in `store.json` → `gift_cards`): amount chips,
+then two buttons, **Email a gift card** and **Post a gift card**. Each opens its own form (email: name, email, your
+name, message, send date; post: name, address, UK postcode, your name, message). A live card preview shows the amount
+and recipient. Fields validate when you leave them and on submit, with the error under the field. The card goes in
+the bag as a normal line with the recipient details attached, and does not count toward free delivery.
+`?send=email|post` deep-links a method.
 
 Before launch: confirm gift card terms (validity, refunds) and set up Shopify gift card products; add their
 variant ids to `gift_cards.shopify_variant_ids` (`"email/100": id`). Recipient details travel with the bag line
 but a plain cart link can't pass them to Shopify; that needs Shopify's gift card recipient fields or an app.
 
-**Footer sign-off.** Every page ends with the small A88 monogram, centred under the large wordmark, linking home.
-
 ## 5. Pre-delivery checklist (ui-ux-pro-max)
 
-- [x] No emoji as icons (SVG sprite; Phosphor social icons shared with the main site)
+- [x] No emoji as icons (SVG sprite)
 - [x] Pointer cursor and hover feedback on every clickable element
-- [x] Hover/press transitions 80–500ms on the brand's motion tokens, exits faster than entrances
-- [x] Text contrast ≥ 4.5:1 (lowest pair: orange on bone, 4.7:1)
-- [x] Visible focus for keyboard navigation
-- [x] `prefers-reduced-motion` respected
+- [x] Hover/press transitions 80–350ms on the motion tokens
+- [x] Text contrast ≥ 4.5:1
+- [x] Visible focus for keyboard navigation; mega-menu reachable and closable by keyboard
+- [x] `prefers-reduced-motion` respected (film, reveals, announcement rotation)
 - [x] Responsive at 375 / 768 / 1024 / 1440, no horizontal scroll (checked at 390px)
 - [x] Media space reserved (aspect-ratio), font fallbacks metric-matched (no CLS)

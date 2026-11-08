@@ -1,64 +1,75 @@
 /* Archive 88 storefront: design tokens.
-   The brand layer is the main site's (Figma "05 Quiet Caps"): same colours, fonts, pills, hang tags and motion speeds.
+   Brand layer = the main site's palette and fonts (Archivo Narrow + Archivo). Layout language = clean retail:
+   square controls, quiet type, product first (patterns studied from leading streetwear / sportswear stores).
    Three layers. Components only read the semantic and component layers, never raw hex.
    1. Primitive  : the brand palette and scales
    2. Semantic   : what a value is FOR (text, surface, action, signal)
-   3. Component  : the few values a component owns (frame ratio, tag shape, drawer width)
-   Fonts (Archivo Narrow + Archivo, with metric-matched fallbacks) come from ../../assets/fonts/fonts.css.
-   See storefront/docs/DESIGN-SYSTEM.md. */
+   3. Component  : the few values a component owns (frame ratio, header heights, drawer width)
+   Fonts come from ../../assets/fonts/fonts.css. See storefront/docs/DESIGN-SYSTEM.md. */
 
 :root {
-  /* 1 ─ Primitive (identical to the main site) ──────────────────────────── */
+  /* 1 ─ Primitive (palette identical to the main site) ──────────────────── */
   --ink: #1b211d;
   --bone: #e6e3da;
   --pine: #2f3d33;
   --paper: #f5f4f0;
-  --ink-soft: rgba(27, 33, 29, 0.7);     /* 5.3:1+ on paper and bone */
-  --bone-soft: rgba(230, 227, 218, 0.7); /* 5.2:1+ on ink and pine */
-  --line: rgba(27, 33, 29, 0.15);
-  --line-strong: rgba(27, 33, 29, 0.28);
-  --accent: #a3471f;                     /* burnt orange: 5.5:1 on paper, 4.7:1 on bone */
+  --white: #fbfaf8;
+  --mist: #ecebe6;                       /* product image ground: lighter than bone, so garments read */
+  --ink-soft: rgba(27, 33, 29, 0.68);    /* 5.4:1 on white, 5.1:1 on paper */
+  --bone-soft: rgba(230, 227, 218, 0.74);
+  --line: rgba(27, 33, 29, 0.12);
+  --line-strong: rgba(27, 33, 29, 0.3);
+  --accent: #a3471f;                     /* burnt orange: 5.5:1 on paper */
   --accent-deep: #8a3a18;
 
   --font-display: "Archivo Narrow", "Archivo Narrow Fallback", sans-serif;
   --font-body: "Archivo", "Archivo Fallback", system-ui, sans-serif;
-  --track-label: 0.2em;                  /* uppercase labels, buttons, nav */
-  --track-title: 0.04em;                 /* uppercase titles */
 
-  --t-press: 0.08s;                      /* button press */
-  --t-fast: 0.3s;                        /* hovers, colour changes, small exits */
-  --t-base: 0.5s;                        /* state changes, drawers */
-  --t-slow: 1s;                          /* large surfaces */
+  --fs-xs: 0.75rem;                      /* 12: badges, legal */
+  --fs-sm: 0.8125rem;                    /* 13: meta, nav */
+  --fs-base: 0.9375rem;                  /* 15: UI + body */
+  --fs-md: 1.0625rem;                    /* 17: card titles on large screens, lead copy */
+  --fs-lg: clamp(1.375rem, 1.1rem + 1vw, 1.875rem);      /* section titles */
+  --fs-xl: clamp(2rem, 1.4rem + 2.6vw, 3.5rem);           /* page titles */
+  --fs-hero: clamp(2.5rem, 1.6rem + 4.4vw, 5.5rem);       /* campaign headline */
+
+  --t-press: 0.08s;
+  --t-fast: 0.2s;                        /* hovers, colour changes */
+  --t-base: 0.35s;                       /* drawers, menus */
+  --t-slow: 0.7s;                        /* section reveals */
   --t-instant: 0s;                       /* card alternate-angle swap: by design, no fade */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   /* 2 ─ Semantic ──────────────────────────────────────────────────────────── */
-  --color-bg: var(--paper);
-  --color-bg-alt: var(--bone);
+  --color-bg: var(--white);
+  --color-bg-alt: var(--paper);
+  --color-surface-dark: var(--ink);
   --color-text: var(--ink);
   --color-text-muted: var(--ink-soft);
+  --color-on-dark: var(--paper);
+  --color-on-dark-muted: var(--bone-soft);
   --color-border: var(--line);
-  --color-action: var(--ink);            /* secondary actions */
-  --color-primary: var(--accent);        /* ONE primary action per page: Add to bag, Checkout, hero CTA */
-  --color-primary-hover: var(--accent-deep);
+  --color-border-strong: var(--line-strong);
+  --color-primary: var(--ink);           /* Add to bag, Checkout, Subscribe: solid ink, as retail expects */
+  --color-primary-hover: var(--pine);
   --color-on-primary: var(--paper);
-  --color-signal: var(--accent);         /* bag count, low stock, delivery meter, active filter count */
-  --color-media: var(--bone);            /* behind every product image */
+  --color-signal: var(--accent);         /* bag count, low stock, sale price, delivery meter */
+  --color-media: var(--mist);            /* behind every product image */
   --color-error: var(--accent-deep);
-  --color-scrim: rgba(27, 33, 29, 0.45);
+  --color-scrim: rgba(27, 33, 29, 0.42);
+  --color-focus: var(--accent);
 
   /* 3 ─ Component ─────────────────────────────────────────────────────────── */
   --media-ratio: 4 / 5;                  /* strict: every product image, everywhere */
-  --gutter: clamp(16px, 4vw, 56px);
-  --page-max: 1600px;
-  --nav-h: 80px;
-  --sidebar-w: 260px;
-  --pill: 100px;
-  --radius-media: 4px;
-  --tag-clip: polygon(18% 0, 82% 0, 100% 34px, 100% 100%, 0 100%, 0 34px);
-  --drawer-w: min(460px, 100%);
+  --gutter: clamp(16px, 2.4vw, 40px);
+  --grid-gap: clamp(8px, 1vw, 16px);
+  --page-max: 1920px;
+  --bar-h: 36px;                         /* announcement bar */
+  --nav-h: 64px;
+  --sidebar-w: 248px;
+  --radius: 0px;                         /* square controls throughout */
+  --drawer-w: min(440px, 100%);
   --tap: 44px;
-  --z-header: 50; --z-sticky: 44; --z-grain: 40; --z-drawer: 80; --z-toast: 90;
+  --z-header: 50; --z-mega: 49; --z-sticky: 44; --z-drawer: 80; --z-toast: 90;
 }
-@media (max-width: 720px) { :root { --nav-h: 64px; } }
+@media (max-width: 999px) { :root { --nav-h: 56px; } }

@@ -52,9 +52,10 @@ category, and lists any pieces that are still waiting for photos.
 
 `storefront/` is a separate, high-volume shop: 100 styles with size × colour variants, a product listing page with a
 sticky filter sidebar, product pages with a variant matrix and a mobile sticky Add to bag, and a slide-out bag.
-It uses the same brand (wordmark, fonts, colours, hang tags) with its own data, build and components, and does not change the pages above.
-Its homepage has the main site's motion (intro loader, drifting wordmark, pinned swinging hang tags, marquee, smooth
-scroll); the shop and product pages stay static.
+It uses the same brand (wordmark, fonts, colours, A88 mark) with its own data, build and components, and does not change the pages above.
+Its layout is clean retail: announcement bar, a header that turns see-through over imagery, a desktop mega-menu,
+search, a film hero, product rails, an editorial split, a category grid, and a footer with a newsletter sign-up.
+Motion is kept calm (film plus gentle fade-ins); no animation libraries load on any storefront page.
 
 ```bash
 python3 storefront/build.py                 # rebuild the storefront
@@ -65,7 +66,7 @@ python3 storefront/tools/seed_catalog.py    # regenerate the SAMPLE catalogue (o
 | To change | Edit |
 | --- | --- |
 | Styles, prices, colours, sizes, stock | `storefront/data/catalog.json` (`stock[colour][size]` is the variant matrix) |
-| Categories, free-delivery threshold, page size, Shopify domain, gift card amounts and wording | `storefront/data/store.json` |
+| Categories, announcement bar messages, free-delivery threshold, page size, Shopify domain, gift card amounts and wording | `storefront/data/store.json` |
 | Photos | `storefront/assets/products/<handle>/<colour>-<n>.jpg` (cropped to 4:5 by the build) |
 | Markup of any component | `storefront/components.py` |
 | Tokens / styles / behaviour | `storefront/assets/css/tokens.css`, `store.css`, `storefront/assets/js/*.js` |
