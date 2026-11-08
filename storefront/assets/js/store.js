@@ -29,6 +29,20 @@
   /* ── Drawer ────────────────────────────────────────────────────────────── */
   const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])';
   const stack = [];
+  /* Everything except the open drawer becomes inert (no clicks, focus or screen reader). Walks up from the drawer
+     and inerts each sibling on the way, so a drawer that lives inside <main> (the PLP filters) stays usable.
+     Live regions are left alone so announcements still read. Returns what it changed, to undo on close. */
+  function inertAround(el) {
+    const changed = [];
+    for (let node = el; node && node.parentElement && node !== document.body; node = node.parentElement) {
+      for (const sib of node.parentElement.children) {
+        if (sib === node || sib.inert || sib.matches("script, template, [aria-live], [role=status]")) continue;
+        sib.setAttribute("inert", "");
+        changed.push(sib);
+      }
+    }
+    return changed;
+  }
   const Drawer = {
     open(el, opener) {
       if (!el || el.classList.contains("is-open")) return;
@@ -40,9 +54,7 @@
       el.classList.add("is-open");
       stack.push(el);
       document.body.classList.add("is-locked");
-      $("main")?.setAttribute("inert", "");
-      $(".nav")?.setAttribute("inert", "");
-      $(".announce")?.setAttribute("inert", "");
+      el._inerted = inertAround(el);
       Mega.close({ restore: false });
       if (el._opener && el._opener.setAttribute) el._opener.setAttribute("aria-expanded", "true");
       const panel = $(".drawer__panel", el);
@@ -53,12 +65,9 @@
       if (!el || !el.classList.contains("is-open")) return;
       el.classList.remove("is-open");
       stack.splice(stack.indexOf(el), 1);
-      if (!stack.length) {
-        document.body.classList.remove("is-locked");
-        $("main")?.removeAttribute("inert");
-        $(".nav")?.removeAttribute("inert");
-        $(".announce")?.removeAttribute("inert");
-      }
+      if (!stack.length) document.body.classList.remove("is-locked");
+      (el._inerted || []).forEach((n) => n.removeAttribute("inert"));
+      el._inerted = null;
       const persistent = el.hasAttribute("data-drawer-persistent");
       const done = () => {
         if (el.classList.contains("is-open")) return;
