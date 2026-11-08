@@ -146,6 +146,7 @@ GSAP + ScrollTrigger + Lenis in `/assets/vendor/`:
 
 | Moment | What happens |
 | --- | --- |
+| Film hero | Graded forest film behind the wordmark; the nav is transparent over it and turns solid once you scroll past |
 | Smooth scroll | Lenis on the homepage; paused whenever the bag, menu or any drawer is open |
 | Intro loader | First visit per session: wordmark letters rise, a counter runs to the number of styles, the ink panel lifts away. Later visits get a short rise. Any click or key skips it |
 | Hero | Wordmark letters rise in; on scroll they drift apart at different speeds while the hero fades |
@@ -155,6 +156,31 @@ GSAP + ScrollTrigger + Lenis in `/assets/vendor/`:
 
 With `prefers-reduced-motion`, no JS, or if the libraries fail to load: no loader, no pinning, and the New in track
 is a normal sideways-scrolling row. Everything is reachable either way.
+
+## 4c. Nav tone and gift cards
+
+**Inverting nav (site-wide).** Any section marked `data-nav="dark"` (the homepage film hero, the marquee, the
+footer) flips the header while the header sits over it: a dark bar with bone type, wordmark and Bag pill (fully
+see-through over sections that also carry `data-nav-clear`, i.e. the film hero). Everywhere
+else it is a solid light bar with ink type. `store.js` watches a 1px line through the middle of the nav, and CSS
+cross-fades between the two (300ms). To make a new section invert the nav, add `data-nav="dark"` to it.
+
+**Homepage film hero.** The main site's graded forest film runs full-bleed behind the wordmark (portrait cut on
+phones). It is muted, pauses when off screen, has a visible Pause / Play button, and does not autoplay with reduced
+motion (the poster shows instead).
+
+**Gift cards** (`/gift-cards/`, `gift()` in build.py, `assets/js/gift.js`, settings in `store.json` → `gift_cards`):
+amount chips, then two buttons, **Email a gift card** and **Post a gift card**. Each opens its own form (email:
+name, email, your name, message, send date; post: name, address, UK postcode, your name, message). A live card
+preview shows the amount and recipient. Fields validate when you leave them and on submit, with the error under the
+field. The card goes in the bag as a normal line with the recipient details attached, and does not count toward
+free delivery. `?send=email|post` deep-links a method.
+
+Before launch: confirm gift card terms (validity, refunds) and set up Shopify gift card products; add their
+variant ids to `gift_cards.shopify_variant_ids` (`"email/100": id`). Recipient details travel with the bag line
+but a plain cart link can't pass them to Shopify; that needs Shopify's gift card recipient fields or an app.
+
+**Footer sign-off.** Every page ends with the small A88 monogram, centred under the large wordmark, linking home.
 
 ## 5. Pre-delivery checklist (ui-ux-pro-max)
 

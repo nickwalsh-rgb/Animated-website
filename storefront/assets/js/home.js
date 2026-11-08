@@ -9,6 +9,32 @@
   const html = document.documentElement;
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const loader = $(".loader");
+
+  /* ---------- Hero film: autoplays muted (not with reduced motion), pauses off screen, has a pause button ---------- */
+  const video = $(".hero__video");
+  const toggle = $("[data-film-toggle]");
+  if (video && toggle) {
+    let userPaused = reduced;
+    const sync = () => {
+      const playing = !video.paused;
+      toggle.setAttribute("aria-pressed", String(!playing));
+      $("[data-film-label]", toggle).textContent = playing ? "Pause film" : "Play film";
+      $("use", toggle).setAttribute("href", playing ? "#i-pause" : "#i-play");
+    };
+    const play = () => video.play().catch(() => {});
+    video.addEventListener("play", sync);
+    video.addEventListener("pause", sync);
+    toggle.hidden = false;
+    toggle.addEventListener("click", () => {
+      userPaused = !video.paused;
+      userPaused ? video.pause() : play();
+    });
+    new IntersectionObserver(([en]) => {
+      if (en.isIntersecting && !userPaused) play(); else video.pause();
+    }, { threshold: 0.05 }).observe(video);
+    sync();
+  }
+
   if (reduced || !window.gsap || !window.ScrollTrigger) { loader?.remove(); return; }
 
   gsap.registerPlugin(ScrollTrigger);

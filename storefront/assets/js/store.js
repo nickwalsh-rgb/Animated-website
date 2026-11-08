@@ -138,7 +138,9 @@
     $("[data-drawer-count]", cartEl).textContent = count ? `(${count})` : "";
     $("[data-cart-empty]", cartEl).hidden = lines.length > 0;
     $(".drawer__foot", cartEl).hidden = lines.length === 0;
-    $("[data-ship-meter]", cartEl).hidden = lines.length === 0;
+    // Gift cards don't ship as goods, so they don't count toward free delivery.
+    const goods = lines.filter((l) => !l.gift);
+    $("[data-ship-meter]", cartEl).hidden = goods.length === 0;
     listEl.innerHTML = lines.map((l) => `
       <li class="cart-line" data-sku="${esc(l.sku)}" ${l.sku === newSku ? "" : 'style="animation:none"'}>
         ${thumb(l)}
@@ -157,7 +159,7 @@
         </div>
       </li>`).join("");
     $("[data-cart-subtotal]", cartEl).textContent = money(Cart.subtotal());
-    const sub = Cart.subtotal(), th = cfg.freeShipping, meter = $("[data-ship-meter]", cartEl);
+    const sub = goods.reduce((n, l) => n + l.qty * l.price, 0), th = cfg.freeShipping, meter = $("[data-ship-meter]", cartEl);
     const left = th - sub;
     $("[data-ship-text]", cartEl).innerHTML = left > 0
       ? `You're <strong>${money(left)}</strong> away from free UK delivery`
@@ -257,6 +259,31 @@
   };
   document.addEventListener("pointerover", prime, { passive: true });
   document.addEventListener("focusin", prime);
+
+  /* ── Nav tone: inverts over dark sections ([data-nav="dark"]) ───────────
+     Watches a 1px line through the middle of the nav. While it crosses a dark section the nav goes transparent
+     with light type; anywhere else it is a solid light bar with ink type. CSS cross-fades between the two. */
+  const navEl = $(".nav");
+  const darks = $$('[data-nav="dark"]');
+  if (navEl && darks.length && "IntersectionObserver" in window) {
+    const over = new Set();
+    let io;
+    const watch = () => {
+      if (io) io.disconnect();
+      const mid = Math.round(navEl.offsetHeight / 2);
+      const below = Math.max(0, window.innerHeight - mid - 1);
+      io = new IntersectionObserver((entries) => {
+        entries.forEach((en) => (en.isIntersecting ? over.add(en.target) : over.delete(en.target)));
+        document.body.classList.toggle("nav-on-dark", over.size > 0);
+        // See-through only over sections that ask for it (the film hero); other dark sections get a solid dark bar.
+        document.body.classList.toggle("nav-clear", [...over].some((el) => el.hasAttribute("data-nav-clear")));
+      }, { rootMargin: "-" + mid + "px 0px -" + below + "px 0px" });
+      darks.forEach((d) => io.observe(d));
+    };
+    watch();
+    let resizeTimer;
+    addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(watch, 150); });
+  }
 
   window.A88S = { cfg, $, $$, money, esc, icon, toast, announce, Drawer, Cart, setCardColour, reduced };
 })();

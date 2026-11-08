@@ -296,3 +296,30 @@ def drawer(did: str, title: str, body: str, *, side: str = "right", footer: str 
     {foot}
   </div>
 </div>'''
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Forms (gift cards; reusable for checkout-style forms)
+# ---------------------------------------------------------------------------------------------------------------------
+
+
+def field(fid: str, label: str, *, type_: str = "text", autocomplete: str = "", required: bool = True,
+          hint: str = "", maxlength: int = 0, inputmode: str = "", textarea: bool = False) -> str:
+    """Labelled input with hint and an inline error slot. Labels are always visible; the error sits under the field
+    and is tied to it with aria-describedby."""
+    desc = f"{fid}-hint {fid}-err" if hint else f"{fid}-err"
+    attrs = [f'id="{e(fid)}"', f'name="{e(fid)}"', f'aria-describedby="{desc}"']
+    if required:
+        attrs.append("required")
+    if autocomplete:
+        attrs.append(f'autocomplete="{e(autocomplete)}"')
+    if maxlength:
+        attrs.append(f'maxlength="{maxlength}"')
+    if inputmode:
+        attrs.append(f'inputmode="{e(inputmode)}"')
+    opt = "" if required else ' <span class="field__opt">(optional)</span>'
+    control = (f'<textarea {" ".join(attrs)} rows="3"></textarea>' if textarea
+               else f'<input type="{e(type_)}" {" ".join(attrs)}>')
+    hint_html = f'<p class="field__hint" id="{fid}-hint">{e(hint)}</p>' if hint else ""
+    return (f'<div class="field"><label class="field__label" for="{e(fid)}">{e(label)}{opt}</label>{control}'
+            f'{hint_html}<p class="field__err" id="{fid}-err" aria-live="polite"></p></div>')
