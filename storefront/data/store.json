@@ -13,16 +13,64 @@
   "shopify_domain": "",
   "_shopify_domain_note": "Set to your-store.myshopify.com and fill shopify_variant_ids in catalog.json to send the bag to Shopify checkout.",
   "promises": [
-    ["Free UK delivery", "On orders over £150"],
-    ["30-day returns", "Free, from your door"],
-    ["Made to last", "Natural fibres, repairs for life"]
+    [
+      "Free UK delivery",
+      "On orders over £150"
+    ],
+    [
+      "30-day returns",
+      "Free, from your door"
+    ],
+    [
+      "Made to last",
+      "Natural fibres, repairs for life"
+    ]
   ],
   "categories": [
-    {"handle": "outerwear", "title": "Outerwear", "intro": "Coats and jackets in wool, wax and gabardine. Built for weather, cut for years."},
-    {"handle": "knitwear", "title": "Knitwear", "intro": "Merino, lambswool and cashmere from mills that have spun for generations."},
-    {"handle": "shirts", "title": "Shirts", "intro": "Oxford, poplin, flannel and linen. The shirts you reach for first."},
-    {"handle": "trousers", "title": "Trousers", "intro": "Chinos, wool trousers and selvedge denim, sized by the waist."},
-    {"handle": "jersey", "title": "Jersey", "intro": "Heavyweight tees and loopback sweats in organic cotton."},
-    {"handle": "tailoring", "title": "Tailoring", "intro": "Soft-shouldered jackets that dress up or down without trying."}
-  ]
+    {
+      "handle": "outerwear",
+      "title": "Outerwear",
+      "intro": "Coats and jackets in wool, wax and gabardine. Built for weather, cut for years."
+    },
+    {
+      "handle": "knitwear",
+      "title": "Knitwear",
+      "intro": "Merino, lambswool and cashmere from mills that have spun for generations."
+    },
+    {
+      "handle": "shirts",
+      "title": "Shirts",
+      "intro": "Oxford, poplin, flannel and linen. The shirts you reach for first."
+    },
+    {
+      "handle": "trousers",
+      "title": "Trousers",
+      "intro": "Chinos, wool trousers and selvedge denim, sized by the waist."
+    },
+    {
+      "handle": "jersey",
+      "title": "Jersey",
+      "intro": "Heavyweight tees and loopback sweats in organic cotton."
+    },
+    {
+      "handle": "tailoring",
+      "title": "Tailoring",
+      "intro": "Soft-shouldered jackets that dress up or down without trying."
+    }
+  ],
+  "gift_cards": {
+    "_note": "SAMPLE terms: check validity period and wording against your policy before launch. shopify_variant_ids: {\"email/100\": 123, \"post/100\": 456} enables checkout handoff.",
+    "amounts": [
+      25,
+      50,
+      100,
+      150,
+      250
+    ],
+    "default": 100,
+    "post_note": "Printed on heavy card in a woven envelope. Free UK postage, dispatched in 1 to 2 working days.",
+    "email_note": "Arrives in their inbox straight away, or on a date you choose.",
+    "terms": "Spend online across the whole collection. Use it in one go or over several orders.",
+    "shopify_variant_ids": {}
+  }
 }

@@ -65,7 +65,7 @@ python3 storefront/tools/seed_catalog.py    # regenerate the SAMPLE catalogue (o
 | To change | Edit |
 | --- | --- |
 | Styles, prices, colours, sizes, stock | `storefront/data/catalog.json` (`stock[colour][size]` is the variant matrix) |
-| Categories, free-delivery threshold, page size, Shopify domain | `storefront/data/store.json` |
+| Categories, free-delivery threshold, page size, Shopify domain, gift card amounts and wording | `storefront/data/store.json` |
 | Photos | `storefront/assets/products/<handle>/<colour>-<n>.jpg` (cropped to 4:5 by the build) |
 | Markup of any component | `storefront/components.py` |
 | Tokens / styles / behaviour | `storefront/assets/css/tokens.css`, `store.css`, `storefront/assets/js/*.js` |

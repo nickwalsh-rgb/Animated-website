@@ -263,11 +263,11 @@ def footer(root: str) -> str:
     cats = "".join(f'<li><a href="{root}shop/{c["handle"]}/">{e(c["title"])}</a></li>' for c in CATS)
     promises = "".join(f'<li><span class="eyebrow">{e(a)}</span><p>{e(b)}</p></li>' for a, b in store["promises"])
     return f'''<section class="promises" aria-label="Our promises"><ul>{promises}</ul></section>
-<footer class="footer">
+<footer class="footer" data-nav="dark">
   <div class="footer__row">
     <p>{e(store["tagline"])}<br>Natural fibres. Est. 1988</p>
     <nav class="footer__nav" aria-label="Footer">
-      <ul><li><a href="{root}shop/">Shop all</a></li>{cats}</ul>
+      <ul><li><a href="{root}shop/">Shop all</a></li>{cats}<li><a href="{root}gift-cards/">Gift cards</a></li></ul>
       <ul><li><a href="{root}../size-guide/">Size guide</a></li><li><a href="{root}../#returns">Returns</a></li>
         <li><a href="{root}../contact/">Contact</a></li><li><a href="{root}../about/">About</a></li></ul>
       <ul><li><a href="{root}../privacy/">Privacy</a></li><li><a href="{root}../terms/">Terms of sale</a></li></ul>
@@ -306,7 +306,7 @@ def menu_drawer(root: str) -> str:
         f'<span class="menu__count">{n}</span><span class="menu__arrow" aria-hidden="true">→</span></a></li>'
         for i, (u, t, n) in enumerate(rows, 1))
     body = (f'<span class="eyebrow menu__eyebrow">Shop by category</span><ul class="menu__cats">{items}</ul>'
-            f'<div class="menu__foot"><nav class="menu__links" aria-label="More"><a href="{root}../">The archive</a>'
+            f'<div class="menu__foot"><nav class="menu__links" aria-label="More"><a href="{root}gift-cards/">Gift cards</a><a href="{root}../">The archive</a>'
             f'<a href="{root}../lookbook/">Shop the look</a><a href="{root}../about/">About</a>'
             f'<a href="{root}../size-guide/">Size guide</a><a href="{root}../contact/">Contact</a></nav>{social("menu")}</div>')
     return C.drawer("menu", "Menu", body, side="menu")
@@ -531,7 +531,16 @@ def home():
   </div>
 </div>
 '''
-    main = f'''<section class="hero">
+    main = f'''<section class="hero" data-nav="dark">
+  <div class="hero__film" aria-hidden="true">
+    <video class="hero__video" muted loop playsinline preload="metadata" poster="{root}../assets/img/forest-poster.jpg">
+      <source src="{root}../assets/video/forest-portrait.mp4" type="video/mp4" media="(max-width: 720px) and (orientation: portrait)">
+      <source src="{root}../assets/video/forest.mp4" type="video/mp4">
+    </video>
+    <div class="hero__shade"></div>
+  </div>
+  <button type="button" class="hero__toggle" data-film-toggle aria-pressed="false" hidden>
+    <svg class="icon" aria-hidden="true"><use href="#i-pause"/></svg><span data-film-label>Pause film</span></button>
   <h1 class="hero__mark">{wordmark("wordmark--hero", store["name"] + ": " + store["tagline"])}</h1>
   <div class="hero__foot">
     <div class="js-hero-fade"><p class="hero__line">{e(store["tagline"].capitalize())}. {len(catalog)} styles in natural fibres, kept in every size.</p>
@@ -552,7 +561,7 @@ def home():
     <div class="archive__viewport"><div class="archive__track">{cards}</div></div>
   </div>
 </section>
-<div class="marquee" aria-hidden="true"><div class="marquee__track">{run}{run}</div></div>
+<div class="marquee" aria-hidden="true" data-nav="dark"><div class="marquee__track">{run}{run}</div></div>
 <section class="tiles" aria-labelledby="tiles-title">
   <div class="section-head"><h2 class="display display--md" id="tiles-title">The collection</h2><p class="eyebrow">Shop by category</p></div>
   <ul class="tiles__grid">{"".join(tiles)}</ul>
@@ -563,14 +572,90 @@ def home():
         scripts=("home",), pre=loader))
 
 
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Gift cards
+# ---------------------------------------------------------------------------------------------------------------------
+
+
+def gift():
+    root = "../"
+    g = store["gift_cards"]
+    amounts = "".join(
+        f'<label class="chip"><input type="radio" name="amount" value="{a}" {"checked" if a == g["default"] else ""}>'
+        f'<span>{money(a, SYM)}</span></label>' for a in g["amounts"])
+    today = date.today().isoformat()
+    email_form = (
+        C.field("email-to", "Their name", autocomplete="off", maxlength=40)
+        + C.field("email-address", "Their email address", type_="email", autocomplete="off", inputmode="email",
+                  hint="We'll send the card here, with your message.")
+        + C.field("email-from", "Your name", autocomplete="name", maxlength=40)
+        + C.field("email-message", "Message", required=False, maxlength=200, textarea=True, hint="Up to 200 characters.")
+        + f'<div class="field"><label class="field__label" for="email-date">Send on</label>'
+          f'<input type="date" id="email-date" name="email-date" value="{today}" min="{today}" aria-describedby="email-date-err">'
+          f'<p class="field__err" id="email-date-err" aria-live="polite"></p></div>')
+    post_form = (
+        C.field("post-to", "Their name", autocomplete="off", maxlength=40)
+        + C.field("post-line1", "Address line 1", autocomplete="off")
+        + C.field("post-line2", "Address line 2", autocomplete="off", required=False)
+        + '<div class="field-row">'
+        + C.field("post-town", "Town or city", autocomplete="off")
+        + C.field("post-postcode", "Postcode", autocomplete="off", maxlength=8)
+        + '</div>'
+        + C.field("post-from", "Your name", autocomplete="name", maxlength=40)
+        + C.field("post-message", "Message", required=False, maxlength=200, textarea=True, hint="Printed inside the card. Up to 200 characters."))
+
+    def buy(method):
+        return (f'<button type="submit" class="buy-btn"><span class="buy-btn__price" data-gift-price>{money(g["default"], SYM)}</span>'
+                f'<span class="tag__cta">Add to bag</span></button>')
+
+    card = f'''<div class="giftcard" data-gift-card data-method="email">
+  <div class="giftcard__face">
+    <div class="giftcard__top">{wordmark("giftcard__mark", "")}<span class="giftcard__kind" data-gift-kind>E-gift card</span></div>
+    <p class="giftcard__amount" data-gift-amount>{money(g["default"], SYM)}</p>
+    <div class="giftcard__foot"><span>For <span data-gift-to>someone good</span></span><span>The permanent collection</span></div>
+  </div>
+</div>'''
+    main = f'''<div class="pdp gift" data-gift data-symbol="{e(SYM)}">
+  {breadcrumbs([("Shop", root + "shop/"), ("Gift cards", None)])}
+  <div class="pdp__layout gift__layout">
+    <div class="gift__visual">{card}<p class="gift__caption">Preview. The amount and name update as you go.</p></div>
+    <div class="pdp__info"><div class="pdp__sticky">
+      <p class="pdp__meta"><span>Gift card</span><span>From {money(min(g["amounts"]), SYM)}</span></p>
+      <h1 class="pdp__title">Gift card</h1>
+      <p class="pdp__desc">Let them choose. {e(g["terms"])}</p>
+      <fieldset class="option gift__amounts"><legend class="option__legend">Amount</legend><div class="chip-grid">{amounts}</div></fieldset>
+      <p class="option__legend gift__how" id="gift-how">How should it arrive?</p>
+      <div class="gift__methods" role="group" aria-labelledby="gift-how">
+        <button type="button" class="gift__method" data-gift-method="email" aria-expanded="false" aria-controls="gift-email">
+          <svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg><span><strong>Email a gift card</strong><small>{e(g["email_note"])}</small></span></button>
+        <button type="button" class="gift__method" data-gift-method="post" aria-expanded="false" aria-controls="gift-post">
+          <svg class="icon" aria-hidden="true"><use href="#i-post"/></svg><span><strong>Post a gift card</strong><small>{e(g["post_note"])}</small></span></button>
+      </div>
+      <form class="gift__form" id="gift-email" data-gift-form="email" novalidate hidden aria-label="Email a gift card">{email_form}{buy("email")}</form>
+      <form class="gift__form" id="gift-post" data-gift-form="post" novalidate hidden aria-label="Post a gift card">{post_form}{buy("post")}</form>
+      <div class="pdp__details">
+        {C.accordion("How gift cards work", f"<p>{e(g['terms'])}</p><p>The code is entered at checkout. Any balance stays on the card for next time.</p>", "gift-how-it-works", open_=True)}
+        {C.accordion("Delivery", f"<p><strong>Email:</strong> {e(g['email_note'])}</p><p><strong>Post:</strong> {e(g['post_note'])}</p>", "gift-delivery")}
+      </div>
+    </div></div>
+  </div>
+</div>
+{C.json_script("gift-config", {"amounts": g["amounts"], "ids": g.get("shopify_variant_ids", {})})}'''
+    write("gift-cards/index.html", page(
+        title=f'Gift cards | {store["name"]}', desc=f'Archive 88 gift cards by email or post. {g["terms"]}',
+        root=root, path="gift-cards/", main=main, scripts=("gift",)))
+
+
 # ---------------------------------------------------------------------------------------------------------------------
 
 if __name__ == "__main__":
     validate()
     PHOTO_CACHE = {p["handle"]: process_photos(p["handle"]) for p in catalog}
-    for d in ("products", "shop"):
+    for d in ("products", "shop", "gift-cards"):
         shutil.rmtree(ROOT / d, ignore_errors=True)
     home()
+    gift()
     plp(None)
     for c in CATS:
         plp(c)
