@@ -1,79 +1,70 @@
 # Archive 88 storefront: brand and design system
 
 The storefront is the high-volume side of Archive 88: a **permanent collection** of 100 styles (1,830 size × colour
-variants in the sample data). The brand, the components and the UX rules below all serve the same strategy:
+variants in the sample data). It wears **the main site's identity unchanged** (Figma "05 Quiet Caps") and adds the
+architecture a large, sized range needs: variant matrix, filterable listings, quick add and a bag drawer.
 
-> **Premium, restrained, repeatable.** The product is the hero; the interface stays quiet and gets out of the way
-> of a decision. Every pattern earns its place by making it faster to find the right piece in the right size.
+> Same brand, more range. The hang tag, the pills, the uppercase type and the one orange action per page carry over,
+> so the archive and the permanent collection read as one house.
 
 Built with the `ui-ux-pro-max` skill (design-system search: *luxury fashion e-commerce, minimal editorial*; style
-**Minimalism & Swiss**, variance 3, motion 3, density 4). Where this document departs from the generated
-recommendation, the reason is given.
+**Minimalism & Swiss**, variance 3, motion 3, density 4) for structure and UX rules. The visual layer is the
+existing brand, not the skill's generated palette and fonts.
 
 ---
 
-## 1. Brand
+## 1. Brand (shared with the main site)
+
+Brand assets are **shared, not copied**: the wordmark letters and social icons come from `src/partials/defs.html`,
+fonts from `assets/fonts/`, and social links from `data/site.json`. Change them there and both sites follow.
 
 | | |
 | --- | --- |
-| Positioning | Considered clothing in natural fibres, kept in the range season after season. Not drops, not trends. |
-| Promise | *Clothes you keep. Made to be worn often.* |
+| Positioning | Considered clothing in natural fibres, kept in the range season after season. |
 | Tagline | The permanent collection |
-| Voice | Plain, specific, unhurried. Say what it is made of and how it fits. No exclamation marks, no urgency theatre. |
-| Conversion stance | Confidence through clarity, not pressure: real stock levels, free-delivery progress, free returns, one primary action per screen. |
-
-**Why it suits 100 SKUs and high conversion:** a restrained frame makes a large range feel edited rather than
-crowded; consistent 4:5 photography turns the grid into a calm, scannable rhythm; and the brand's only colour is
-reserved for information that changes a decision (stock, bag, progress), so it is never noise.
-
-### Wordmark
-`ARCHIVE` set in Cormorant Garamond 600, uppercase, tracked 0.14em, followed by an italic *88*. It is live text
-(`.wordmark`), so it is sharp at every size and costs no extra request.
+| Voice | Plain, specific, unhurried. Say what it is made of and how it fits. |
+| Signature elements | Centred wordmark nav (Menu / Bag pill), hang-tag product cards with a punched hole and a number, pill buttons and chips, full-screen ink menu, film grain over flat colour |
 
 ### Colour
 
 | Token | Hex | Use |
 | --- | --- | --- |
-| Paper `--paper` | `#F5F4F0` | Page background |
-| Ink `--ink-900` | `#1B211D` | Text, primary buttons, footer (14.9:1 on paper) |
-| Ink muted `--ink-500` | `#5D625E` | Secondary text (5.7:1) |
-| Bone `--bone` | `#E9E6DE` | Behind every product image |
-| Line `--line-300` | `#D2CEC4` | Borders and dividers |
-| Pine `--pine` | `#2F3D33` | Button hover, "in stock" dot, *Added* state |
-| Ember `--ember` | `#A3471F` | **Signals only**: low stock, bag count, free-delivery meter, focus ring (5.5:1) |
-| Error `--error` | `#8F2A1C` | Form errors (7.6:1) |
+| Ink | `#1B211D` | Text, dark tags, footer, menu, selected chips |
+| Bone | `#E6E3DA` | Home background, light tags, behind product photos |
+| Paper | `#F5F4F0` | Shop and product page background, bag |
+| Pine | `#2F3D33` | Green tags, hover on ink, *in stock* / *added* states |
+| Burnt orange | `#A3471F` (hover `#8A3A18`) | **One primary action per page** (hero CTA, Add to bag, Checkout) and **signals** (bag count, low stock, delivery meter, active filter counts, focus ring) |
 
-Departure from the generated palette: it proposed a gold accent (`#A16207`) on stone. Archive 88 already owns
-ember and pine, so the storefront keeps them for continuity with the main site, and the primary action stays ink.
-A coloured "Buy" button is the loudest thing a premium page can do; restraint here is deliberate.
+Accent rules are the main site's: light surfaces only; every other button stays ink. Text contrast: ink-soft
+5.3:1+, orange 5.5:1 on paper and 4.7:1 on bone, paper on orange 5.5:1.
 
 ### Typography
 
 | Role | Face | Where |
 | --- | --- | --- |
-| Editorial serif | **Cormorant Garamond** 500 (+ italic) | Page titles, product names on PDP, section titles, drawer titles, wordmark |
-| Utility sans | **Inter** 400 / 500 / 600 | Everything you read or operate: nav, cards, prices, filters, sizes, buttons, bag |
+| Display | **Archivo Narrow** 500, uppercase, tracked (0.04em titles, 0.2em labels) | Wordmark, page and product titles, tag titles, nav, buttons, chips, labels |
+| Body | **Archivo** 300 / 400 / 500 | Descriptions, prices in running text, form messages |
 
-Departure: the generated pairing was Cormorant + Montserrat. Montserrat is geometric and wide; at 13px in a filter
-list or size grid it reads poorly. Inter was designed for UI at small sizes (tabular figures for prices and stock).
-Both fonts are self-hosted variable files with metric-matched fallbacks (`Inter Fallback`, `Cormorant Fallback`)
-so the page doesn't shift when they load.
+Self-hosted with metric-matched fallbacks, so text doesn't shift when fonts load.
 
-Scale: body 16px / 1.5; UI labels 13px; badges 11px uppercase + 0.08em tracking (badges only). Display sizes use
-`clamp()` from 32px to 92px.
+### Product card = hang tag
+Ink, pine or bone tag (cycled by style number unless `tag` is set in the data), clipped corners and a punched hole,
+`No. 042` and the size range on top, the 4:5 photo, the title over a rule, colour swatches, then the price pill.
+Desktop hover: the tag tilts slightly, the photo switches to the alternate angle instantly, the price pill
+inverts, and quick-add sizes appear over the photo.
 
 ---
 
 ## 2. Token architecture (`assets/css/tokens.css`)
 
-1. **Primitive**: the palette, spacing (4 → 96px), type scale, motion durations.
-2. **Semantic**: what a value is for: `--color-text`, `--color-action`, `--color-signal`, `--color-media`, `--color-error`, `--focus-ring`.
-3. **Component**: values a component owns: `--media-ratio: 4 / 5`, `--sidebar-w`, `--drawer-w`, `--tap: 44px`, `--grid-gap-*`.
+1. **Primitive**: the brand palette (identical to `assets/css/style.css`), fonts, tracking, motion speeds.
+2. **Semantic**: what a value is for: `--color-text`, `--color-primary` (the one orange action), `--color-signal`, `--color-media`, `--color-error`.
+3. **Component**: values a component owns: `--media-ratio: 4 / 5`, `--tag-clip`, `--pill`, `--sidebar-w`, `--drawer-w`, `--tap: 44px`.
 
 Components read layers 2 and 3 only. To restyle, change a semantic token; no component CSS changes.
 
-Motion tokens: `--dur-instant` (0ms, card angle swap), `--dur-fast` 140ms (hover), `--dur-base` 220ms,
-`--dur-enter` 320ms / `--dur-exit` 220ms (exits faster than entrances). `prefers-reduced-motion` removes movement
+Motion tokens are the main site's: `--t-press` 80ms, `--t-fast` 300ms (hovers, exits), `--t-base` 500ms (drawers,
+state changes), `--t-slow` 1s (menu reveal, grain), plus `--t-instant` 0ms for the card angle swap. `prefers-reduced-motion` removes movement
 but keeps every state change.
 
 ---
@@ -86,16 +77,17 @@ under the same name; behaviour lives in `assets/js/`.
 | Component | Python | CSS | JS | Notes |
 | --- | --- | --- | --- | --- |
 | Media frame | `media()`, `frame()` | `.media` | – | The only way an image is drawn. Strict 4:5. |
-| Product card | `product_card()` | `.card` | `store.js` | Used on PLP, home, PDP recommendations. |
+| Product card (hang tag) | `product_card()` | `.card.tag` | `store.js` | Used on PLP, home, PDP recommendations. |
 | Swatches | `swatch_list()` | `.swatch` | `store.js` | Recolour the card in place; link keeps `?colour=`. |
 | Quick add | inside `product_card()` | `.quick-add` | `store.js` | Fine pointers only. Sizes for the shown colour; sold-out struck through. |
 | Badge | `badge()` | `.badge` | – | *New*, *Few left* (signal), *Sold out*. Max two. |
 | Filter group | `filter_group()` | `.filter` | `plp.js` | `<details>`; shows a count of active choices. |
 | Size chips / colour options | `size_chips()`, `colour_filters()` | `.chip`, `.colour-opt` | `plp.js` | Real checkboxes, 44px targets. |
-| Drawer | `drawer()` | `.drawer` | `store.js` (`Drawer`) | One controller for bag, menu, mobile filters, size sheet. |
-| Colour / size selectors | `colour_selector()`, `size_selector()` | `.option`, `.size-opt` | `pdp.js` | Real radios. Sold-out sizes disabled and struck; low stock gets an ember dot. |
+| Drawer | `drawer()` | `.drawer`, `.drawer--menu` | `store.js` (`Drawer`) | One controller for bag, full-screen menu, mobile filters, size sheet. |
+| Colour / size selectors | `colour_selector()`, `size_selector()` | `.option`, `.size-opt` | `pdp.js` | Real radios. Sold-out sizes disabled and struck; low stock gets an orange dot. |
 | Variant matrix | `variant_matrix()` | `.matrix` | – | Full size × colour availability table (PDP, *Availability*). |
-| Sticky Add to bag | `sticky_atc()` | `.sticky-atc` | `pdp.js` | Phones/tablets only. |
+| Buy pill | inline in `pdp()` | `.buy-btn` | `pdp.js` | Price left, inset *Add to bag* pill right. Orange. |
+| Sticky Add to bag | `sticky_atc()` | `.sticky-atc` | `pdp.js` | Floating pill, phones/tablets only. |
 | Accordion | `accordion()` | `.accordion` | – | Native `<details>`. |
 
 ### Scaling the catalogue
@@ -140,7 +132,7 @@ without a size shows the error next to the sizes and moves focus there. `?colour
 with the product, chosen colour/size and price. With no size chosen it reads *Select size* and opens a bottom sheet
 of sizes; picking one adds to the bag. Page padding grows so the bar never covers the footer.
 
-**Accessibility.** AA contrast on every text/background pair; visible focus ring (ember) on everything; real form
+**Accessibility.** AA contrast on every text/background pair; visible focus ring (orange) on everything; real form
 controls for every option; 44px minimum targets; live regions announce result counts, stock and bag changes;
 skip link; `prefers-reduced-motion` respected.
 
@@ -148,10 +140,10 @@ skip link; `prefers-reduced-motion` respected.
 
 ## 5. Pre-delivery checklist (ui-ux-pro-max)
 
-- [x] No emoji as icons (SVG sprite, Lucide-style strokes)
+- [x] No emoji as icons (SVG sprite; Phosphor social icons shared with the main site)
 - [x] Pointer cursor and hover feedback on every clickable element
-- [x] Hover/press transitions 140–320ms, exits faster than entrances
-- [x] Text contrast ≥ 4.5:1 (lowest pair: ember on paper, 5.5:1)
+- [x] Hover/press transitions 80–500ms on the brand's motion tokens, exits faster than entrances
+- [x] Text contrast ≥ 4.5:1 (lowest pair: orange on bone, 4.7:1)
 - [x] Visible focus for keyboard navigation
 - [x] `prefers-reduced-motion` respected
 - [x] Responsive at 375 / 768 / 1024 / 1440, no horizontal scroll (checked at 390px)

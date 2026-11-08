@@ -39,7 +39,7 @@
       stack.push(el);
       document.body.classList.add("is-locked");
       $("main")?.setAttribute("inert", "");
-      $(".site-header")?.setAttribute("inert", "");
+      $(".nav")?.setAttribute("inert", "");
       if (el._opener && el._opener.setAttribute) el._opener.setAttribute("aria-expanded", "true");
       const panel = $(".drawer__panel", el);
       requestAnimationFrame(() => panel.focus({ preventScroll: true }));
@@ -52,7 +52,7 @@
       if (!stack.length) {
         document.body.classList.remove("is-locked");
         $("main")?.removeAttribute("inert");
-        $(".site-header")?.removeAttribute("inert");
+        $(".nav")?.removeAttribute("inert");
       }
       const persistent = el.hasAttribute("data-drawer-persistent");
       const done = () => {

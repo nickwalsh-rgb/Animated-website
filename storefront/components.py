@@ -105,9 +105,22 @@ def swatch_list(p: dict, *, limit: int = 5) -> str:
 # ---------------------------------------------------------------------------------------------------------------------
 
 
+TAG_TONES = ("ink", "pine", "paper")
+
+
+def tag_tone(p: dict) -> str:
+    """Hang-tag colour: from the data if set, otherwise cycled by style number so neighbours differ."""
+    return p.get("tag") or TAG_TONES[int(p["style"].split("-")[-1]) % 3]
+
+
+def size_range(p: dict) -> str:
+    return p["sizes"][0] if len(p["sizes"]) == 1 else f'{p["sizes"][0]}–{p["sizes"][-1]}'
+
+
 def product_card(p: dict, root: str, sym: str, *, eager: bool = False, quick_add: bool = True) -> str:
-    """The product card. Hover (fine pointers only) swaps to the alternate angle instantly; the second image is
-    already loaded in the same frame, so there's no flash. Data attributes drive filtering, sorting and quick add."""
+    """The product card, drawn as an Archive 88 hang tag. Hover (fine pointers only) swaps the photo to the alternate
+    angle instantly; the second image is already loaded in the same frame, so there's no flash. Data attributes drive
+    filtering, sorting and quick add."""
     first = p["colours"][0]
     v = p["media"][first["handle"]]
     url = f'{root}products/{p["handle"]}/'
@@ -137,7 +150,11 @@ def product_card(p: dict, root: str, sym: str, *, eager: bool = False, quick_add
         qa = (f'<div class="quick-add" data-quick-add>'
               f'<p class="quick-add__label">Quick add <span class="quick-add__colour">{e(first["name"])}</span></p>'
               f'<div class="quick-add__sizes"></div></div>')
-    return f'''<article class="card" data-product="{e(p["handle"])}" data-title="{e(p["title"])}" data-style="{e(p["style"])}" data-sil="{e(p["silhouette"])}" data-url="{e(url)}" data-colours="{colours_json}" {attrs}>
+    number = p["style"].split("-")[-1]
+    cta = "Sold out" if p["sold_out"] else "Choose size"
+    return f'''<article class="card tag tag--{tag_tone(p)}{" is-soldout" if p["sold_out"] else ""}" data-product="{e(p["handle"])}" data-title="{e(p["title"])}" data-style="{e(p["style"])}" data-sil="{e(p["silhouette"])}" data-url="{e(url)}" data-colours="{colours_json}" {attrs}>
+  <span class="tag__hole" aria-hidden="true"></span>
+  <p class="tag__top"><span>No. {e(number)}</span><span>{e(size_range(p))}</span></p>
   <div class="card__media">
     <a class="card__link" href="{e(url)}" tabindex="-1" aria-hidden="true">
       {frame(media(v[0], alt_front, eager=eager, cls="media__item--primary") + media(v[1], alt_back, cls="media__item--alt"), "media--hover")}
@@ -147,8 +164,8 @@ def product_card(p: dict, root: str, sym: str, *, eager: bool = False, quick_add
   </div>
   <div class="card__body">
     <h3 class="card__title"><a href="{e(url)}">{e(p["title"])}</a></h3>
-    {price(p, sym)}
     {swatch_list(p)}
+    <div class="tag__add">{price(p, sym)}<span class="tag__cta" aria-hidden="true">{cta}</span></div>
   </div>
 </article>'''
 
@@ -254,13 +271,13 @@ def accordion(title: str, body: str, aid: str, open_: bool = False) -> str:
 
 
 def sticky_atc(p: dict, sym: str) -> str:
-    """Mobile-only bar pinned to the bottom while the main Add to bag button is off screen."""
+    """Phones/tablets: a floating pill pinned to the bottom while the main Add to bag button is off screen."""
     return f'''<div class="sticky-atc" data-sticky-atc hidden>
   <div class="sticky-atc__info">
     <p class="sticky-atc__title">{e(p["title"])}</p>
     <p class="sticky-atc__meta"><span data-sticky-variant>{e(p["colours"][0]["name"])}</span> · {money(p["price"], sym)}</p>
   </div>
-  <button type="button" class="btn btn--primary sticky-atc__btn" data-sticky-btn>Select size</button>
+  <button type="button" class="buy-btn buy-btn--bar" data-sticky-btn><span class="tag__cta" data-sticky-label>Select size</span></button>
 </div>'''
 
 
@@ -273,7 +290,7 @@ def drawer(did: str, title: str, body: str, *, side: str = "right", footer: str 
   <div class="drawer__panel" tabindex="-1">
     <header class="drawer__head">
       <h2 class="drawer__title" id="{e(did)}-title">{e(title)}{label_extra}</h2>
-      <button type="button" class="icon-btn" data-drawer-close aria-label="Close">{icon("x")}</button>
+      <button type="button" class="drawer__close" data-drawer-close>Close</button>
     </header>
     <div class="drawer__body">{body}</div>
     {foot}

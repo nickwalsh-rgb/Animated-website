@@ -47,10 +47,10 @@
     else { stockMsg.textContent = "In stock. Dispatched in 1 to 2 working days"; stockMsg.classList.add("is-in"); }
     const all = M.sizes.every((x) => units(c.h, x) === 0);
     atc.disabled = all;
-    atc.innerHTML = all ? `Sold out in ${esc(c.n)}` : atcLabel;
+    atc.innerHTML = all ? `<span class="buy-btn__price">Sold out in ${esc(c.n)}</span>` : atcLabel;
     // sticky bar
     $("[data-sticky-variant]").textContent = [c.n, s].filter(Boolean).join(", ");
-    stickyBtn.textContent = all ? "Sold out" : s ? "Add to bag" : "Select size";
+    $("[data-sticky-label]", stickyBtn).textContent = all ? "Sold out" : s ? "Add to bag" : "Select size";
     stickyBtn.disabled = all;
     if (push) {
       const url = new URL(location.href);
@@ -91,7 +91,7 @@
     if (!s) return false;
     if (Cart.add(item(s), { opener })) {
       atc.classList.add("is-added");
-      atc.textContent = "Added to bag";
+      $("[data-atc-label]", atc).textContent = "In bag";
       setTimeout(() => { atc.classList.remove("is-added"); update({ push: false }); }, 1400);
     }
     return true;
