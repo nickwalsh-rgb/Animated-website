@@ -160,7 +160,8 @@ is a normal sideways-scrolling row. Everything is reachable either way.
 ## 4c. Nav tone and gift cards
 
 **Inverting nav (site-wide).** Any section marked `data-nav="dark"` (the homepage film hero, the marquee, the
-footer) flips the header while the header sits over it: transparent with bone type, wordmark and Bag pill. Everywhere
+footer) flips the header while the header sits over it: a dark bar with bone type, wordmark and Bag pill (fully
+see-through over sections that also carry `data-nav-clear`, i.e. the film hero). Everywhere
 else it is a solid light bar with ink type. `store.js` watches a 1px line through the middle of the nav, and CSS
 cross-fades between the two (300ms). To make a new section invert the nav, add `data-nav="dark"` to it.
 
@@ -178,6 +179,8 @@ free delivery. `?send=email|post` deep-links a method.
 Before launch: confirm gift card terms (validity, refunds) and set up Shopify gift card products; add their
 variant ids to `gift_cards.shopify_variant_ids` (`"email/100": id`). Recipient details travel with the bag line
 but a plain cart link can't pass them to Shopify; that needs Shopify's gift card recipient fields or an app.
+
+**Footer sign-off.** Every page ends with the small A88 monogram, centred under the large wordmark, linking home.
 
 ## 5. Pre-delivery checklist (ui-ux-pro-max)
 

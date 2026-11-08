@@ -275,6 +275,9 @@ def footer(root: str) -> str:
     <div class="footer__end">{social("footer")}<p>© {date.today().year} {e(store["name"])}</p><p class="footer__small">Sample catalogue: names, prices and stock are placeholders.</p></div>
   </div>
   {wordmark("wordmark--footer")}
+  <div class="footer__base">
+    <a class="footer__mono" href="{root}" aria-label="{e(store["name"])}, home"><svg viewBox="0 0 146 68" aria-hidden="true" focusable="false"><use href="#mono"/></svg></a>
+  </div>
 </footer>'''
 
 
@@ -531,7 +534,7 @@ def home():
   </div>
 </div>
 '''
-    main = f'''<section class="hero" data-nav="dark">
+    main = f'''<section class="hero" data-nav="dark" data-nav-clear>
   <div class="hero__film" aria-hidden="true">
     <video class="hero__video" muted loop playsinline preload="metadata" poster="{root}../assets/img/forest-poster.jpg">
       <source src="{root}../assets/video/forest-portrait.mp4" type="video/mp4" media="(max-width: 720px) and (orientation: portrait)">

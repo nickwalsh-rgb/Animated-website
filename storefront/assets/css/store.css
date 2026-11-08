@@ -678,7 +678,8 @@ html.has-motion .archive__viewport { overflow: visible; padding-bottom: 0; }
 /* ── Nav tone: solid light bar by default, transparent with light type over dark sections ── */
 .nav { transition: background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out), backdrop-filter var(--t-fast); }
 .nav .nav__cart, .nav .nav__count { transition: background-color var(--t-fast), color var(--t-fast), border-color var(--t-fast); }
-body.nav-on-dark .nav { background: transparent; color: var(--bone); backdrop-filter: none; }
+body.nav-on-dark .nav { background: color-mix(in srgb, var(--ink) 94%, transparent); color: var(--bone); }
+body.nav-on-dark.nav-clear .nav { background: transparent; backdrop-filter: none; }
 body.nav-on-dark .nav__count[data-empty] { background: var(--bone); color: var(--ink); }
 body.nav-on-dark .social--nav { --face: var(--bone); --icon: var(--ink); --base: #9d998e; --rim: rgba(255,255,255,.55); }
 body.nav-on-dark .nav :focus-visible { outline-color: var(--bone); }
@@ -763,3 +764,9 @@ body.nav-on-dark .nav :focus-visible { outline-color: var(--bone); }
 .gift__amounts { display: block; }
 .gift__amounts .option__legend { float: none; display: block; margin-bottom: 12px; }
 .gift__how { float: none; }
+
+/* Footer sign-off: the small A88 mark at the very bottom of every page */
+.footer__base { display: flex; justify-content: center; margin-top: clamp(28px, 5vh, 48px); padding-top: clamp(20px, 3vh, 28px); border-top: 1px solid rgba(230,227,218,.14); }
+.footer__mono { display: grid; place-items: center; width: 64px; height: 44px; color: var(--bone); transition: opacity var(--t-fast), transform var(--t-base) var(--ease-spring); }
+.footer__mono svg { width: 40px; height: auto; fill: currentColor; }
+.footer__mono:hover { opacity: .7; transform: translateY(-2px); }

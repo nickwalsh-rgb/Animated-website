@@ -275,6 +275,8 @@
       io = new IntersectionObserver((entries) => {
         entries.forEach((en) => (en.isIntersecting ? over.add(en.target) : over.delete(en.target)));
         document.body.classList.toggle("nav-on-dark", over.size > 0);
+        // See-through only over sections that ask for it (the film hero); other dark sections get a solid dark bar.
+        document.body.classList.toggle("nav-clear", [...over].some((el) => el.hasAttribute("data-nav-clear")));
       }, { rootMargin: "-" + mid + "px 0px -" + below + "px 0px" });
       darks.forEach((d) => io.observe(d));
     };
