@@ -53,6 +53,8 @@ category, and lists any pieces that are still waiting for photos.
 `storefront/` is a separate, high-volume shop: 100 styles with size × colour variants, a product listing page with a
 sticky filter sidebar, product pages with a variant matrix and a mobile sticky Add to bag, and a slide-out bag.
 It uses the same brand (wordmark, fonts, colours, hang tags) with its own data, build and components, and does not change the pages above.
+Its homepage has the main site's motion (intro loader, drifting wordmark, pinned swinging hang tags, marquee, smooth
+scroll); the shop and product pages stay static.
 
 ```bash
 python3 storefront/build.py                 # rebuild the storefront

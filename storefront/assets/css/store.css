@@ -623,3 +623,54 @@ body.has-sticky-atc .toast { bottom: calc(92px + env(safe-area-inset-bottom)); }
 .tile .media__art { background: var(--paper); }
 body[data-tone="bone"] .tag--paper { --tag-bg: var(--paper); }
 body[data-tone="bone"] .tag--paper .media, body[data-tone="bone"] .tag--paper .media__art { background: var(--bone); }
+
+/* ── Homepage motion (home.js). Without motion every section is complete and static. ── */
+.loader { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: var(--ink); color: var(--bone); }
+.loader__inner { width: min(560px, 78vw); }
+.wordmark--loader { overflow: hidden; }
+.loader__meta {
+  display: flex; justify-content: space-between; margin-top: 20px; color: var(--bone-soft);
+  font-family: var(--font-display); font-weight: 500; font-size: 12px; letter-spacing: var(--track-label); text-transform: uppercase;
+}
+.loader__count { font-variant-numeric: tabular-nums; }
+html.seen-intro .loader, html.no-js .loader { display: none; }
+.wordmark--hero { overflow: hidden; }
+body.is-intro { overflow: hidden; }
+
+/* New in: a sideways track of hang tags. Static: it scrolls sideways. With motion: pinned and driven by page scroll. */
+.archive { margin-top: clamp(40px, 8vh, 80px); }
+.archive__pin { display: flex; flex-direction: column; justify-content: center; padding: 24px 0 48px; overflow: hidden; }
+html.has-motion .archive__pin { min-height: 100vh; min-height: 100svh; padding-top: calc(var(--nav-h) + 16px); }
+.archive__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px 24px; flex-wrap: wrap; padding: 0 var(--gutter); margin-bottom: clamp(28px, 5vh, 56px); }
+.archive__head .eyebrow { width: 100%; }
+.archive__side { display: flex; flex-direction: column; align-items: flex-end; gap: 18px; margin-bottom: 8px; }
+.archive__progress { width: min(240px, 30vw); height: 1px; background: rgba(27,33,29,.18); }
+.archive__progress span { display: block; height: 100%; background: var(--accent); transform-origin: left; transform: scaleX(0); }
+.archive__viewport { overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; padding-bottom: 24px; }
+.archive__viewport::-webkit-scrollbar { display: none; }
+html.has-motion .archive__viewport { overflow: visible; padding-bottom: 0; }
+.archive__track { display: flex; gap: clamp(20px, 3vw, 48px); width: max-content; padding: 0 var(--gutter); will-change: transform; }
+.archive__track .tag { width: clamp(230px, min(22vw, (100svh - 360px) * 0.6), 300px); flex: none; transition: none; }
+.archive__track .tag:hover { transform: none; } /* GSAP swings these; no CSS tilt fighting it */
+@media (max-height: 780px) and (min-width: 721px) {
+  html.has-motion .archive__pin { padding-top: calc(var(--nav-h) + 4px); padding-bottom: 20px; }
+  .archive__head { margin-bottom: 20px; }
+  .archive__head .eyebrow { display: none; }
+}
+@media (max-width: 720px) {
+  .archive__track .tag { width: clamp(180px, min(64vw, (100svh - 290px) * 0.56), 260px); }
+  .archive__head { margin-bottom: 20px; align-items: center; }
+  .archive__head .eyebrow { display: none; }
+  .archive__side { margin-bottom: 0; gap: 12px; }
+  .archive__progress { width: 96px; }
+  html.has-motion .archive__pin { padding-bottom: 16px; }
+}
+
+/* Marquee band */
+.marquee { margin-top: clamp(64px, 10vh, 120px); padding: 28px 0; overflow: hidden; background: var(--ink); color: var(--bone); }
+.marquee__track {
+  display: flex; align-items: center; gap: 40px; width: max-content; padding-right: 40px; white-space: nowrap; will-change: transform;
+  font-family: var(--font-display); font-weight: 500; font-size: clamp(36px, 6vw, 88px); letter-spacing: .08em; text-transform: uppercase;
+}
+.marquee__track i { font-style: normal; font-size: .35em; opacity: .5; }
+.marquee + .tiles { margin-top: clamp(64px, 10vh, 120px); }

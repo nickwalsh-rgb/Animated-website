@@ -43,7 +43,7 @@
       if (el._opener && el._opener.setAttribute) el._opener.setAttribute("aria-expanded", "true");
       const panel = $(".drawer__panel", el);
       requestAnimationFrame(() => panel.focus({ preventScroll: true }));
-      el.dispatchEvent(new CustomEvent("drawer:open"));
+      el.dispatchEvent(new CustomEvent("drawer:open", { bubbles: true }));
     },
     close(el) {
       if (!el || !el.classList.contains("is-open")) return;
@@ -61,7 +61,7 @@
       };
       reduced.matches ? done() : setTimeout(done, 240);
       if (el._opener && el._opener.focus) { el._opener.setAttribute?.("aria-expanded", "false"); el._opener.focus({ preventScroll: true }); }
-      el.dispatchEvent(new CustomEvent("drawer:close"));
+      el.dispatchEvent(new CustomEvent("drawer:close", { bubbles: true }));
     },
     top: () => stack[stack.length - 1],
   };

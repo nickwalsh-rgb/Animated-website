@@ -292,7 +292,7 @@ def drawer(did: str, title: str, body: str, *, side: str = "right", footer: str 
       <h2 class="drawer__title" id="{e(did)}-title">{e(title)}{label_extra}</h2>
       <button type="button" class="drawer__close" data-drawer-close>Close</button>
     </header>
-    <div class="drawer__body">{body}</div>
+    <div class="drawer__body" data-lenis-prevent>{body}</div>
     {foot}
   </div>
 </div>'''

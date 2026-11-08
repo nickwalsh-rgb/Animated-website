@@ -200,7 +200,7 @@ SPRITE = (ROOT / "assets" / "sprite.svg").read_text() if (ROOT / "assets" / "spr
 SITE_ROOT = ROOT.parent
 BRAND_DEFS = (SITE_ROOT / "src" / "partials" / "defs.html").read_text()
 SITE = json.loads((SITE_ROOT / "data" / "site.json").read_text())
-WM = "".join(f'<use href="#wm-{c}"/>' for c in ["A", "R", "C", "H", "I", "V", "E", "8a", "8b"])
+WM = "".join(f'<use href="#wm-{c}" class="wm-l"/>' for c in ["A", "R", "C", "H", "I", "V", "E", "8a", "8b"])
 
 
 def wordmark(cls: str = "", label: str = "Archive 88") -> str:
@@ -312,13 +312,15 @@ def menu_drawer(root: str) -> str:
     return C.drawer("menu", "Menu", body, side="menu")
 
 
-def page(*, title, desc, root, path, main, active=None, scripts=(), jsonld=None, extra="", tone="paper") -> str:
+def page(*, title, desc, root, path, main, active=None, scripts=(), jsonld=None, extra="", tone="paper",
+         vendor=(), pre="") -> str:
     canonical = store["url"] + path
     cfg = {"root": root, "currency": store["currency"], "symbol": SYM, "locale": store["locale"],
            "freeShipping": store["free_shipping_threshold"], "lowStock": LOW, "shopify": store.get("shopify_domain", "")}
-    js = "".join(f'<script src="{root}assets/js/{s}.js" defer></script>' for s in ("store", *scripts))
+    js = "".join(f'<script src="{root}../{v}" defer></script>' for v in vendor)
+    js += "".join(f'<script src="{root}assets/js/{s}.js" defer></script>' for s in ("store", *scripts))
     return (head(title, desc, root, canonical, jsonld) +
-            f'\n<body data-tone="{tone}">\n{BRAND_DEFS}\n{SPRITE}\n{header(root, active)}\n<main id="main">\n{main}\n</main>\n{footer(root)}\n'
+            f'\n<body data-tone="{tone}">\n{pre}{BRAND_DEFS}\n{SPRITE}\n{header(root, active)}\n<main id="main">\n{main}\n</main>\n{footer(root)}\n'
             f'{cart_drawer().replace("__ROOT__", root)}\n{menu_drawer(root)}\n{extra}\n'
             f'<div class="grain" aria-hidden="true"></div>\n'
             f'<div class="toast" data-toast role="status" aria-live="polite"></div>\n'
@@ -517,25 +519,48 @@ def home():
         tiles.append(f'<li><a class="tile" href="shop/{c["handle"]}/">{C.frame(C.media(v, ""), "tile__media")}'
                      f'<span class="tile__meta"><span>{i:02d}</span><span>{counts[c["handle"]]} styles</span></span>'
                      f'<span class="tile__title">{e(c["title"])}</span></a></li>')
-    newest = [p for p in sorted(catalog, key=lambda p: p["rank"]) if p.get("new")][:8]
+    newest = [p for p in sorted(catalog, key=lambda p: p["rank"]) if p.get("new")][:10]
     cards = "".join(C.product_card(p, root, SYM) for p in newest)
+    words = ["Natural fibres", "Kept in every size", "Free 30-day returns", "Made to be worn often", f"{len(catalog)} styles"]
+    run = "".join(f"<span>{e(w)}</span><i>✦</i>" for w in words)
+    loader = f'''<script>try{{if(sessionStorage.getItem("a88-store-intro"))document.documentElement.classList.add("seen-intro")}}catch(e){{}}</script>
+<div class="loader" aria-hidden="true">
+  <div class="loader__inner">
+    {wordmark("wordmark--loader", "")}
+    <div class="loader__meta"><span>{e(store["tagline"])}</span><span class="loader__count"><span class="js-count">00</span>/{len(catalog)}</span></div>
+  </div>
+</div>
+'''
     main = f'''<section class="hero">
   <h1 class="hero__mark">{wordmark("wordmark--hero", store["name"] + ": " + store["tagline"])}</h1>
   <div class="hero__foot">
-    <div><p class="hero__line">{e(store["tagline"].capitalize())}. {len(catalog)} styles in natural fibres, kept in every size.</p>
+    <div class="js-hero-fade"><p class="hero__line">{e(store["tagline"].capitalize())}. {len(catalog)} styles in natural fibres, kept in every size.</p>
     <p class="hero__signal">Free UK delivery over {money(store["free_shipping_threshold"], SYM)}. Free 30-day returns.</p></div>
-    <a class="btn btn--accent btn--lg" href="shop/">Shop the collection</a>
+    <a class="btn btn--accent btn--lg js-hero-fade" href="shop/">Shop the collection</a>
   </div>
 </section>
+<section class="archive" aria-labelledby="new-title">
+  <div class="archive__pin">
+    <div class="archive__head">
+      <p class="eyebrow">Just in · {len(newest)} styles</p>
+      <h2 class="display display--md" id="new-title">New in</h2>
+      <div class="archive__side">
+        <a class="link-line" href="shop/?sort=new">View all new <span aria-hidden="true">→</span></a>
+        <div class="archive__progress" aria-hidden="true"><span class="js-progress"></span></div>
+      </div>
+    </div>
+    <div class="archive__viewport"><div class="archive__track">{cards}</div></div>
+  </div>
+</section>
+<div class="marquee" aria-hidden="true"><div class="marquee__track">{run}{run}</div></div>
 <section class="tiles" aria-labelledby="tiles-title">
   <div class="section-head"><h2 class="display display--md" id="tiles-title">The collection</h2><p class="eyebrow">Shop by category</p></div>
   <ul class="tiles__grid">{"".join(tiles)}</ul>
-</section>
-<section class="recs" aria-labelledby="new-title">
-  <div class="section-head"><h2 class="display display--md" id="new-title">New in</h2><a class="link-line" href="shop/?sort=new">View all new <span aria-hidden="true">→</span></a></div>
-  <div class="grid grid--4">{cards}</div>
 </section>'''
-    write("index.html", page(title=f'{store["name"]}: {store["tagline"]}', desc=store["description"], root=root, path="", main=main, tone="bone"))
+    write("index.html", page(
+        title=f'{store["name"]}: {store["tagline"]}', desc=store["description"], root=root, path="", main=main, tone="bone",
+        vendor=("assets/vendor/gsap.min.js", "assets/vendor/ScrollTrigger.min.js", "assets/vendor/lenis.min.js"),
+        scripts=("home",), pre=loader))
 
 
 # ---------------------------------------------------------------------------------------------------------------------

@@ -138,6 +138,24 @@ skip link; `prefers-reduced-motion` respected.
 
 ---
 
+## 4b. Homepage motion (homepage only)
+
+The homepage carries the main site's motion; listing and product pages deliberately don't (no animation libraries
+are loaded there, so 100-style grids stay fast and still). `assets/js/home.js`, using the vendored
+GSAP + ScrollTrigger + Lenis in `/assets/vendor/`:
+
+| Moment | What happens |
+| --- | --- |
+| Smooth scroll | Lenis on the homepage; paused whenever the bag, menu or any drawer is open |
+| Intro loader | First visit per session: wordmark letters rise, a counter runs to the number of styles, the ink panel lifts away. Later visits get a short rise. Any click or key skips it |
+| Hero | Wordmark letters rise in; on scroll they drift apart at different speeds while the hero fades |
+| New in | Pinned sideways track of hang tags driven by page scroll; tags swing with scroll speed (elastic) and settle; orange progress line. Tabbing into a tag scrolls it into view |
+| Marquee | Ink band that drifts, speeds up and flips direction with scroll |
+| Categories | Tiles rise in with a stagger |
+
+With `prefers-reduced-motion`, no JS, or if the libraries fail to load: no loader, no pinning, and the New in track
+is a normal sideways-scrolling row. Everything is reachable either way.
+
 ## 5. Pre-delivery checklist (ui-ux-pro-max)
 
 - [x] No emoji as icons (SVG sprite; Phosphor social icons shared with the main site)
