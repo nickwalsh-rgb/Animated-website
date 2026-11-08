@@ -2,8 +2,8 @@
 # straight on GitHub (no Python needed on your computer).
 #
 # Runs when:
-#   - data, templates, the build script or product photos change on main
-#   - every hour, so a scheduled drop goes live on time (it only commits if something changed)
+#   - data, page sources, the build scripts or product photos change on main
+#   - every hour (it only commits if something changed), ready for a scheduled stock import
 #   - you press "Run workflow" under the Actions tab
 name: Build site
 
@@ -13,13 +13,9 @@ on:
     paths:
       - "data/**"
       - "src/**"
-      - "build.py"
+      - "*.py"
       - "assets/products/**"
       - "!assets/products/*/web/**"
-      - "storefront/data/**"
-      - "storefront/*.py"
-      - "storefront/assets/products/**"
-      - "!storefront/assets/products/*/web/**"
   schedule:
     - cron: "7 * * * *"
   workflow_dispatch:
@@ -47,9 +43,6 @@ jobs:
 
       - name: Build
         run: python build.py
-
-      - name: Build storefront
-        run: python storefront/build.py
 
       - name: Commit generated files
         id: commit

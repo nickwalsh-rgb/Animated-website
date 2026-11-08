@@ -1,899 +1,888 @@
 #!/usr/bin/env python3
-"""Archive 88 site build.
+"""Builds the Archive 88 site from data/ and src/ into static pages.
 
-Reads data/site.json + data/products.json, the templates in src/partials/ and the
-info pages in src/pages/, then writes:
-  index.html                       homepage (current drop)
-  shop/index.html                  every available piece, filterable
-  record/index.html                every piece ever released, by drop
-  products/<handle>/index.html     one page per piece
-  <slug>/index.html                about, contact, size guide, privacy, terms
-  shopify/products.csv             Shopify product import (same data)
-  sitemap.xml, robots.txt
+    python3 build.py
 
-Photos: drop files into assets/products/<handle>/ (01.jpg, 02.jpg ...) and rebuild.
-If Pillow is installed (pip install pillow) web-sized copies are made in
-assets/products/<handle>/web/. Without it, the originals are used as they are.
+Reads   data/store.json, data/catalog.json, assets/products/<handle>/<colour>-<n>.(jpg|png|webp)
+Writes  index.html, shop/index.html, shop/<category>/index.html, products/<handle>/index.html,
+        assets/products/<handle>/web/* (4:5 crops at 480/960/1600 px, when Pillow is installed)
 
-Usage:  python3 build.py
+Standard library only; Pillow is optional (photo cropping/resizing). Markup comes from components.py.
 """
 from __future__ import annotations
 
-import csv
-import datetime as dt
-import html
 import json
 import re
 import shutil
-import struct
 import sys
+from datetime import date
 from pathlib import Path
-from zoneinfo import ZoneInfo
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import components as C  # noqa: E402
+from components import e, icon, money  # noqa: E402
+
+ROOT = Path(__file__).resolve().parent
+DATA = ROOT / "data"
+PHOTOS = ROOT / "assets" / "products"
+WIDTHS = (480, 960, 1600)
+RATIO = 4 / 5
+ANGLES = ("front", "back", "detail", "fabric")
+ANGLE_LABEL = {"front": "front", "back": "back", "detail": "detail", "fabric": "fabric close-up"}
 
 try:
     from PIL import Image, ImageOps
-except ImportError:  # photos are then served at original size
+except ImportError:  # photos are still used, just not cropped/resized
     Image = None
 
-ROOT = Path(__file__).resolve().parent
-SRC = ROOT / "src" / "partials"
-PAGES = ROOT / "src" / "pages"
-UK = ZoneInfo("Europe/London")
-NOW = dt.datetime.now(UK)
-IMG_EXT = {".jpg", ".jpeg", ".png", ".webp"}
-TAGS = {"ink", "pine", "paper"}
-WEB_WIDTHS = (480, 960, 1600)
-# Info page slugs become top-level folders that the build deletes and regenerates,
-# so they must never collide with real folders.
-RESERVED = {"assets", "data", "src", "docs", "shopify", "products", "shop", "record", "lookbook", "github", "node_modules"}
-WM = "".join(f'<use href="#wm-{c}" class="wm-l"/>' for c in ["A", "R", "C", "H", "I", "V", "E", "8a", "8b"])
-SCRIPTS = ["assets/vendor/gsap.min.js", "assets/vendor/ScrollTrigger.min.js", "assets/vendor/lenis.min.js",
-           "assets/js/site.js"]
 
+def fail(msg: str):
+    sys.exit(f"\n  Build stopped: {msg}\n")
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Data
+# ---------------------------------------------------------------------------------------------------------------------
+
+store = json.loads((DATA / "store.json").read_text())
+catalog = json.loads((DATA / "catalog.json").read_text())["products"]
+SYM = store["currency_symbol"]
+LOW = store["low_stock_threshold"]
+CATS = store["categories"]
+CAT_BY = {c["handle"]: c for c in CATS}
+REQUIRED = ("handle", "style", "title", "category", "silhouette", "price", "colours", "sizes", "stock", "description")
+
+
+def validate():
+    seen, styles = set(), set()
+    for i, p in enumerate(catalog):
+        for f in REQUIRED:
+            if f not in p:
+                fail(f"product #{i + 1} ({p.get('handle', '?')}) is missing '{f}'")
+        if p["handle"] in seen:
+            fail(f"duplicate handle '{p['handle']}'")
+        if p["style"] in styles:
+            fail(f"duplicate style number '{p['style']}'")
+        if not re.fullmatch(r"[a-z0-9-]+", p["handle"]):
+            fail(f"handle '{p['handle']}' may only use a-z, 0-9 and -")
+        if p["category"] not in CAT_BY:
+            fail(f"'{p['handle']}' has unknown category '{p['category']}'")
+        for c in p["colours"]:
+            if c["handle"] not in p["stock"]:
+                fail(f"'{p['handle']}' has no stock row for colour '{c['handle']}'")
+            missing = [s for s in p["sizes"] if s not in p["stock"][c["handle"]]]
+            if missing:
+                fail(f"'{p['handle']}' / {c['handle']} has no stock for sizes {missing}")
+        seen.add(p["handle"])
+        styles.add(p["style"])
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Photos: everything is centre-cropped to exactly 4:5. Fallback is placeholder art in the same frame.
+# ---------------------------------------------------------------------------------------------------------------------
+
+PHOTO_RE = re.compile(r"^(?P<colour>[a-z0-9-]+)-(?P<n>\d+)\.(jpe?g|png|webp)$", re.I)
 warnings: list[str] = []
 
 
-def e(s) -> str:
-    """HTML-escape text for element content and attributes."""
-    return html.escape(str(s), quote=True)
+def crop_45(im):
+    w, h = im.size
+    if abs(w / h - RATIO) < 0.005:
+        return im
+    if w / h > RATIO:  # too wide
+        nw = round(h * RATIO)
+        left = (w - nw) // 2
+        return im.crop((left, 0, left + nw, h))
+    nh = round(w / RATIO)
+    top = (h - nh) // 2
+    return im.crop((0, top, w, top + nh))
 
 
-def partial(name: str) -> str:
-    return (SRC / f"{name}.html").read_text()
-
-
-def fill(tpl: str, ctx: dict) -> str:
-    """Replace {{key}} placeholders. Unknown keys are left visible so they get noticed."""
-    def sub(m):
-        key = m.group(1)
-        if key.startswith("social:"):
-            return social(key.split(":", 1)[1], ctx["_site"])
-        if key.startswith("biz:"):
-            return biz(ctx["_site"], key.split(":", 1)[1])
-        if key in ctx:
-            return str(ctx[key])
-        warnings.append(f"unfilled placeholder {{{{{key}}}}}")
-        return m.group(0)
-    return re.sub(r"\{\{([\w:]+)\}\}", sub, tpl)
-
-
-def social(variant: str, site: dict) -> str:
-    links = [("instagram", "Instagram"), ("facebook", "Facebook")]
-    items = "".join(
-        f'<li><a class="social__btn" href="{e(site["social"][k])}" target="_blank" rel="noopener noreferrer" '
-        f'aria-label="{label} (opens in a new tab)"><span class="social__base" aria-hidden="true"></span>'
-        f'<span class="social__face"><svg aria-hidden="true"><use href="#ico-{k}"/></svg></span></a></li>'
-        for k, label in links
-    )
-    return f'<ul class="social social--{variant}" aria-label="Archive 88 on social media">{items}</ul>'
-
-
-def biz(site, key) -> str:
-    """Business detail for info pages; missing values are visibly marked."""
-    v = (site.get("business") or {}).get(key, "")
-    if not v:
-        return '<span class="tbc">To be confirmed</span>'
-    if key == "email":
-        return f'<a href="mailto:{e(v)}">{e(v)}</a>'
-    if key == "phone":
-        return f'<a href="tel:{e(re.sub(r"[^0-9+]", "", v))}">{e(v)}</a>'
-    return e(v).replace("\n", "<br />")
-
-
-def money(n, site) -> str:
-    return site["currency_symbol"] + (f"{n:,.0f}" if float(n).is_integer() else f"{n:,.2f}")
-
-
-def slug(s: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
-
-
-# ---------------------------------------------------------------- photos
-
-def photo_sources(handle: str) -> list[Path]:
-    folder = ROOT / "assets" / "products" / handle
+def process_photos(handle: str) -> dict[str, list[Path]]:
+    """Returns {colour: [web base paths]} for photos found in assets/products/<handle>/."""
+    folder = PHOTOS / handle
+    found: dict[str, list[tuple[int, Path]]] = {}
     if not folder.is_dir():
-        return []
-    return [p for p in sorted(folder.iterdir())
-            if p.is_file() and p.suffix.lower() in IMG_EXT and not p.name.startswith(".")]
-
-
-def rel(p: Path) -> str:
-    return p.relative_to(ROOT).as_posix()
-
-
-def make_web_copies(src: Path):
-    """WebP at several widths + one 1200px JPEG (share previews, bag, fallback). Skips up-to-date files."""
-    web = src.parent / "web"
-    web.mkdir(exist_ok=True)
-    stem = src.stem
-    targets = {w: web / f"{stem}-{w}.webp" for w in WEB_WIDTHS}
-    jpg = web / f"{stem}-1200.jpg"
-    if all(t.exists() and t.stat().st_mtime >= src.stat().st_mtime for t in [*targets.values(), jpg]):
-        return targets, jpg
-    with Image.open(src) as im:
-        im = ImageOps.exif_transpose(im).convert("RGB")
-        for w, out in targets.items():
-            copy = im.copy()
-            if copy.width > w:
-                copy = copy.resize((w, round(copy.height * w / copy.width)), Image.LANCZOS)
-            copy.save(out, "WEBP", quality=80, method=6)
-        copy = im.copy()
-        if copy.width > 1200:
-            copy = copy.resize((1200, round(copy.height * 1200 / copy.width)), Image.LANCZOS)
-        copy.save(jpg, "JPEG", quality=82, optimize=True, progressive=True)
-    return targets, jpg
-
-
-def photos_for(handle: str) -> list[dict]:
-    """[{orig, src, srcset}] per photo. src is the light JPEG when available."""
-    out = []
-    sources = photo_sources(handle)
-    if sources and Image is None:
-        warnings.append("Pillow not installed: product photos are served at full size (pip install pillow)")
-    keep = set()
-    for s in sources:
-        if Image is not None:
-            targets, jpg = make_web_copies(s)
-            keep.update([*targets.values(), jpg])
-            srcset = ", ".join(f"{rel(t)} {w}w" for w, t in targets.items())
-            out.append({"orig": rel(s), "src": rel(jpg), "srcset": srcset})
-        else:
-            out.append({"orig": rel(s), "src": rel(s), "srcset": ""})
-    web = ROOT / "assets" / "products" / handle / "web"
-    if Image is not None and web.is_dir():  # remove copies of photos that were deleted
-        for f in web.iterdir():
-            if f not in keep:
-                f.unlink()
+        return {}
+    for f in sorted(folder.iterdir()):
+        m = PHOTO_RE.match(f.name)
+        if m:
+            found.setdefault(m["colour"].lower(), []).append((int(m["n"]), f))
+    out: dict[str, list[Path]] = {}
+    web = folder / "web"
+    for colour, files in found.items():
+        for _, src in sorted(files):
+            stem = src.stem.lower()
+            if Image is None:
+                warnings.append(f"Pillow not installed: {handle}/{src.name} used as-is (CSS still crops it to 4:5)")
+                out.setdefault(colour, []).append(src)
+                continue
+            web.mkdir(exist_ok=True)
+            target = web / f"{stem}-1200.jpg"
+            if not target.exists() or target.stat().st_mtime < src.stat().st_mtime:
+                with Image.open(src) as im:
+                    im = crop_45(ImageOps.exif_transpose(im).convert("RGB"))
+                    if im.width < 1200:
+                        warnings.append(f"{handle}/{src.name} is only {im.width}px wide (1600 x 2000 recommended)")
+                    for w in WIDTHS:
+                        im.resize((w, round(w / RATIO)), Image.LANCZOS).save(web / f"{stem}-{w}.webp", "WEBP", quality=82)
+                    im.resize((1200, 1500), Image.LANCZOS).save(target, "JPEG", quality=84, optimize=True, progressive=True)
+            out.setdefault(colour, []).append(web / stem)
     return out
 
 
-def img_tag(photo, root, alt, sizes, lazy=True, cls=""):
-    srcset = ", ".join(f"{root}{part}" for part in photo["srcset"].split(", ")) if photo["srcset"] else ""
-    return (f'<img{f" class={chr(34)}{cls}{chr(34)}" if cls else ""} src="{root}{photo["src"]}"'
-            + (f' srcset="{srcset}" sizes="{sizes}"' if srcset else "")
-            + f' alt="{e(alt)}"{" loading=" + chr(34) + "lazy" + chr(34) if lazy else ""} decoding="async" />')
+def photo_view(path: Path, root: str) -> dict:
+    rel = path.relative_to(ROOT).as_posix()
+    if path.suffix:  # unprocessed original
+        return {"kind": "img", "src": root + rel, "webp": root + rel}
+    return {"kind": "img", "src": f"{root}{rel}-1200.jpg",
+            "webp": ", ".join(f"{root}{rel}-{w}.webp {w}w" for w in WIDTHS)}
 
 
-def image_size(path: Path):
-    """Width/height for JPEG and PNG without third-party libraries (for og:image)."""
-    try:
-        data = path.read_bytes()
-        if data[:8] == b"\x89PNG\r\n\x1a\n":
-            return struct.unpack(">II", data[16:24])
-        if data[:2] == b"\xff\xd8":
-            i = 2
-            while i < len(data):
-                if data[i] != 0xFF:
-                    i += 1
-                    continue
-                marker = data[i + 1]
-                if marker in (0xC0, 0xC1, 0xC2):
-                    h, w = struct.unpack(">HH", data[i + 5:i + 9])
-                    return w, h
-                i += 2 + struct.unpack(">H", data[i + 2:i + 4])[0]
-    except Exception:
-        pass
-    return None
+# ---------------------------------------------------------------------------------------------------------------------
+# Derived product data
+# ---------------------------------------------------------------------------------------------------------------------
 
 
-def mime(path: str) -> str:
-    ext = Path(path).suffix.lower()
-    return {".png": "image/png", ".webp": "image/webp"}.get(ext, "image/jpeg")
+def prepare(root: str):
+    """Adds media, availability and card data to every product for pages at depth `root`."""
+    for i, p in enumerate(catalog):
+        photos = PHOTO_CACHE[p["handle"]]
+        p["index"] = i
+        p["media"] = {}
+        for c in p["colours"]:
+            if photos.get(c["handle"]):
+                views = [photo_view(x, root) for x in photos[c["handle"]]]
+                if len(views) == 1:  # the card needs an alternate angle: fall back to the same photo
+                    views.append(views[0])
+            else:
+                views = [{"kind": "svg", "sil": p["silhouette"], "hex": c["hex"], "angle": a} for a in ANGLES]
+            p["media"][c["handle"]] = views
+        p["in_stock"] = {c: [s for s in p["sizes"] if row.get(s, 0) > 0] for c, row in p["stock"].items()}
+        total = sum(sum(row.values()) for row in p["stock"].values())
+        p["sold_out"] = total == 0
+        p["low_stock"] = 0 < total <= LOW * 4
+        p["card_colours"] = [{
+            "h": c["handle"], "n": c["name"], "hex": c["hex"], "f": c["family"],
+            "img": [v["webp"] for v in p["media"][c["handle"]][:2]] if p["media"][c["handle"]][0]["kind"] == "img" else None,
+            "src": [v["src"] for v in p["media"][c["handle"]][:2]] if p["media"][c["handle"]][0]["kind"] == "img" else None,
+            "stock": p["stock"][c["handle"]],
+        } for c in p["colours"]]
 
 
-# ---------------------------------------------------------------- drops
-
-def drop_label(when: dt.datetime) -> str:
-    hour = when.strftime("%I").lstrip("0")
-    mins = "" if when.minute == 0 else when.strftime(":%M")
-    return f"{when.strftime('%A')} {when.day} {when.strftime('%B')}, {hour}{mins}{when.strftime('%p').lower()}"
-
-
-def load_drops(site):
-    drops = []
-    for d in site["drops"]["list"]:
-        when = dt.datetime.fromisoformat(d["date"]).astimezone(UK)
-        drops.append({**d, "when": when, "iso": when.isoformat(), "label": drop_label(when),
-                      "year": when.year, "month": when.strftime("%B %Y")})
-    drops.sort(key=lambda d: d["when"])
-    past = [d for d in drops if d["when"] <= NOW]
-    future = [d for d in drops if d["when"] > NOW]
-    current = past[-1] if past else (drops[0] if drops else None)
-    nxt = future[0] if future else None
-    if not past:
-        warnings.append("no drop date has passed yet; showing the first drop on the homepage")
-    return drops, current, nxt
-
-
-# ---------------------------------------------------------------- validation
-
-def validate(site, products):
-    cats = {c["handle"] for c in site["categories"]}
-    drops = {d["handle"] for d in site["drops"]["list"]}
-    seen_h, seen_n = set(), set()
-    required = ["handle", "number", "title", "category", "drop", "price", "available", "tag",
-                "era", "size", "material", "condition", "measurements_cm", "description"]
+def size_groups(products) -> list[tuple[str, list[str]]]:
+    alpha, waist = [], []
     for p in products:
-        for k in required:
-            if k not in p or p[k] in ("", None):
-                sys.exit(f"products.json: '{p.get('handle', '?')}' is missing '{k}'")
-        if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", p["handle"]):
-            sys.exit(f"products.json: handle '{p['handle']}' must be lowercase-with-dashes")
-        if p["handle"] in seen_h or p["number"] in seen_n:
-            sys.exit(f"products.json: duplicate handle or number at '{p['handle']}'")
-        seen_h.add(p["handle"]); seen_n.add(p["number"])
-        if p["category"] not in cats:
-            sys.exit(f"products.json: '{p['handle']}' has unknown category '{p['category']}'")
-        if p["drop"] not in drops:
-            sys.exit(f"products.json: '{p['handle']}' has unknown drop '{p['drop']}' (see drops.list in site.json)")
-        if p["tag"] not in TAGS:
-            sys.exit(f"products.json: '{p['handle']}' tag must be one of {sorted(TAGS)}")
-        if not photo_sources(p["handle"]):
-            warnings.append(f"no photos yet for {p['handle']} (assets/products/{p['handle']}/)")
-    b = site.get("business") or {}
-    missing = [k for k in ("legal_name", "address", "email") if not b.get(k)]
-    if missing:
-        warnings.append(f"business details still to add in site.json: {', '.join(missing)}")
-    if "placeholder" in (b.get("legal_name", "") + b.get("address", "")).lower() or b.get("email", "").endswith(".example"):
-        warnings.append("business details in site.json are PLACEHOLDERS: replace them before launch")
+        for s in p["sizes"]:
+            target = waist if s.isdigit() else alpha
+            if s not in target:
+                target.append(s)
+    order = ["XS", "S", "M", "L", "XL", "XXL"]
+    alpha.sort(key=lambda s: order.index(s) if s in order else 99)
+    waist.sort(key=int)
+    groups = []
+    if alpha:
+        groups.append(("Tops & outerwear", alpha))
+    if waist:
+        groups.append(("Waist (inches)", waist))
+    return groups
 
 
-# ---------------------------------------------------------------- shared markup
+# ---------------------------------------------------------------------------------------------------------------------
+# Page shell
+# ---------------------------------------------------------------------------------------------------------------------
 
-def cat_title(site, handle):
-    return next(c["title"] for c in site["categories"] if c["handle"] == handle)
-
-
-def tag_card(p, site, root, extra_class="", photos=None):
-    """The hang tag: archive track, shop grid and 'More from the archive'."""
-    url = f"{root}products/{p['handle']}/"
-    photos = photos if photos is not None else PHOTOS[p["handle"]]
-    sold = not p["available"]
-    if photos:
-        photo = img_tag(photos[0], root, f'{p["title"]}, front', "(max-width: 720px) 70vw, 320px")
-        photo_cls = "has-photo"
-    else:
-        photo = '<svg class="tag__mono" viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg>'
-        photo_cls = "is-empty"
-    action = '<span class="tag__sold">Sold</span>' if sold else add_button(p, site, "tag__add", photos)
-    data = (f'data-cat="{p["category"]}" data-size="{e(slug(p["size"]))}" data-sold="{"1" if sold else "0"}" '
-            f'data-price="{p["price"]}" data-no="{e(p["number"])}"')
-    return f'''          <article class="tag tag--{p["tag"]}{" is-sold" if sold else ""}{extra_class}" {data}>
-            <span class="tag__hole"></span>
-            <div class="tag__top"><span>No. {e(p["number"])}</span><span>{e(p["size"])}</span></div>
-            <a class="tag__photo {photo_cls}" href="{url}" tabindex="-1" aria-hidden="true" style="view-transition-name: piece-{p["handle"]}">{photo}{'<span class="tag__stamp">Sold</span>' if sold else ''}</a>
-            <div class="tag__body">
-              <h3><a class="tag__link" href="{url}">{e(p["title"])}</a></h3>
-              <dl><dt>Category</dt><dd>{e(cat_title(site, p["category"]))}</dd><dt>Era</dt><dd>{e(p["era"])}</dd></dl>
-              {action}
-            </div>
-          </article>'''
+SPRITE = (ROOT / "assets" / "sprite.svg").read_text() if (ROOT / "assets" / "sprite.svg").exists() else ""
 
 
-def add_button(p, site, cls, photos, block=False):
-    img = photos[0]["src"] if photos else ""
-    return (f'<button class="{cls}{" btn--block" if block else ""} js-add" type="button" data-id="{e(p["number"])}" '
-            f'data-name="{e(p["title"])}" data-cat="{e(cat_title(site, p["category"]))}" data-price="{p["price"]}" '
-            f'data-theme="tag--{p["tag"]}" data-img="{e(img)}" data-url="products/{p["handle"]}/">'
-            f'<span class="tag__price">{money(p["price"], site)}</span><span class="tag__cta">Add to bag</span></button>')
+# Brand assets: wordmark letters, A88 mark and social icons (src/brand-defs.html), fonts (assets/fonts/), social
+# links and business details (data/store.json). One source of truth for the identity.
+BRAND_DEFS = (ROOT / "src" / "brand-defs.html").read_text()
+WM = "".join(f'<use href="#wm-{c}" class="wm-l"/>' for c in ["A", "R", "C", "H", "I", "V", "E", "8a", "8b"])
 
 
-def menu_cats(site, products, root):
-    avail = [p for p in products if p["available"]]
-    rows = [("all", "All pieces", 1, "Everything available now. One of each, numbered.", len(avail))]
-    rows += [(c["handle"], c["title"], c["image"], c["description"],
-              sum(1 for p in avail if p["category"] == c["handle"])) for c in site["categories"]]
-    out = []
-    for i, (h, title, img, desc, n) in enumerate(rows):
-        href = f"{root}shop/" + ("" if h == "all" else f"?cat={h}")
-        out.append(
-            f'          <li><a href="{href}" data-cat="{h}" data-img="{img}" data-desc="{e(desc)}">'
-            f'<span class="menu__num">{i:02d}</span><span class="menu__name"><span>{e(title)}</span></span>'
-            f'<span class="menu__count">{n:02d}</span><span class="menu__arrow" aria-hidden="true">→</span></a></li>')
-    return "\n".join(out), rows[0][3]
+def wordmark(cls: str = "", label: str = "Archive 88") -> str:
+    aria = f'role="img" aria-label="{e(label)}"' if label else 'aria-hidden="true" focusable="false"'
+    return f'<svg class="wordmark {cls}" viewBox="0 0 640 68" {aria}>{WM}</svg>'
 
 
-def accordion(items, prefix, open_first=False):
-    out = []
-    for i, (q, a_html) in enumerate(items, 1):
-        is_open = open_first and i == 1
-        out.append(f'''          <div class="acc js-acc">
-            <button class="acc__q" type="button" aria-expanded="{"true" if is_open else "false"}" aria-controls="{prefix}-{i}" id="{prefix}-q{i}"><span>{e(q)}</span><i aria-hidden="true"></i></button>
-            <div class="acc__a" id="{prefix}-{i}" role="region" aria-labelledby="{prefix}-q{i}"{"" if is_open else " hidden"}><div class="acc__body">{a_html}</div></div>
-          </div>''')
-    return "\n".join(out)
+def social_links(cls: str = "") -> str:
+    return "".join(
+        f'<li><a class="{cls}" href="{e(store["social"][k])}" target="_blank" rel="noopener noreferrer">'
+        f'{label}<span class="sr-only"> (opens in a new tab)</span></a></li>'
+        for k, label in (("instagram", "Instagram"), ("facebook", "Facebook")))
 
 
-def countdown(nxt, cls=""):
-    """Live countdown markup (filled in by site.js). Hidden by the script once the date passes."""
-    if not nxt:
-        return ""
-    unit = lambda k, label: (f'<span class="cd__unit"><span class="cd__num js-cd-{k}">00</span>'
-                             f'<span class="cd__label">{label}</span></span>')
-    return (f'<div class="countdown js-countdown js-drop {cls}" data-drop="{nxt["iso"]}" role="timer" '
-            f'aria-label="Time until {e(nxt["name"])}: {e(nxt["label"])}">'
-            f'<p class="countdown__title">{e(nxt["name"])} drops {e(nxt["label"])}</p>'
-            f'<div class="countdown__units" aria-hidden="true">{unit("d", "Days")}{unit("h", "Hours")}'
-            f'{unit("m", "Minutes")}{unit("s", "Seconds")}</div></div>')
+def head(title: str, desc: str, root: str, canonical: str, jsonld: list | None = None, preload: str = "") -> str:
+    ld = "".join(f'<script type="application/ld+json">{json.dumps(x, ensure_ascii=False)}</script>' for x in (jsonld or []))
+    return f'''<!doctype html>
+<!-- GENERATED by build.py. Edit data/, components.py or build.py, not this file. -->
+<html lang="{store["locale"]}" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{e(title)}</title>
+<meta name="description" content="{e(desc)}">
+<link rel="canonical" href="{e(canonical)}">
+<meta name="theme-color" content="#FBFAF8">
+<meta property="og:type" content="website"><meta property="og:site_name" content="{e(store["name"])}">
+<meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}">
+<meta property="og:image" content="{e(store["url"])}assets/img/og-image.jpg">
+<link rel="icon" href="{root}assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="{root}assets/fonts/archivo-narrow-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{root}assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+{preload}<link rel="stylesheet" href="{root}assets/fonts/fonts.css">
+<link rel="stylesheet" href="{root}assets/css/tokens.css">
+<link rel="stylesheet" href="{root}assets/css/store.css">
+<script>document.documentElement.classList.replace("no-js","js")</script>
+{ld}
+</head>'''
 
 
-SWATCH = {"ink": ("var(--ink)", "var(--bone)"), "pine": ("var(--pine)", "var(--bone)"), "paper": ("var(--bone)", "var(--ink)")}
+def announce_bar(root: str) -> str:
+    """Rotating messages above the header. Pauses on hover/focus, has a pause button (WCAG 2.2.2), and stays on the
+    first message with reduced motion."""
+    items = []
+    for i, (msg, text, href) in enumerate(store["announcements"]):
+        link = f' <a href="{root}{e(href)}">{e(text)}</a>' if href else ""
+        state = ' is-active"' if i == 0 else '" aria-hidden="true"'
+        items.append(f'<li class="announce__item{state}>{e(msg)}{link}</li>')
+    return f'''<div class="announce" data-announce role="region" aria-label="Offers and services" aria-roledescription="carousel">
+  <button type="button" class="announce__btn announce__btn--prev" data-announce-step="-1" aria-label="Previous message">{icon("chevron")}</button>
+  <ul class="announce__list" aria-live="off">{"".join(items)}</ul>
+  <button type="button" class="announce__btn announce__btn--next" data-announce-step="1" aria-label="Next message">{icon("chevron")}</button>
+  <button type="button" class="announce__pause" data-announce-pause aria-pressed="false"><span class="sr-only">Pause messages</span>{icon("pause")}</button>
+</div>'''
 
 
-def cart_suggest(site, products, root):
-    """Empty bag: three pieces still available, newest first, so the bag is never a dead end."""
-    avail = sorted((p for p in products if p["available"]), key=lambda p: -int(re.sub(r"\D", "", p["number"]) or 0))[:3]
-    if not avail:
-        return ""
-    rows = []
-    for p in avail:
-        photos = PHOTOS[p["handle"]]
-        bg, fg = SWATCH.get(p["tag"], SWATCH["ink"])
-        thumb = (img_tag(photos[0], root, "", "64px") if photos
-                 else '<svg viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg>')
-        rows.append(f'<li><a class="cart__sug" href="{root}products/{p["handle"]}/">'
-                    f'<span class="cart__swatch{" has-photo" if photos else ""}" style="--sw-bg:{bg};--sw-fg:{fg}">{thumb}</span>'
-                    f'<span class="cart__sug-meta"><small>No. {e(p["number"])}, size {e(p["size"])}</small><strong>{e(p["title"])}</strong></span>'
-                    f'<span class="cart__price">{money(p["price"], site)}</span></a></li>')
-    return ('<div class="cart__suggest"><p class="cart__suggest-title">Still in the archive</p><ul>'
-            + "".join(rows) + "</ul></div>")
+def counts() -> dict:
+    return {c["handle"]: sum(1 for p in catalog if p["category"] == c["handle"]) for c in CATS}
 
 
-def base_ctx(site, products, root, page_id):
-    cats_html, first_desc = menu_cats(site, products, root)
-    return {"_site": site, "root": root, "home": root, "page": page_id, "wm": WM, "year": NOW.year,
-            "locale": site["locale"], "menu_cats": cats_html, "menu_first_desc": e(first_desc),
-            "og_type": "website", "og_image": site["url"] + "assets/img/og-image.jpg",
-            "og_image_type": "image/jpeg", "og_image_w": 1200, "og_image_h": 630,
-            "og_image_alt": "The Archive 88 wordmark over a sunlit pine forest path, two people walking toward the sea.",
-            "extra_meta": "", "cart_suggest": cart_suggest(site, products, root)}
+def mega(root: str) -> str:
+    """Desktop mega-menu under "Shop": featured links, categories with counts, sizes, and two editorial tiles."""
+    n = counts()
+    cats = "".join(f'<li><a href="{root}shop/{c["handle"]}/">{e(c["title"])} <span class="count">{n[c["handle"]]}</span></a></li>' for c in CATS)
+    alpha = [s for s in ("XS", "S", "M", "L", "XL", "XXL")]
+    sizes = "".join(f'<li><a class="size-link" href="{root}shop/?size={s}" aria-label="Shop size {s}">{s}</a></li>' for s in alpha)
+    waists = "".join(f'<li><a class="size-link" href="{root}shop/trousers/?size={s}" aria-label="Shop trousers, {s} inch waist">{s}</a></li>' for s in ("28", "30", "32", "34", "36"))
+    tiles = "".join(
+        f'<li><a class="mega__tile" href="{root}{href}"><span class="mega__img"><img src="{root}assets/img/{img}" alt="" width="720" height="900" loading="lazy" decoding="async"></span>'
+        f'<span class="mega__tile-title">{e(t)}</span><span class="mega__tile-cta">Shop now</span></a></li>'
+        for img, t, href in (("menu-2.jpg", "Outerwear for weather", "shop/outerwear/"), ("menu-4.jpg", "Knitwear, spun slow", "shop/knitwear/")))
+    return f'''<div class="mega" id="mega-shop" data-mega-panel hidden>
+  <div class="mega__inner">
+    <div class="mega__col"><p class="mega__head">Featured</p><ul class="mega__list">
+      <li><a href="{root}shop/?sort=new">New in</a></li><li><a href="{root}shop/">Shop all <span class="count">{len(catalog)}</span></a></li>
+      <li><a href="{root}gift-cards/">Gift cards</a></li><li><a href="{root}returns/">Delivery &amp; returns</a></li></ul></div>
+    <div class="mega__col"><p class="mega__head">Clothing</p><ul class="mega__list">{cats}</ul></div>
+    <div class="mega__col"><p class="mega__head">Shop by size</p><ul class="mega__sizes">{sizes}</ul>
+      <p class="mega__head mega__head--sub">Waist (in)</p><ul class="mega__sizes">{waists}</ul>
+      <a class="link-arrow mega__guide" href="{root}size-guide/">Size guide {icon("arrow")}</a></div>
+    <ul class="mega__tiles">{tiles}</ul>
+  </div>
+</div>
+<div class="mega-scrim" data-mega-scrim hidden></div>'''
 
 
-def mark_current(body_html, root, current):
-    """aria-current="page" on links (menu, footer, logo) that point at the page being built."""
-    if current is None:
-        return body_html
-    target = re.escape(f'href="{root}{current}"')
-    return re.sub(rf'<a ([^>]*?){target}', lambda m: m.group(0).replace("<a ", '<a aria-current="page" ', 1), body_html)
+def header(root: str, active: str | None = None) -> str:
+    def cur(key):
+        return ' aria-current="page"' if key == active else ""
+    links = [("new", "shop/?sort=new", "New in"), ("outerwear", "shop/outerwear/", "Outerwear"),
+             ("knitwear", "shop/knitwear/", "Knitwear"), ("gift", "gift-cards/", "Gift cards")]
+    lis = "".join(f'<li><a class="nav__link" href="{root}{u}"{cur(k)}>{t}</a></li>' for k, u, t in links)
+    return f'''<a class="skip" href="#main">Skip to content</a>
+{announce_bar(root)}
+<header class="nav" data-nav-root>
+  <div class="nav__bar">
+    <a class="nav__logo" href="{root}" aria-label="{e(store["name"])}, home">{wordmark(label="")}</a>
+    <nav class="nav__primary" aria-label="Main">
+      <ul>
+        <li><button type="button" class="nav__link nav__link--mega" data-mega aria-expanded="false" aria-controls="mega-shop">Shop {icon("chevron")}</button>
+          {mega(root)}</li>
+        {lis}
+      </ul>
+    </nav>
+    <div class="nav__tools">
+      <button type="button" class="nav__tool" data-drawer-open="search" aria-controls="search" aria-expanded="false">{icon("search")}<span class="nav__tool-label">Search</span></button>
+      <button type="button" class="nav__tool nav__cart" data-drawer-open="cart" aria-controls="cart" aria-expanded="false" aria-label="Bag, 0 items" data-bag-btn>
+        {icon("bag")}<span class="nav__tool-label">Bag</span><span class="nav__count" data-bag-count data-empty>0</span></button>
+      <button type="button" class="nav__tool nav__menu" data-drawer-open="menu" aria-controls="menu" aria-expanded="false">{icon("menu")}<span class="sr-only">Menu</span></button>
+    </div>
+  </div>
+</header>'''
 
 
-def page(ctx, body_attrs, body_html, scripts):
-    body_html = mark_current(body_html, ctx["root"], ctx.get("current"))
-    head = fill(partial("head"), ctx)
-    tail = "\n".join(f'  <script src="{ctx["root"]}{s}"></script>' for s in [*SCRIPTS, *scripts])
-    return (f"{head}<body {body_attrs}>\n  <div class=\"grain\" aria-hidden=\"true\"></div>\n\n{partial('defs')}\n"
-            f"{body_html}\n{tail}\n</body>\n</html>\n")
+def promises() -> str:
+    items = "".join(f'<li>{icon(i)}<p><strong>{e(a)}</strong><span>{e(b)}</span></p></li>' for i, a, b in store["promises"])
+    return f'<section class="promises" aria-label="Our promises"><ul>{items}</ul></section>'
 
 
-def write(path: str, content: str):
+def signup() -> str:
+    return '''<section class="signup" aria-labelledby="signup-title">
+  <div class="signup__inner">
+    <div><h2 class="section-title" id="signup-title">First look at new arrivals</h2>
+    <p class="signup__lead">One email when something new lands. Nothing else.</p></div>
+    <form class="signup__form" data-signup novalidate>
+      <div class="field signup__field">
+        <label class="field__label" for="signup-email">Email address</label>
+        <div class="signup__row"><input type="email" id="signup-email" name="email" autocomplete="email" inputmode="email" required aria-describedby="signup-msg">
+        <button type="submit" class="btn btn--primary">Subscribe</button></div>
+        <p class="signup__msg" id="signup-msg" data-signup-msg aria-live="polite">You can unsubscribe at any time.</p>
+      </div>
+    </form>
+  </div>
+</section>'''
+
+
+def footer(root: str) -> str:
+    cats = "".join(f'<li><a href="{root}shop/{c["handle"]}/">{e(c["title"])}</a></li>' for c in CATS)
+    col = lambda title, body: f'<div class="footer__col"><h2 class="footer__head">{title}</h2><ul>{body}</ul></div>'
+    return f'''{promises()}
+{signup()}
+<footer class="footer" data-nav="dark">
+  <div class="footer__cols">
+    {col("Shop", f'<li><a href="{root}shop/?sort=new">New in</a></li><li><a href="{root}shop/">Shop all</a></li>{cats}<li><a href="{root}gift-cards/">Gift cards</a></li>')}
+    {col("Help", f'<li><a href="{root}size-guide/">Size guide</a></li><li><a href="{root}returns/">Delivery &amp; returns</a></li><li><a href="{root}contact/">Contact</a></li>')}
+    {col("Archive 88", f'<li><a href="{root}about/">About</a></li>')}
+    {col("Follow", social_links())}
+  </div>
+  <div class="footer__legal">
+    <p>United Kingdom · £ GBP</p>
+    <ul><li><a href="{root}privacy/">Privacy</a></li><li><a href="{root}terms/">Terms of sale</a></li></ul>
+    <p>© {date.today().year} {e(store["name"])}. Sample catalogue: names, prices and stock are placeholders.</p>
+  </div>
+  <div class="footer__base">
+    <a class="footer__mono" href="{root}" aria-label="{e(store["name"])}, home"><svg viewBox="0 0 146 68" aria-hidden="true" focusable="false"><use href="#mono"/></svg></a>
+  </div>
+</footer>'''
+
+
+def cart_drawer() -> str:
+    th = store["free_shipping_threshold"]
+    body = f'''<div class="ship-meter" data-ship-meter data-threshold="{th}">
+  <p class="ship-meter__text" data-ship-text>Free UK delivery on orders over {money(th, SYM)}</p>
+  <div class="ship-meter__track"><span class="ship-meter__bar" data-ship-bar></span></div>
+</div>
+<ul class="cart-lines" data-cart-lines aria-label="Items in your bag"></ul>
+<div class="cart-empty" data-cart-empty hidden>
+  <p class="cart-empty__title">Your bag is empty</p>
+  <p>Start with the pieces people reach for first.</p>
+  <a class="btn btn--secondary" href="__ROOT__shop/">Shop all</a>
+</div>'''
+    foot = f'''<dl class="cart-total"><dt>Subtotal</dt><dd data-cart-subtotal>{money(0, SYM)}</dd></dl>
+<p class="cart-note">Delivery and taxes calculated at checkout.</p>
+<button type="button" class="btn btn--primary btn--block cart__checkout" data-checkout>Checkout</button>
+<p class="cart-msg" data-checkout-msg aria-live="polite"></p>'''
+    return C.drawer("cart", "Bag", body, footer=foot, label_extra=' <span class="drawer__count" data-drawer-count></span>')
+
+
+def count_span(k) -> str:
+    return f'<span class="count">{k}</span>' if k else ""
+
+
+def menu_drawer(root: str) -> str:
+    """Phones and tablets: the whole navigation in one panel from the left."""
+    n = counts()
+    rows = [("shop/?sort=new", "New in", None), ("shop/", "Shop all", len(catalog))] + \
+           [(f'shop/{c["handle"]}/', c["title"], n[c["handle"]]) for c in CATS] + [("gift-cards/", "Gift cards", None)]
+    items = "".join(
+        f'<li><a href="{root}{u}"><span>{e(t)}</span>{count_span(k)}{icon("chevron")}</a></li>'
+        for u, t, k in rows)
+    body = (f'<ul class="menu__list">{items}</ul>'
+            f'<ul class="menu__sizes" aria-label="Shop by size">'
+            + "".join(f'<li><a class="size-link" href="{root}shop/?size={s}" aria-label="Shop size {s}">{s}</a></li>' for s in ("XS", "S", "M", "L", "XL", "XXL"))
+            + f'</ul><ul class="menu__links"><li><a href="{root}size-guide/">Size guide</a></li><li><a href="{root}returns/">Delivery &amp; returns</a></li>'
+            f'<li><a href="{root}contact/">Contact</a></li><li><a href="{root}about/">About</a></li></ul>'
+            f'<ul class="menu__social">{social_links()}</ul>')
+    return C.drawer("menu", "Menu", body, side="left")
+
+
+def search_drawer(root: str) -> str:
+    """Search panel from the top. Results come from search.json (written by the build), loaded on first open."""
+    pop = "".join(f'<li><a class="chip-link" href="{root}shop/{c["handle"]}/">{e(c["title"])}</a></li>' for c in CATS)
+    body = f'''<form class="search" role="search" data-search action="{root}shop/">
+  <label class="sr-only" for="search-q">Search products</label>
+  {icon("search")}<input type="search" id="search-q" name="q" placeholder="Search coats, knitwear, colours" autocomplete="off" enterkeyhint="search" aria-describedby="search-count">
+  <button type="reset" class="search__clear" data-search-clear hidden>Clear</button>
+</form>
+<div class="search__suggest" data-search-suggest><p class="search__label">Popular categories</p><ul class="chip-links">{pop}</ul></div>
+<p class="search__count" id="search-count" data-search-count aria-live="polite"></p>
+<ul class="search__results" data-search-results></ul>'''
+    return C.drawer("search", "Search", body, side="top")
+
+
+def page(*, title, desc, root, path, main, active=None, scripts=(), jsonld=None, extra="", tone="light",
+         pre="", preload="") -> str:
+    canonical = store["url"] + path
+    cfg = {"root": root, "currency": store["currency"], "symbol": SYM, "locale": store["locale"],
+           "freeShipping": store["free_shipping_threshold"], "lowStock": LOW, "shopify": store.get("shopify_domain", "")}
+    js = "".join(f'<script src="{root}assets/js/{s}.js" defer></script>' for s in ("store", *scripts))
+    return (head(title, desc, root, canonical, jsonld, preload) +
+            f'\n<body data-tone="{tone}">\n{pre}{BRAND_DEFS}\n{SPRITE}\n{header(root, active)}\n<main id="main">\n{main}\n</main>\n{footer(root)}\n'
+            f'{cart_drawer().replace("__ROOT__", root)}\n{menu_drawer(root)}\n{search_drawer(root)}\n{extra}\n'
+            f'<div class="toast" data-toast role="status" aria-live="polite"></div>\n'
+            f'{C.json_script("store-config", cfg)}\n{js}\n</body>\n</html>\n')
+
+
+def write(path: str, html: str):
     out = ROOT / path
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(content)
+    out.write_text(html)
 
 
-def org_ld(site):
-    b = site.get("business") or {}
-    org = {"@type": "Organization", "@id": site["url"] + "#org", "name": site["name"], "url": site["url"],
-           "logo": site["url"] + "assets/img/icon-512.png", "image": site["url"] + "assets/img/og-image.jpg",
-           "description": site["description"], "foundingDate": "1988",
-           "sameAs": [site["social"]["instagram"], site["social"]["facebook"]]}
-    if b.get("legal_name"):
-        org["legalName"] = b["legal_name"]
-    if b.get("email"):
-        org["email"] = b["email"]
-    return org
+def breadcrumbs(items: list[tuple[str, str | None]]) -> str:
+    lis = "".join(f'<li><a href="{e(u)}">{e(t)}</a></li>' if u else f'<li aria-current="page">{e(t)}</li>' for t, u in items)
+    return f'<nav class="crumbs" aria-label="Breadcrumb"><ol>{lis}</ol></nav>'
 
 
-def product_ld(p, site):
-    url = f'{site["url"]}products/{p["handle"]}/'
-    photos = PHOTOS[p["handle"]]
-    return {
-        "@type": "Product", "@id": url + "#product", "name": p["title"], "sku": f'A88-{p["number"]}',
-        "url": url, "description": p["description"], "category": cat_title(site, p["category"]),
-        "brand": {"@id": site["url"] + "#org"}, "material": p["material"], "size": p["size"],
-        "image": [site["url"] + ph["src"] for ph in photos] or [site["url"] + "assets/img/og-image.jpg"],
-        "offers": {
-            "@type": "Offer", "url": url, "price": f'{p["price"]:.2f}', "priceCurrency": site["currency"],
-            "availability": "https://schema.org/" + ("InStock" if p["available"] else "SoldOut"),
-            "itemCondition": "https://schema.org/UsedCondition", "seller": {"@id": site["url"] + "#org"},
-        },
-    }
+# ---------------------------------------------------------------------------------------------------------------------
+# PLP
+# ---------------------------------------------------------------------------------------------------------------------
 
 
-def ld_json(graph) -> str:
-    text = json.dumps({"@context": "https://schema.org", "@graph": graph}, indent=2, ensure_ascii=False)
-    return "\n".join("  " + line for line in text.replace("</", "<\\/").splitlines())
+def plp(category: dict | None):
+    root = "../" if category is None else "../../"
+    prepare(root)
+    items = [p for p in catalog if category is None or p["category"] == category["handle"]]
+    items.sort(key=lambda p: p["rank"])  # "Featured" order
+    counts_ = counts()
+    families = sorted({c["family"] for p in items for c in p["colours"]})
+    title = category["title"] if category else "Shop all"
+    intro = category["intro"] if category else store["description"]
+    cards = "\n".join(C.product_card(p, root, SYM, eager=i < 4) for i, p in enumerate(items))
+    filters = (C.filter_group("Category", C.category_links(CATS, category and category["handle"], counts_, len(catalog), root), gid="category")
+               + C.filter_group("Size", C.size_chips(size_groups(items)), gid="size")
+               + C.filter_group("Colour", C.colour_filters(families), gid="colour"))
+    page_size = store["page_size"]
+    here = category and category["handle"]
+    pills = ('<nav class="pills" aria-label="Categories"><ul>'
+             + f'<li><a class="pill" href="{root}shop/"{" aria-current=page" if not here else ""}>All</a></li>'
+             + "".join(f'<li><a class="pill" href="{root}shop/{c["handle"]}/"{" aria-current=page" if c["handle"] == here else ""}>{e(c["title"])}</a></li>' for c in CATS)
+             + '</ul></nav>')
+    main = f'''<div class="plp" data-plp data-page-size="{page_size}">
+  <header class="plp__head">
+    {breadcrumbs([("Home", root), ("Shop", root + "shop/" if category else None)] + ([(title, None)] if category else []))}
+    <h1 class="page-title">{e(title)} <span class="page-title__count">{len(items)}</span></h1>
+    <p class="plp__intro">{e(intro)}</p>
+    {pills}
+  </header>
+  <div class="plp__toolbar">
+    <button type="button" class="btn btn--secondary plp__filter-btn" data-drawer-open="filters" aria-controls="filters">{icon("filter")} Filter <span class="plp__filter-n" data-filter-n></span></button>
+    <p class="plp__count" data-result-count aria-live="polite">{len(items)} styles</p>
+    <div class="active-filters" data-active-filters></div>
+    <label class="sort"><span>Sort</span>
+      <select name="sort" data-sort>
+        <option value="featured">Featured</option><option value="new">New in</option>
+        <option value="price-asc">Price, low to high</option><option value="price-desc">Price, high to low</option>
+      </select>{icon("chevron")}</label>
+  </div>
+  <div class="plp__layout">
+    <aside class="plp__filters drawer drawer--left drawer--inline" id="filters" aria-labelledby="filters-title" data-drawer-persistent>
+      <div class="drawer__scrim" data-drawer-close></div>
+      <form class="drawer__panel" data-filter-form tabindex="-1">
+        <header class="drawer__head"><h2 class="drawer__title" id="filters-title">Filter</h2>
+          <button type="button" class="drawer__close" data-drawer-close>Close</button></header>
+        <div class="drawer__body">{filters}</div>
+        <div class="drawer__foot plp__filters-foot">
+          <button type="reset" class="btn btn--secondary" data-clear-filters>Clear all</button>
+          <button type="button" class="btn btn--primary" data-drawer-close data-show-results>Show {len(items)} styles</button>
+        </div>
+      </form>
+    </aside>
+    <section class="plp__results" aria-labelledby="results-title">
+      <h2 class="sr-only" id="results-title">Products</h2>
+      <div class="grid" data-grid>
+{cards}
+      </div>
+      <div class="plp__empty" data-empty hidden>
+        <p class="plp__empty-title">Nothing matches those filters</p>
+        <p>Try another size or colour, or clear the filters.</p>
+        <button type="button" class="btn btn--secondary" data-clear-filters>Clear filters</button>
+      </div>
+      <div class="pager" data-pager>
+        <p class="pager__text" data-pager-text>Showing {min(page_size, len(items))} of {len(items)}</p>
+        <div class="pager__track"><span class="pager__bar" data-pager-bar></span></div>
+        <button type="button" class="btn btn--secondary" data-load-more>Load more</button>
+      </div>
+    </section>
+  </div>
+</div>'''
+    path = "shop/" + (category["handle"] + "/" if category else "")
+    write(path + "index.html", page(
+        title=f'{title} | {store["name"]}', desc=intro, root=root, path=path, main=main,
+        active=category["handle"] if category else None, scripts=("plp",)))
 
 
-def breadcrumbs_ld(site, items):
-    return {"@type": "BreadcrumbList", "itemListElement": [
-        {"@type": "ListItem", "position": i, "name": n, "item": u} for i, (n, u) in enumerate(items, 1)]}
+# ---------------------------------------------------------------------------------------------------------------------
+# PDP
+# ---------------------------------------------------------------------------------------------------------------------
 
 
-# ---------------------------------------------------------------- pages
-
-def build_home(site, products, current, nxt, looks=()):
-    root = ""
-    ctx = base_ctx(site, products, root, "home")
-    ctx["current"] = ""
-    faq = accordion([(f["q"], f'<p>{e(f["a"])}</p>') for f in site["returns_faq"]], "acc")
-    in_drop = [p for p in products if current and p["drop"] == current["handle"]]
-    drop_attr = f' data-drop="{nxt["iso"]}"' if nxt else ""
-    ctx.update({
-        "title": e(site["title"]), "description": e(site["description"]), "canonical": site["url"],
-        "jsonld": ld_json([org_ld(site),
-                           {"@type": "WebSite", "@id": site["url"] + "#website", "url": site["url"],
-                            "name": site["name"], "publisher": {"@id": site["url"] + "#org"}, "inLanguage": "en-GB"},
-                           {"@type": "ItemList", "name": current["name"] if current else "The archive",
-                            "itemListElement": [
-                                {"@type": "ListItem", "position": i, "url": f'{site["url"]}products/{p["handle"]}/'}
-                                for i, p in enumerate(in_drop, 1)]}]),
-        "drop_name": e(current["name"]) if current else "The archive",
-        "archive_tags": "\n".join(tag_card(p, site, root) for p in in_drop),
-        "returns_faq": faq,
-        "next_drop_hero": (f' <span class="hero__drop js-drop"{drop_attr}>Next drop: {e(nxt["label"])}.</span>'
-                           if nxt else ""),
-        "countdown": countdown(nxt, "js-reveal"),
-        "lookbook_feature": ("    <section class=\"lookfeat\" id=\"look\" data-theme=\"bone\" data-chapter=\"Look\" aria-label=\"Shop the look\">\n"
-                             + look_html(looks[0], 0, site, root, feature=True) + "\n    </section>") if looks else "",
-    })
-    body = "\n".join(fill(partial(n), ctx) for n in ["loader", "header", "home-main", "footer"])
-    write("index.html", page(ctx, 'class="is-loading" data-nav="bone"', body, ["assets/js/home.js", "assets/js/lookbook.js"]))
-
-
-def build_product(site, products, p, nxt):
+def pdp(p: dict):
     root = "../../"
-    url = f'{site["url"]}products/{p["handle"]}/'
-    photos = PHOTOS[p["handle"]]
-    title = p["title"]
-    cat = cat_title(site, p["category"])
+    cat = CAT_BY[p["category"]]
+    sets = []
+    for i, c in enumerate(p["colours"]):
+        frames = ""
+        for n, v in enumerate(p["media"][c["handle"]]):
+            alt = f'{p["title"]} in {c["name"]}, {ANGLE_LABEL.get(v.get("angle"), "view " + str(n + 1))}'
+            img = C.media(v, alt, sizes="(min-width: 1000px) 30vw, 100vw", eager=(i == 0 and n == 0))
+            frames += f'<li class="gallery__slide">{C.frame(img)}</li>'
+        sets.append(f'<ul class="gallery__set" data-colour="{e(c["handle"])}" {"hidden" if i else ""} aria-label="{e(c["name"])} images">{frames}</ul>')
+    count = len(p["media"][p["colours"][0]["handle"]])
+    gallery = (f'<section class="gallery" aria-label="Product images" data-gallery>{"".join(sets)}'
+               f'<p class="gallery__pager" aria-hidden="true"><span data-gallery-index>1</span> / <span data-gallery-total>{count}</span></p></section>')
 
-    if photos:
-        slides = [f'          <figure class="pdp__slide">'
-                  + img_tag(ph, root, f"{title}, photo {i}", "(max-width: 900px) 86vw, 55vw", lazy=i > 1)
-                  + "</figure>" for i, ph in enumerate(photos, 1)]
-    else:
-        slides = [f'          <figure class="pdp__slide is-empty tag--{p["tag"]}"><svg viewBox="0 0 146 68" aria-hidden="true">'
-                  f'<use href="#mono"/></svg><figcaption>{e(shot)}<small>Photo to come</small></figcaption></figure>'
-                  for shot in site["shot_list"]]
-    # Page transition: the first photo shares a name with this piece's hang-tag photo on the
-    # page you came from, so the browser morphs one into the other.
-    slides[0] = slides[0].replace("<figure class=", f'<figure style="view-transition-name: piece-{p["handle"]}" class=', 1)
-    pager = "".join(f'<i{" class=\"is-on\"" if i == 0 else ""}></i>' for i in range(len(slides)))
+    th = store["free_shipping_threshold"]
+    details = (f'<p>{e(p["description"])}</p><ul class="spec"><li><span>Composition</span>{e(p.get("material", ""))}</li>'
+               f'<li><span>Care</span>{e(p.get("care", ""))}</li><li><span>Origin</span>{e(p.get("origin", ""))}</li>'
+               f'<li><span>Style</span>{e(p["style"])}</li></ul>')
+    fit = (f'<p>{e(p.get("fit", ""))}.</p><p>Between sizes? Take your usual size for a close fit, or size up for room to layer.</p>'
+           f'<p><a href="{root}size-guide/">Full size guide</a></p>')
+    delivery = (f'<p>Free UK delivery on orders over {money(th, SYM)}; otherwise {money(5, SYM)}. Dispatched within 1 to 2 working days.</p>'
+                f'<p>Free returns within 30 days, from your door.</p>')
 
-    if p["available"]:
-        buy = "          " + add_button(p, site, "buy-btn", photos, block=True)
-        if p.get("final_sale"):
-            buy += ('\n          <p class="pdp__note"><strong>Final sale.</strong> Excluded from 30-day returns. '
-                    'Your 14-day legal right to cancel still applies.</p>')
-    else:
-        buy = ('          <p class="pdp__sold">Sold</p>\n'
-               '          <p class="pdp__note">This piece has found a home. '
-               + (f'{e(nxt["name"])} drops {e(nxt["label"])}. ' if nxt else "")
-               + f'Join the list to see it first.</p>\n          <a class="btn btn--ink btn--block" href="{root}#join">Join the list</a>')
+    number = p["style"].split("-")[-1]
+    info = f'''<div class="pdp__info">
+  <div class="pdp__sticky">
+    <p class="pdp__meta"><a href="{root}shop/{cat["handle"]}/">{e(cat["title"])}</a><span>Style {e(number)}</span></p>
+    <h1 class="pdp__title">{e(p["title"])}</h1>
+    <div class="pdp__price">{C.price(p, SYM)}</div>
+    <form class="buy" data-buy novalidate>
+      {C.colour_selector(p)}
+      {C.size_selector(p, root)}
+      <p class="stock-msg" data-stock-msg aria-live="polite"></p>
+      <button type="submit" class="buy-btn" data-atc><span data-atc-label>Add to bag</span></button>
+    </form>
+    <ul class="pdp__note"><li>{icon("truck")}Free UK delivery over {money(th, SYM)}</li><li>{icon("return")}Free returns within 30 days</li></ul>
+    <div class="pdp__details">
+      {C.accordion("Details & composition", details, "details-info", open_=True)}
+      {C.accordion("Size & fit", fit, "details-fit")}
+      {C.accordion("Availability", C.variant_matrix(p, LOW), "details-availability")}
+      {C.accordion("Delivery & returns", delivery, "details-delivery")}
+    </div>
+  </div>
+</div>'''
 
-    # Phones: a slim bar pinned to the bottom while the main buy button is out of view.
-    bar_action = (add_button(p, site, "buy-btn buy-btn--bar", photos) if p["available"]
-                  else f'<a class="btn btn--ink buybar__join" href="{root}#join">Join the list</a>')
-    buybar = (f'<div class="buybar js-buybar" inert><div class="buybar__meta"><strong>{e(title)}</strong>'
-              f'<span>{"No. " + e(p["number"]) + ", size " + e(p["size"]) if p["available"] else "Sold"}</span></div>{bar_action}</div>')
+    prepare_for = [q for q in catalog if q["category"] == p["category"] and q["handle"] != p["handle"]]
+    prepare_for.sort(key=lambda q: abs(q["price"] - p["price"]))
+    recs = "".join(C.product_card(q, root, SYM, quick_add=False) for q in prepare_for[:10])
 
-    rows = "".join(f"<tr><th scope=\"row\">{e(k)}</th><td>{e(v)} cm</td></tr>" for k, v in p["measurements_cm"].items())
-    # "Check the fit": compare one of your own measurements (remembered on this device) with this piece.
-    fit_opts = "".join(f'<option value="{e(k)}" data-cm="{v}">{e(k)}</option>' for k, v in p["measurements_cm"].items())
-    fit = ('<form class="fit js-fit" novalidate><p class="fit__title">Check the fit</p>'
-           '<p class="fit__help">Lay something you own that fits well flat, measure it the same way, and compare.</p>'
-           f'<div class="fit__row"><label class="fit__field"><span>Measurement</span><select class="js-fit-key">{fit_opts}</select></label>'
-           '<label class="fit__field"><span>Yours, in cm</span><input class="js-fit-val" type="number" inputmode="decimal" '
-           'min="1" max="250" step="0.5" placeholder="e.g. 56" /></label></div>'
-           '<div class="fit__scale js-fit-scale" aria-hidden="true" hidden><i class="fit__mark fit__mark--piece"></i><i class="fit__mark fit__mark--you"></i></div>'
-           '<p class="fit__out js-fit-out" role="status" aria-live="polite"></p></form>')
-    flaws = ("<ul class=\"pdp__flaws\">" + "".join(f"<li>{e(f)}</li>" for f in p.get("flaws", [])) + "</ul>"
-             if p.get("flaws") else "<p>Nothing to note beyond normal wear for its age.</p>")
-    details = accordion([
-        ("Measurements", f'<table class="pdp__measure"><caption>Measured flat, in centimetres. Labelled size: {e(p["size"])}. '
-                         f'<a href="{root}size-guide/">How we measure</a>.</caption><tbody>{rows}</tbody></table>' + fit),
-        ("Condition", f'<p><strong>{e(p["condition"])}.</strong> {e(p.get("condition_notes", ""))}</p>{flaws}'),
-        ("Material", f'<p>{e(p["material"])}</p>'),
-        ("Shipping", f'<p>{e(site["shipping"]["text"])}</p>'),
-        ("Returns", f'<p>30 days from delivery for a full refund. <a href="{root}#returns">How returns work</a>.</p>'),
-    ], "pd", open_first=True)
+    matrix = {
+        "handle": p["handle"], "style": p["style"], "title": p["title"], "price": p["price"], "sil": p["silhouette"],
+        "url": f'{root}products/{p["handle"]}/', "sizes": p["sizes"], "stock": p["stock"],
+        "colours": [{"h": c["handle"], "n": c["name"], "hex": c["hex"],
+                     "img": p["media"][c["handle"]][0].get("src")} for c in p["colours"]],
+        "ids": p.get("shopify_variant_ids", {}),
+    }
+    main = f'''<div class="pdp" data-pdp>
+  {breadcrumbs([("Shop", root + "shop/"), (cat["title"], root + "shop/" + cat["handle"] + "/"), (p["title"], None)])}
+  <div class="pdp__layout">{gallery}{info}</div>
+</div>
+{C.rail("recs", "You may also like", recs, link=("Shop " + cat["title"].lower(), root + "shop/" + cat["handle"] + "/"))}
+{C.json_script("variant-matrix", matrix)}'''
 
-    others = sorted((o for o in products if o["handle"] != p["handle"]),
-                    key=lambda o: (not o["available"], o["category"] != p["category"]))[:3]
-    more = "\n".join(tag_card(o, site, root, " tag--grid js-reveal") for o in others)
-
-    desc = f'{p["description"]} Size {p["size"]}, {p["era"]}. One of one, {money(p["price"], site)}.'
-    ctx = base_ctx(site, products, root, "product")
-    if photos and image_size(ROOT / photos[0]["src"]):
-        w, h = image_size(ROOT / photos[0]["src"])
-        ctx.update({"og_image": site["url"] + photos[0]["src"], "og_image_type": mime(photos[0]["src"]),
-                    "og_image_w": w, "og_image_h": h, "og_image_alt": f"{title} from Archive 88"})
-    ctx.update({
-        "og_type": "product",
-        "extra_meta": "\n".join([
-            f'  <meta property="product:price:amount" content="{p["price"]:.2f}" />',
-            f'  <meta property="product:price:currency" content="{site["currency"]}" />',
-            f'  <meta property="product:availability" content="{"in stock" if p["available"] else "out of stock"}" />',
-            '  <meta property="product:condition" content="used" />',
-            f'  <meta property="product:retailer_item_id" content="A88-{p["number"]}" />']),
-        "title": e(f"{title} No. {p['number']} - Archive 88"), "description": e(desc), "canonical": url,
-        "jsonld": ld_json([org_ld(site), product_ld(p, site), breadcrumbs_ld(site, [
-            ("Shop", site["url"] + "shop/"), (cat, f'{site["url"]}shop/?cat={p["category"]}'), (title, url)])]),
-        "handle": p["handle"], "number": e(p["number"]), "category": p["category"], "category_title": e(cat),
-        "name": e(title), "title_lower": e(title.lower()), "price_fmt": money(p["price"], site),
-        "size": e(p["size"]), "era": e(p["era"]), "condition": e(p["condition"]),
-        "description": e(p["description"]), "gallery": "\n".join(slides), "pager": pager,
-        "buy": buy, "buybar": buybar, "details": details, "more": more,
-    })
-    body = "\n".join(fill(partial(n), ctx) for n in ["header", "product-main", "footer"])
-    write(f"products/{p['handle']}/index.html",
-          page(ctx, f'data-nav="paper" class="{"is-sold" if not p["available"] else ""}"', body, ["assets/js/product.js"]))
+    size_sheet = C.drawer("size-sheet", "Select a size", '<div class="size-sheet" data-size-sheet></div>', side="bottom")
+    offers = [{"@type": "Offer", "sku": f'{p["style"]}-{c["handle"].upper()}-{s}', "price": p["price"],
+               "priceCurrency": store["currency"], "itemCondition": "https://schema.org/NewCondition",
+               "availability": "https://schema.org/" + ("InStock" if p["stock"][c["handle"]][s] else "OutOfStock")}
+              for c in p["colours"] for s in p["sizes"]]
+    ld = [{"@context": "https://schema.org", "@type": "Product", "name": p["title"], "sku": p["style"],
+           "description": p["description"], "brand": {"@type": "Brand", "name": store["name"]},
+           "category": cat["title"], "color": ", ".join(c["name"] for c in p["colours"]), "offers": offers}]
+    path = f'products/{p["handle"]}/'
+    write(path + "index.html", page(
+        title=f'{p["title"]} | {store["name"]}', desc=p["description"], root=root, path=path, main=main,
+        active=p["category"], scripts=("pdp",), jsonld=ld, extra=C.sticky_atc(p, SYM) + size_sheet))
 
 
-def build_shop(site, products, nxt):
+# ---------------------------------------------------------------------------------------------------------------------
+# Home
+# ---------------------------------------------------------------------------------------------------------------------
+
+
+def ranked() -> list:
+    return sorted(catalog, key=lambda p: p["rank"])
+
+
+def mark_bestsellers():
+    """Bestsellers: the top-ranked styles that aren't new this season."""
+    for i, p in enumerate([p for p in ranked() if not p.get("new")]):
+        p["best"] = i < 12
+
+
+def editorial(img: str, title: str, cta: str, href: str, *, w: int = 720, h: int = 900, cls: str = "") -> str:
+    return (f'<a class="split__panel reveal {cls}" href="{href}"><img src="assets/img/{img}" alt="" width="{w}" height="{h}" loading="lazy" decoding="async">'
+            f'<span class="split__text"><span class="split__title">{e(title)}</span><span class="link-arrow">{e(cta)} {icon("arrow")}</span></span></a>')
+
+
+def home():
+    root = ""
+    prepare(root)
+    n = counts()
+    order = ranked()
+    newest = [p for p in order if p.get("new")][:12]
+    best = [p for p in order if p.get("best")][:12]
+    tiles = []
+    for c in CATS:
+        lead = next(p for p in order if p["category"] == c["handle"])
+        v = lead["media"][lead["colours"][0]["handle"]][0]
+        tiles.append(f'<li class="reveal"><a class="cat-tile" href="shop/{c["handle"]}/">{C.frame(C.media(v, ""), "cat-tile__media")}'
+                     f'<span class="cat-tile__text"><span class="cat-tile__title">{e(c["title"])}</span>'
+                     f'<span class="cat-tile__count">{n[c["handle"]]} styles</span></span></a></li>')
+    th = money(store["free_shipping_threshold"], SYM)
+    main = f'''<section class="hero" data-nav="dark" data-nav-clear aria-labelledby="hero-title">
+  <div class="hero__film" aria-hidden="true">
+    <video class="hero__video" muted loop playsinline preload="metadata" poster="{root}assets/img/forest-poster.jpg">
+      <source src="{root}assets/video/forest-portrait.mp4" type="video/mp4" media="(max-width: 720px) and (orientation: portrait)">
+      <source src="{root}assets/video/forest.mp4" type="video/mp4">
+    </video>
+    <div class="hero__shade"></div>
+  </div>
+  <div class="hero__content">
+    <p class="hero__eyebrow">Natural fibres, kept in every size</p>
+    <h1 class="hero__title" id="hero-title">{e(store["tagline"].capitalize())}</h1>
+    <ul class="hero__links">
+      <li><a class="link-arrow" href="shop/">Shop all {icon("arrow")}</a></li>
+      <li><a class="link-arrow" href="shop/?sort=new">New in {icon("arrow")}</a></li>
+    </ul>
+  </div>
+  <button type="button" class="hero__toggle" data-film-toggle aria-pressed="false" hidden>
+    {icon("pause")}<span class="sr-only" data-film-label>Pause film</span></button>
+</section>
+{C.rail("new", "New in", "".join(C.product_card(p, root, SYM, eager=i < 2) for i, p in enumerate(newest)), link=("See all", "shop/?sort=new"))}
+<section class="split" data-nav="dark" data-nav-clear aria-label="Featured collections">
+  {editorial("menu-1.jpg", "Built for weather", "Shop outerwear", "shop/outerwear/")}
+  {editorial("menu-3.jpg", "Knitwear, spun slow", "Shop knitwear", "shop/knitwear/")}
+</section>
+{C.rail("best", "Bestsellers", "".join(C.product_card(p, root, SYM) for p in best), link=("Shop all", "shop/"))}
+<section class="cats" aria-labelledby="cats-title">
+  <div class="section-head"><h2 class="section-title" id="cats-title">Shop by category</h2></div>
+  <ul class="cats__grid">{"".join(tiles)}</ul>
+</section>
+<section class="banner" data-nav="dark" data-nav-clear aria-labelledby="banner-title">
+  <img class="banner__img" src="{root}assets/img/forest-poster.jpg" alt="" width="1280" height="720" loading="lazy" decoding="async">
+  <div class="banner__text reveal">
+    <h2 class="banner__title" id="banner-title">Made to be worn often</h2>
+    <p>Wool, cotton, linen and wax, cut in fits that stay in the range season after season. Free repairs for life.</p>
+    <a class="link-arrow" href="{root}about/">About Archive 88 {icon("arrow")}</a>
+  </div>
+</section>
+<section class="about-copy" aria-labelledby="about-title">
+  <h2 class="section-title" id="about-title">Archive 88: clothing made to stay</h2>
+  <div class="about-copy__cols">
+    <p>{e(store["description"])}</p>
+    <p>Every style in the collection is kept in every size, so the coat you buy this winter is the one we'll still make next year. Delivery is free across the UK on orders over {th}, and returns are free for 30 days.</p>
+  </div>
+</section>'''
+    write("index.html", page(
+        title=f'{store["name"]}: {store["tagline"]}', desc=store["description"], root=root, path="", main=main,
+        scripts=("home",), preload=f'<link rel="preload" href="{root}assets/img/forest-poster.jpg" as="image" fetchpriority="high">\n'))
+
+
+def search_index():
+    """search.json for the header search: one row per style, loaded on first open (about 20 KB)."""
+    prepare("")
+    rows = []
+    for p in ranked():
+        c0 = p["colours"][0]
+        v = p["media"][c0["handle"]][0]
+        rows.append({"t": p["title"], "u": f'products/{p["handle"]}/', "p": p["price"], "c": CAT_BY[p["category"]]["title"],
+                     "k": " ".join([p["silhouette"], p.get("material", ""), *(c["name"] for c in p["colours"])]),
+                     "n": len(p["colours"]), "h": c0["hex"], "s": p["silhouette"], "i": v.get("src")})
+    (ROOT / "search.json").write_text(json.dumps(rows, ensure_ascii=False, separators=(",", ":")))
+
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Gift cards
+# ---------------------------------------------------------------------------------------------------------------------
+
+
+def gift():
     root = "../"
-    ctx = base_ctx(site, products, root, "shop")
-    ctx["current"] = "shop/"
-    avail = [p for p in products if p["available"]]
-    chip = lambda group, val, label, n=None, on=False: (
-        f'<button class="chip{" is-on" if on else ""}" type="button" data-{group}="{e(val)}" aria-pressed="{"true" if on else "false"}">'
-        f'{e(label)}{f"<span>{n}</span>" if n is not None else ""}</button>')
-    cat_chips = [chip("cat", "all", "All", len(avail), True)] + [
-        chip("cat", c["handle"], c["title"], sum(1 for p in avail if p["category"] == c["handle"]))
-        for c in site["categories"]]
-    sizes = list(dict.fromkeys(p["size"] for p in products))
-    size_chips = [chip("size", "all", "Any", None, True)] + [chip("size", slug(s), s) for s in sizes]
-    # Available pieces first (newest numbers first), then sold ones (hidden until "Include sold").
-    ordered = sorted(products, key=lambda p: (not p["available"], -int(re.sub(r"\D", "", p["number"]) or 0)))
-    ctx.update({
-        "title": "Shop all - Archive 88",
-        "description": e("Every piece available in the Archive 88 archive. Filter by category and size. One of each."),
-        "canonical": site["url"] + "shop/",
-        "jsonld": ld_json([org_ld(site), {"@type": "CollectionPage", "name": "Shop all", "url": site["url"] + "shop/",
-                                          "isPartOf": {"@id": site["url"] + "#website"}}]),
-        "cat_chips": "\n".join("            " + c for c in cat_chips),
-        "size_chips": "\n".join("            " + c for c in size_chips),
-        "grid": "\n".join(tag_card(p, site, root, " tag--grid") for p in ordered),
-        "count": len(avail),
-        "join_note": (f"{e(nxt['name'])} drops {e(nxt['label'])}." if nxt else "New pieces arrive with every drop."),
-    })
-    body = "\n".join(fill(partial(n), ctx) for n in ["header", "shop-main", "footer"])
-    write("shop/index.html", page(ctx, 'data-nav="paper"', body, ["assets/vendor/Flip.min.js", "assets/js/shop.js"]))
+    g = store["gift_cards"]
+    amounts = "".join(
+        f'<label class="chip"><input type="radio" name="amount" value="{a}" {"checked" if a == g["default"] else ""}>'
+        f'<span>{money(a, SYM)}</span></label>' for a in g["amounts"])
+    today = date.today().isoformat()
+    email_form = (
+        C.field("email-to", "Their name", autocomplete="off", maxlength=40)
+        + C.field("email-address", "Their email address", type_="email", autocomplete="off", inputmode="email",
+                  hint="We'll send the card here, with your message.")
+        + C.field("email-from", "Your name", autocomplete="name", maxlength=40)
+        + C.field("email-message", "Message", required=False, maxlength=200, textarea=True, hint="Up to 200 characters.")
+        + f'<div class="field"><label class="field__label" for="email-date">Send on</label>'
+          f'<input type="date" id="email-date" name="email-date" value="{today}" min="{today}" aria-describedby="email-date-err">'
+          f'<p class="field__err" id="email-date-err" aria-live="polite"></p></div>')
+    post_form = (
+        C.field("post-to", "Their name", autocomplete="off", maxlength=40)
+        + C.field("post-line1", "Address line 1", autocomplete="off")
+        + C.field("post-line2", "Address line 2", autocomplete="off", required=False)
+        + '<div class="field-row">'
+        + C.field("post-town", "Town or city", autocomplete="off")
+        + C.field("post-postcode", "Postcode", autocomplete="off", maxlength=8)
+        + '</div>'
+        + C.field("post-from", "Your name", autocomplete="name", maxlength=40)
+        + C.field("post-message", "Message", required=False, maxlength=200, textarea=True, hint="Printed inside the card. Up to 200 characters."))
+
+    def buy(method):
+        return (f'<button type="submit" class="buy-btn"><span>Add to bag · <span data-gift-price>{money(g["default"], SYM)}</span></span></button>')
+
+    card = f'''<div class="giftcard" data-gift-card data-method="email">
+  <div class="giftcard__face">
+    <div class="giftcard__top">{wordmark("giftcard__mark", "")}<span class="giftcard__kind" data-gift-kind>E-gift card</span></div>
+    <p class="giftcard__amount" data-gift-amount>{money(g["default"], SYM)}</p>
+    <div class="giftcard__foot"><span>For <span data-gift-to>someone good</span></span><span>The permanent collection</span></div>
+  </div>
+</div>'''
+    main = f'''<div class="pdp gift" data-gift data-symbol="{e(SYM)}">
+  {breadcrumbs([("Shop", root + "shop/"), ("Gift cards", None)])}
+  <div class="pdp__layout gift__layout">
+    <div class="gift__visual">{card}<p class="gift__caption">Preview. The amount and name update as you go.</p></div>
+    <div class="pdp__info"><div class="pdp__sticky">
+      <p class="pdp__meta"><span>Gift card</span><span>From {money(min(g["amounts"]), SYM)}</span></p>
+      <h1 class="pdp__title">Gift card</h1>
+      <p class="pdp__desc">Let them choose. {e(g["terms"])}</p>
+      <fieldset class="option gift__amounts"><legend class="option__legend">Amount</legend><div class="chip-grid">{amounts}</div></fieldset>
+      <p class="option__legend gift__how" id="gift-how">How should it arrive?</p>
+      <div class="gift__methods" role="group" aria-labelledby="gift-how">
+        <button type="button" class="gift__method" data-gift-method="email" aria-expanded="false" aria-controls="gift-email">
+          <svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg><span><strong>Email a gift card</strong><small>{e(g["email_note"])}</small></span></button>
+        <button type="button" class="gift__method" data-gift-method="post" aria-expanded="false" aria-controls="gift-post">
+          <svg class="icon" aria-hidden="true"><use href="#i-post"/></svg><span><strong>Post a gift card</strong><small>{e(g["post_note"])}</small></span></button>
+      </div>
+      <form class="gift__form" id="gift-email" data-gift-form="email" novalidate hidden aria-label="Email a gift card">{email_form}{buy("email")}</form>
+      <form class="gift__form" id="gift-post" data-gift-form="post" novalidate hidden aria-label="Post a gift card">{post_form}{buy("post")}</form>
+      <div class="pdp__details">
+        {C.accordion("How gift cards work", f"<p>{e(g['terms'])}</p><p>The code is entered at checkout. Any balance stays on the card for next time.</p>", "gift-how-it-works", open_=True)}
+        {C.accordion("Delivery", f"<p><strong>Email:</strong> {e(g['email_note'])}</p><p><strong>Post:</strong> {e(g['post_note'])}</p>", "gift-delivery")}
+      </div>
+    </div></div>
+  </div>
+</div>
+{C.json_script("gift-config", {"amounts": g["amounts"], "ids": g.get("shopify_variant_ids", {})})}'''
+    write("gift-cards/index.html", page(
+        title=f'Gift cards | {store["name"]}', desc=f'Archive 88 gift cards by email or post. {g["terms"]}',
+        root=root, path="gift-cards/", main=main, active="gift", scripts=("gift",)))
 
 
-def build_record(site, products, drops):
-    root = "../"
-    ctx = base_ctx(site, products, root, "record")
-    ctx["current"] = "record/"
-    groups = []
-    for d in reversed([d for d in drops if any(p["drop"] == d["handle"] for p in products)]):
-        pieces = sorted((p for p in products if p["drop"] == d["handle"]), key=lambda p: p["number"])
-        sold = sum(1 for p in pieces if not p["available"])
-        rows = "\n".join(
-            f'''              <tr class="{"is-sold" if not p["available"] else ""}">
-                <td class="rec__no">No. {e(p["number"])}</td>
-                <th scope="row" class="rec__name"><a href="{root}products/{p["handle"]}/">{e(p["title"])}</a></th>
-                <td>{e(cat_title(site, p["category"]))}</td><td>{e(p["size"])}</td><td>{e(p["era"])}</td>
-                <td class="rec__status">{"Sold" if not p["available"] else "Available"}</td>
-              </tr>''' for p in pieces)
-        groups.append(f'''        <section class="rec js-reveal" aria-labelledby="drop-{d["handle"]}">
-          <header class="rec__head">
-            <h2 id="drop-{d["handle"]}">{e(d["name"])}</h2>
-            <p>Released {e(d["month"])}. {len(pieces)} pieces, {sold} sold.</p>
-          </header>
-          <table class="rec__table">
-            <thead><tr><th scope="col">No.</th><th scope="col">Piece</th><th scope="col">Category</th><th scope="col">Size</th><th scope="col">Era</th><th scope="col">Status</th></tr></thead>
-            <tbody>
-{rows}
-            </tbody>
-          </table>
-        </section>''')
-    total = len(products)
-    ctx.update({
-        "title": "The record - Archive 88",
-        "description": e("Every piece Archive 88 has released, kept on record by drop. Sold pieces stay listed."),
-        "canonical": site["url"] + "record/",
-        "jsonld": ld_json([org_ld(site), {"@type": "CollectionPage", "name": "The record", "url": site["url"] + "record/"}]),
-        "groups": "\n".join(groups), "total": total,
-        "sold_total": sum(1 for p in products if not p["available"]),
-    })
-    body = "\n".join(fill(partial(n), ctx) for n in ["header", "record-main", "footer"])
-    write("record/index.html", page(ctx, 'data-nav="paper"', body, []))
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Info pages (src/pages/*.html), 404 and sitemap
+# ---------------------------------------------------------------------------------------------------------------------
+
+PAGES = ROOT / "src" / "pages"
 
 
-def build_info_pages(site, products):
-    """src/pages/<slug>.html: first line is a JSON comment with title/description/lede."""
+def fill(text: str, root: str) -> str:
+    """{{root}}, {{updated}}, {{shipping_text}}, {{free_threshold}}, {{instagram}} and {{biz:<key>}} from store.json."""
+    biz = store["business"]
+
+    def sub(m):
+        key = m.group(1)
+        if key == "root":
+            return root
+        if key == "updated":
+            return f"{date.today().day} {date.today().strftime('%B %Y')}"
+        if key == "shipping_text":
+            return e(store["shipping_text"])
+        if key == "free_threshold":
+            return money(store["free_shipping_threshold"], SYM)
+        if key == "instagram":
+            return e(store["social"]["instagram"])
+        if key.startswith("biz:"):
+            name = key[4:]
+            if name == "address_inline":
+                return e(biz["address"].replace("\n", ", "))
+            if name not in biz:
+                fail(f"unknown {{{{{key}}}}} in src/pages (not in store.json business)")
+            return e(biz[name]).replace("\n", "<br>")
+        fail(f"unknown placeholder {{{{{key}}}}} in src/pages")
+    return re.sub(r"\{\{([a-z_:]+)\}\}", sub, text)
+
+
+def info_pages() -> list[str]:
+    """Each src/pages/<slug>.html starts with <!-- {"title", "description", "lede", "legal"?} --> and becomes /<slug>/."""
     built = []
     for f in sorted(PAGES.glob("*.html")):
         text = f.read_text()
         m = re.match(r"\s*<!--\s*(\{.*?\})\s*-->\s*", text, re.S)
         if not m:
-            sys.exit(f"{f}: must start with <!-- {{\"title\": ..., \"description\": ...}} -->")
+            fail(f"{f.name} must start with <!-- {{\"title\": ..., \"description\": ...}} -->")
         meta = json.loads(m.group(1))
-        slug_ = f.stem
-        root = "../"
-        ctx = base_ctx(site, products, root, slug_)
-        ctx["current"] = f"{slug_}/"
-        is_legal = meta.get("legal", False)
-        ctx.update({
-            "title": e(f'{meta["title"]} - Archive 88'), "description": e(meta["description"]),
-            "canonical": f'{site["url"]}{slug_}/',
-            "jsonld": ld_json([org_ld(site), {"@type": "WebPage", "name": meta["title"], "url": f'{site["url"]}{slug_}/'}]),
-            "page_title": e(meta["title"]), "lede": meta.get("lede", ""),
-            "updated": f"{NOW.day} {NOW.strftime('%B %Y')}",
-            "shipping_text": e(site["shipping"]["text"]),
-            "_ig": e(site["social"]["instagram"]),
-            "legal_note": ('<p class="legal-note"><strong>Draft.</strong> This is a starting template, not legal advice. '
-                           'Have it checked before the shop opens.</p>' if is_legal and not site.get("legal_reviewed") else ""),
-        })
-        ctx["content"] = fill(text[m.end():], ctx)
-        body = "\n".join(fill(partial(n), ctx) for n in ["header", "page-main", "footer"])
-        write(f"{slug_}/index.html", page(ctx, 'data-nav="paper"', body, []))
+        slug_, root = f.stem, "../"
+        draft = ('<p class="info__note"><strong>Draft.</strong> This is a starting template, not legal advice. '
+                 'Have it checked before the shop opens.</p>') if meta.get("legal") and not store.get("legal_reviewed") else ""
+        lede = f'<p class="info__lede">{fill(meta["lede"], root)}</p>' if meta.get("lede") else ""
+        main = f'''<article class="info">
+  {breadcrumbs([("Home", root), (meta["title"], None)])}
+  <header class="info__head"><h1 class="page-title">{e(meta["title"])}</h1>{lede}</header>
+  {draft}
+  <div class="info__body">{fill(text[m.end():], root)}</div>
+</article>'''
+        shutil.rmtree(ROOT / slug_, ignore_errors=True)
+        write(f"{slug_}/index.html", page(title=f'{meta["title"]} | {store["name"]}', desc=fill(meta["description"], root),
+                                          root=root, path=f"{slug_}/", main=main, active=slug_))
         built.append(slug_)
     return built
 
 
-# ---------------------------------------------------------------- lookbook (Shop the look)
-
-def look_photo(handle):
-    for ext in (".jpg", ".jpeg", ".png", ".webp"):
-        f = ROOT / "assets" / "lookbook" / f"{handle}{ext}"
-        if f.exists():
-            if Image is not None:
-                targets, jpg = make_web_copies(f)
-                return {"orig": rel(f), "src": rel(jpg), "srcset": ", ".join(f"{rel(t)} {w}w" for w, t in targets.items())}
-            return {"orig": rel(f), "src": rel(f), "srcset": ""}
-    return None
-
-
-def load_looks(products):
-    """Looks with their spots resolved to released products (unknown/unreleased pieces are skipped)."""
-    path = ROOT / "data" / "lookbook.json"
-    if not path.exists():
-        return []
-    by_handle = {p["handle"]: p for p in products}
-    looks = []
-    for lk in json.loads(path.read_text())["looks"]:
-        if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", lk["handle"]):
-            sys.exit(f"lookbook: handle '{lk['handle']}' must be lowercase-with-dashes")
-        spots = []
-        for sp in lk["spots"]:
-            p = by_handle.get(sp["product"])
-            if not p:
-                warnings.append(f"lookbook '{lk['handle']}': '{sp['product']}' isn't a released piece; marker skipped")
-                continue
-            if not (0 <= sp["x"] <= 100 and 0 <= sp["y"] <= 100):
-                sys.exit(f"lookbook '{lk['handle']}': x and y must be between 0 and 100")
-            spots.append({**sp, "p": p})
-        if spots:
-            photo = look_photo(lk["handle"])
-            if not photo:
-                warnings.append(f"no lookbook photo yet for '{lk['handle']}' (assets/lookbook/{lk['handle']}.jpg)")
-            looks.append({**lk, "spots": spots, "photo": photo})
-    return looks
+def not_found():
+    """404.html. GitHub Pages serves it for any missing path, so links use the site's absolute base path. It also sends
+    old addresses on: /storefront/... (before the storefront became the site) and the retired /lookbook/ and /record/."""
+    from urllib.parse import urlparse
+    base = urlparse(store["url"]).path or "/"
+    redirect = f'''<script>(function(){{var b={json.dumps(base)},p=location.pathname,s=b+"storefront/";
+if(p.indexOf(s)===0){{location.replace(b+p.slice(s.length)+location.search+location.hash);return;}}
+if(/\\/(lookbook|record)(\\/|$)/.test(p.slice(b.length-1))){{location.replace(b+"shop/");}}}})();</script>
+'''
+    main = f'''<section class="info info--center">
+  <h1 class="page-title">Page not found</h1>
+  <p class="info__lede">That page has moved or doesn't exist. Try the shop, or search for what you were after.</p>
+  <p class="info__actions"><a class="btn btn--primary" href="{base}shop/">Shop all</a>
+  <button type="button" class="btn btn--secondary" data-drawer-open="search" aria-controls="search">Search</button></p>
+</section>'''
+    write("404.html", page(title=f'Page not found | {store["name"]}', desc=store["description"], root=base, path="404.html",
+                           main=main, pre=redirect).replace('<link rel="canonical"', '<meta name="robots" content="noindex">\n<link rel="canonical"', 1))
 
 
-def look_spot(sp, n, hid, site, root):
-    p = sp["p"]
-    photos = PHOTOS[p["handle"]]
-    sold = not p["available"]
-    url = f'{root}products/{p["handle"]}/'
-    thumb = (img_tag(photos[0], root, "", "96px") if photos else
-             '<svg viewBox="0 0 146 68" aria-hidden="true"><use href="#mono"/></svg>')
-    if sold:
-        action = '<span class="look__sold">Sold</span>'
-    else:
-        action = add_button(p, site, "look__add", photos).replace(
-            '<span class="tag__price">', '<span class="tag__price sr-only">', 1)
-    pid = f"pop-{hid}-{n}"
-    label = f'{p["title"]}, {"sold" if sold else money(p["price"], site)}'
-    button = (f'          <button class="hotspot{" is-sold" if sold else ""}" type="button" '
-              f'style="--x:{sp["x"]}%;--y:{sp["y"]}%" data-spot="{n}" aria-expanded="false" aria-controls="{pid}" '
-              f'aria-label="{e(label)}"><span class="hotspot__ring" aria-hidden="true"></span>'
-              f'<span class="hotspot__dot" aria-hidden="true">{n}</span></button>')
-    pop = (f'          <div class="pop" id="{pid}" role="group" aria-label="{e(p["title"])}" data-spot="{n}" hidden>\n'
-           f'            <a class="pop__thumb tag--{p["tag"]}" href="{url}" tabindex="-1" aria-hidden="true">{thumb}</a>\n'
-           f'            <div class="pop__body">\n'
-           f'              <p class="pop__meta">No. {e(p["number"])} <span>Size {e(p["size"])}</span></p>\n'
-           f'              <p class="pop__name"><a href="{url}">{e(p["title"])}</a></p>\n'
-           f'              <p class="pop__price">{"Sold" if sold else money(p["price"], site)}</p>\n'
-           f'              <div class="pop__actions">{action}<a class="pop__view" href="{url}">View</a></div>\n'
-           f'            </div>\n'
-           f'          </div>')
-    piece = (f'            <li class="look__piece{" is-sold" if sold else ""}" data-spot="{n}">'
-             f'<span class="look__num" aria-hidden="true">{n}</span>'
-             f'<a class="look__name" href="{url}">{e(p["title"])}<small>No. {e(p["number"])}, size {e(p["size"])}</small></a>'
-             f'<span class="look__price">{"Sold" if sold else money(p["price"], site)}</span></li>')
-    return button + "\n" + pop, piece
+def sitemap(info: list[str]):
+    urls = ["", "shop/", *(f'shop/{c["handle"]}/' for c in CATS), "gift-cards/", *(f"{s}/" for s in info),
+            *(f'products/{p["handle"]}/' for p in ranked())]
+    rows = "\n".join(f"  <url><loc>{e(store['url'] + u)}</loc></url>" for u in urls)
+    write("sitemap.xml", f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{rows}\n</urlset>\n')
+    write("robots.txt", f"User-agent: *\nAllow: /\n\nSitemap: {store['url']}sitemap.xml\n")
+    return len(urls)
 
 
-def look_html(lk, i, site, root, feature=False):
-    """One look: photo (or labelled slot) with hotspots + popovers, and the list of pieces."""
-    hid = ("f-" if feature else "") + lk["handle"]
-    if lk["photo"]:
-        figure_img = img_tag(lk["photo"], root, f'{lk["title"]}. {lk["caption"]}', "(max-width: 900px) 100vw, 60vw",
-                             cls="look__img")
-        empty = ""
-    else:
-        figure_img = ('<div class="look__slot" aria-hidden="true"><svg viewBox="0 0 146 68"><use href="#mono"/></svg>'
-                      '<p>Editorial photo to come<small>Full length, portrait 4:5</small></p></div>')
-        empty = " is-empty"
-    parts = [look_spot(sp, n, hid, site, root) for n, sp in enumerate(lk["spots"], 1)]
-    spots = "\n".join(a for a, _ in parts)
-    pieces = "\n".join(b for _, b in parts)
-    flipped = " is-flipped" if (i % 2 and not feature) else ""
-    eyebrow = "Shop the look" if feature else f"Look {i + 1:02d}"
-    more = (f'\n          <a class="archive__all look__more" href="{root}lookbook/">See every look <span aria-hidden="true">→</span></a>'
-            if feature else "")
-    # Every available piece in one go (secondary, ink): only worth offering for two or more.
-    avail = [sp["p"] for sp in lk["spots"] if sp["p"]["available"]]
-    whole = (f'\n          <button class="btn btn--ink look__whole js-add-look" type="button" '
-             f'data-ids="{",".join(e(P["number"]) for P in avail)}" data-title="{e(lk["title"])}">'
-             f'<span class="js-look-label">Add the whole look</span> <span class="look__whole-price">{money(sum(P["price"] for P in avail), site)}</span></button>'
-             if len(avail) > 1 else "")
-    return (f'      <article class="look{flipped}" id="look-{hid}" aria-labelledby="look-title-{hid}">\n'
-            f'        <figure class="look__figure{empty} js-look">\n'
-            f'          {figure_img}\n{spots}\n'
-            f'        </figure>\n'
-            f'        <div class="look__panel">\n'
-            f'          <p class="look__eyebrow">{eyebrow}</p>\n'
-            f'          <h2 class="look__title" id="look-title-{hid}">{e(lk["title"])}</h2>\n'
-            f'          <p class="look__caption">{e(lk["caption"])}</p>\n'
-            f'          <p class="look__hint">Hover or tap a number to shop that piece.</p>\n'
-            f'          <ol class="look__pieces">\n{pieces}\n          </ol>{whole}{more}\n'
-            f'        </div>\n'
-            f'      </article>')
-
-
-def build_lookbook(site, products, looks):
-    root = "../"
-    ctx = base_ctx(site, products, root, "lookbook")
-    ctx["current"] = "lookbook/"
-    ctx.update({
-        "title": "Shop the look - Archive 88",
-        "description": e("Editorial looks from Archive 88. Tap each piece to see it and add it to your bag."),
-        "canonical": site["url"] + "lookbook/",
-        "jsonld": ld_json([org_ld(site), {"@type": "CollectionPage", "name": "Shop the look",
-                                          "url": site["url"] + "lookbook/"}]),
-        "looks": "\n".join(look_html(lk, i, site, root) for i, lk in enumerate(looks)),
-    })
-    body = "\n".join(fill(partial(n), ctx) for n in ["header", "lookbook-main", "footer"])
-    write("lookbook/index.html", page(ctx, 'data-nav="paper"', body, ["assets/js/lookbook.js"]))
-
-
-# ---------------------------------------------------------------- Shopify CSV
-
-def build_shopify_csv(site, products, drops):
-    drop_names = {d["handle"]: d["name"] for d in drops}
-    meta = {
-        "Number (product.metafields.archive.number)": lambda p: p["number"],
-        "Era (product.metafields.archive.era)": lambda p: p["era"],
-        "Size (product.metafields.archive.size)": lambda p: p["size"],
-        "Material (product.metafields.archive.material)": lambda p: p["material"],
-        "Condition (product.metafields.archive.condition)": lambda p: p["condition"],
-        "Condition notes (product.metafields.archive.condition_notes)": lambda p: p.get("condition_notes", ""),
-        "Flaws (product.metafields.archive.flaws)": lambda p: "\n".join(p.get("flaws", [])),
-        "Measurements (product.metafields.archive.measurements)": lambda p: json.dumps(p["measurements_cm"]),
-        "Tag colour (product.metafields.archive.tag_colour)": lambda p: p["tag"],
-        "Final sale (product.metafields.archive.final_sale)": lambda p: "TRUE" if p.get("final_sale") else "FALSE",
-        "Drop (product.metafields.archive.drop)": lambda p: drop_names[p["drop"]],
-    }
-    cols = ["Handle", "Title", "Body (HTML)", "Vendor", "Product Category", "Type", "Tags", "Published",
-            "Option1 Name", "Option1 Value", "Variant SKU", "Variant Grams", "Variant Inventory Tracker",
-            "Variant Inventory Qty", "Variant Inventory Policy", "Variant Fulfillment Service", "Variant Price",
-            "Variant Compare At Price", "Variant Requires Shipping", "Variant Taxable", "Image Src",
-            "Image Position", "Image Alt Text", "Gift Card", "SEO Title", "SEO Description", "Status", *meta]
-    (ROOT / "shopify").mkdir(exist_ok=True)
-    with open(ROOT / "shopify" / "products.csv", "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=cols)
-        w.writeheader()
-        for p in products:
-            photos = PHOTOS[p["handle"]]
-            row = {c: "" for c in cols}
-            row.update({
-                "Handle": p["handle"], "Title": p["title"], "Body (HTML)": f'<p>{e(p["description"])}</p>',
-                "Vendor": site["name"], "Type": cat_title(site, p["category"]),
-                "Tags": ", ".join([cat_title(site, p["category"]), drop_names[p["drop"]], p["era"], f'size {p["size"]}']),
-                "Published": "TRUE", "Option1 Name": "Title", "Option1 Value": "Default Title",
-                "Variant SKU": f'A88-{p["number"]}', "Variant Inventory Tracker": "shopify",
-                "Variant Inventory Qty": 1 if p["available"] else 0, "Variant Inventory Policy": "deny",
-                "Variant Fulfillment Service": "manual", "Variant Price": f'{p["price"]:.2f}',
-                "Variant Requires Shipping": "TRUE", "Variant Taxable": "TRUE", "Gift Card": "FALSE",
-                "SEO Title": f'{p["title"]} No. {p["number"]} - Archive 88',
-                "SEO Description": p["description"], "Status": "active",
-                **{k: fn(p) for k, fn in meta.items()},
-            })
-            # Shopify downloads and resizes the originals itself.
-            for i, ph in enumerate(photos, 1):
-                img = {"Image Src": site["url"] + ph["orig"], "Image Position": i, "Image Alt Text": f'{p["title"]}, photo {i}'}
-                if i == 1:
-                    row.update(img)
-                    w.writerow(row)
-                else:
-                    w.writerow({**{c: "" for c in cols}, "Handle": p["handle"], **img})
-            if not photos:
-                w.writerow(row)
-
-
-# ---------------------------------------------------------------- main
-
-PHOTOS: dict[str, list[dict]] = {}
-
-
-def main():
-    site = json.loads((ROOT / "data" / "site.json").read_text())
-    products = json.loads((ROOT / "data" / "products.json").read_text())["products"]
-    validate(site, products)
-    drops, current, nxt = load_drops(site)
-    for p in products:
-        PHOTOS[p["handle"]] = photos_for(p["handle"])
-
-    # Scheduled drops: pieces from a drop whose date hasn't arrived stay off the site
-    # (they are still in the Shopify CSV). The hourly GitHub rebuild publishes them.
-    released_drops = {d["handle"] for d in drops if d["when"] <= NOW} or ({current["handle"]} if current else set())
-    all_products = products
-    products = [p for p in all_products if p["drop"] in released_drops]
-    waiting = len(all_products) - len(products)
-
-    # Generated folders are rebuilt from scratch so removed pieces and pages don't linger.
-    shutil.rmtree(ROOT / "products", ignore_errors=True)
-    for f in PAGES.glob("*.html"):
-        if f.stem.lower() in RESERVED or not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", f.stem):
-            sys.exit(f"src/pages/{f.name}: '{f.stem}' can't be used as a page name")
-        shutil.rmtree(ROOT / f.stem, ignore_errors=True)
-
-    looks = load_looks(products)
-    build_home(site, products, current, nxt, looks)
-    for p in products:
-        build_product(site, products, p, nxt)
-    build_shop(site, products, nxt)
-    build_record(site, products, drops)
-    shutil.rmtree(ROOT / "lookbook", ignore_errors=True)
-    if looks:
-        build_lookbook(site, products, looks)
-    info = build_info_pages(site, products)
-    build_shopify_csv(site, all_products, drops)
-
-    urls = ([site["url"], site["url"] + "shop/", site["url"] + "record/"]
-            + ([site["url"] + "lookbook/"] if looks else [])
-            + [f'{site["url"]}{s}/' for s in info]
-            + [f'{site["url"]}products/{p["handle"]}/' for p in products])
-    write("sitemap.xml",
-          '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-          + "".join(f"  <url><loc>{u}</loc></url>\n" for u in urls) + "</urlset>\n")
-    write("robots.txt", f"User-agent: *\nAllow: /\n\nSitemap: {site['url']}sitemap.xml\n")
-
-    print(f"Built home, shop, record, {len(info)} info pages and {len(products)} product pages"
-          f"{'' if Image else ' (Pillow not installed: no photo resizing)'}.")
-    if current:
-        print(f"  homepage drop: {current['name']}" + (f"; next: {nxt['name']} on {nxt['label']}" if nxt else ""))
-    if waiting:
-        print(f"  {waiting} piece(s) waiting for a future drop (not on the site yet)")
-    for w in dict.fromkeys(warnings):
-        print("  note:", w)
-
+# ---------------------------------------------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    main()
+    validate()
+    mark_bestsellers()
+    PHOTO_CACHE = {p["handle"]: process_photos(p["handle"]) for p in catalog}
+    for d in ("products", "shop", "gift-cards"):
+        shutil.rmtree(ROOT / d, ignore_errors=True)
+    home()
+    search_index()
+    gift()
+    plp(None)
+    for c in CATS:
+        plp(c)
+    prepare("../../")
+    for p in catalog:
+        pdp(p)
+    prepare("")
+    info = info_pages()
+    not_found()
+    n_urls = sitemap(info)
+    variants = sum(len(p["colours"]) * len(p["sizes"]) for p in catalog)
+    with_photos = sum(1 for h in PHOTO_CACHE.values() if h)
+    print(f"Built {len(catalog)} product pages, {len(CATS) + 1} listing pages, home, gift cards, {len(info)} info pages, 404. "
+          f"Sitemap: {n_urls} URLs.")
+    print(f"  "
+          f"{variants} variants. {with_photos}/{len(catalog)} styles have photos; the rest show placeholder art.")
+    for w in sorted(set(warnings)):
+        print("  !", w)
