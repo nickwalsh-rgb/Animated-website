@@ -1,0 +1,28 @@
+{
+  "_readme": "Storefront settings. Edit, then run: python3 storefront/build.py",
+  "name": "Archive 88",
+  "tagline": "The permanent collection",
+  "description": "Archive 88 makes a permanent collection of considered clothing: natural fibres, honest construction and fits that stay in the range season after season.",
+  "url": "https://nickwalsh-rgb.github.io/Animated-website/storefront/",
+  "locale": "en-GB",
+  "currency": "GBP",
+  "currency_symbol": "£",
+  "free_shipping_threshold": 150,
+  "low_stock_threshold": 3,
+  "page_size": 24,
+  "shopify_domain": "",
+  "_shopify_domain_note": "Set to your-store.myshopify.com and fill shopify_variant_ids in catalog.json to send the bag to Shopify checkout.",
+  "promises": [
+    ["Free UK delivery", "On orders over £150"],
+    ["30-day returns", "Free, from your door"],
+    ["Made to last", "Natural fibres, repairs for life"]
+  ],
+  "categories": [
+    {"handle": "outerwear", "title": "Outerwear", "intro": "Coats and jackets in wool, wax and gabardine. Built for weather, cut for years."},
+    {"handle": "knitwear", "title": "Knitwear", "intro": "Merino, lambswool and cashmere from mills that have spun for generations."},
+    {"handle": "shirts", "title": "Shirts", "intro": "Oxford, poplin, flannel and linen. The shirts you reach for first."},
+    {"handle": "trousers", "title": "Trousers", "intro": "Chinos, wool trousers and selvedge denim, sized by the waist."},
+    {"handle": "jersey", "title": "Jersey", "intro": "Heavyweight tees and loopback sweats in organic cotton."},
+    {"handle": "tailoring", "title": "Tailoring", "intro": "Soft-shouldered jackets that dress up or down without trying."}
+  ]
+}

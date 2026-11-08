@@ -1,0 +1,100 @@
+/* Archive 88 storefront: design tokens.
+   Three layers. Components only ever read the semantic and component layers, never raw hex.
+   1. Primitive  : the palette and scales themselves
+   2. Semantic   : what a value is FOR (text, surface, action, signal)
+   3. Component  : the few values a component owns (card gap, drawer width, frame ratio)
+   See storefront/docs/DESIGN-SYSTEM.md. */
+
+/* Fonts: self-hosted, SIL Open Font License. Variable files, latin subset. */
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url(../fonts/cormorant-garamond.woff2) format("woff2");
+  font-weight: 300 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url(../fonts/cormorant-garamond-italic.woff2) format("woff2");
+  font-weight: 300 700; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url(../fonts/inter.woff2) format("woff2");
+  font-weight: 100 900; font-style: normal; font-display: swap;
+}
+/* Metric-matched fallbacks so text doesn't jump when the web fonts arrive (CLS). */
+@font-face { font-family: "Inter Fallback"; src: local("Arial"); size-adjust: 107%; ascent-override: 90%; descent-override: 22%; line-gap-override: 0%; }
+@font-face { font-family: "Cormorant Fallback"; src: local("Georgia"); size-adjust: 84%; ascent-override: 110%; descent-override: 34%; line-gap-override: 0%; }
+
+:root {
+  /* 1 ─ Primitive ─────────────────────────────────────────────────────────── */
+  --ink-900: #1b211d;
+  --ink-700: #3a403c;
+  --ink-500: #5d625e;   /* 5.6:1 on paper */
+  --paper: #f5f4f0;
+  --white: #ffffff;
+  --bone: #e9e6de;
+  --bone-200: #dedad0;
+  --line-300: #d2cec4;
+  --line-500: #a9a59b;
+  --pine: #2f3d33;
+  --ember: #a3471f;     /* 5.3:1 on paper. Signals only. */
+  --ember-tint: #f3e6de;
+  --error: #8f2a1c;     /* 7.3:1 on paper */
+
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
+  --space-6: 32px; --space-7: 48px; --space-8: 64px; --space-9: 96px;
+
+  --font-display: "Cormorant Garamond", "Cormorant Fallback", Georgia, serif;
+  --font-ui: "Inter", "Inter Fallback", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --text-2xs: 0.6875rem;  /* 11px: badges only, uppercase + tracking */
+  --text-xs: 0.75rem;     /* 12px: meta */
+  --text-sm: 0.8125rem;   /* 13px: UI labels */
+  --text-base: 1rem;      /* 16px: body */
+  --text-md: 1.125rem;
+  --text-lg: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+  --text-xl: clamp(2rem, 1.4rem + 2.2vw, 3.25rem);
+  --text-2xl: clamp(2.75rem, 1.6rem + 4.6vw, 5.75rem);
+  --track-label: 0.08em;
+
+  --dur-instant: 0ms;   /* card alternate-angle swap: by design, no fade */
+  --dur-fast: 140ms;
+  --dur-base: 220ms;
+  --dur-enter: 320ms;
+  --dur-exit: 220ms;    /* exits are faster than entrances */
+  --ease-out: cubic-bezier(0.2, 0.7, 0.1, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+
+  /* 2 ─ Semantic ──────────────────────────────────────────────────────────── */
+  --color-bg: var(--paper);
+  --color-surface: var(--white);
+  --color-media: var(--bone);         /* behind every product image */
+  --color-text: var(--ink-900);
+  --color-text-muted: var(--ink-500);
+  --color-border: var(--line-300);
+  --color-border-strong: var(--ink-900);
+  --color-action: var(--ink-900);     /* primary buttons: restrained, never coloured */
+  --color-action-hover: var(--pine);
+  --color-on-action: var(--paper);
+  --color-signal: var(--ember);       /* low stock, bag count, progress. Never a button fill. */
+  --color-signal-bg: var(--ember-tint);
+  --color-error: var(--error);
+  --color-focus: var(--ember);
+  --color-scrim: rgb(27 33 29 / 0.42);
+
+  --radius: 0px;                      /* sharp corners throughout */
+  --radius-round: 999px;              /* swatches only */
+  --shadow-panel: 0 0 0 1px rgb(27 33 29 / 0.06), 0 24px 64px rgb(27 33 29 / 0.18);
+  --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-focus);
+
+  /* 3 ─ Component ─────────────────────────────────────────────────────────── */
+  --media-ratio: 4 / 5;               /* strict: every product image, everywhere */
+  --page-gutter: clamp(16px, 3vw, 40px);
+  --page-max: 1600px;
+  --header-h: 64px;
+  --sidebar-w: 248px;
+  --grid-gap-x: clamp(12px, 1.6vw, 24px);
+  --grid-gap-y: clamp(32px, 3vw, 48px);
+  --drawer-w: min(440px, 100vw);
+  --tap: 44px;                        /* minimum touch target */
+  --z-header: 20; --z-sticky: 30; --z-drawer: 50; --z-toast: 60;
+}

@@ -16,6 +16,10 @@ on:
       - "build.py"
       - "assets/products/**"
       - "!assets/products/*/web/**"
+      - "storefront/data/**"
+      - "storefront/*.py"
+      - "storefront/assets/products/**"
+      - "!storefront/assets/products/*/web/**"
   schedule:
     - cron: "7 * * * *"
   workflow_dispatch:
@@ -43,6 +47,9 @@ jobs:
 
       - name: Build
         run: python build.py
+
+      - name: Build storefront
+        run: python storefront/build.py
 
       - name: Commit generated files
         id: commit

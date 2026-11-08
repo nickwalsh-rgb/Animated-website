@@ -48,6 +48,29 @@ python3 -m http.server 8080   # preview at http://localhost:8080
 The build stops with a clear message if a product is missing a field, has a duplicate number or an unknown
 category, and lists any pieces that are still waiting for photos.
 
+## Storefront (permanent collection)
+
+`storefront/` is a separate, high-volume shop: 100 styles with size × colour variants, a product listing page with a
+sticky filter sidebar, product pages with a variant matrix and a mobile sticky Add to bag, and a slide-out bag.
+It has its own data, build and design system and does not change the pages above.
+
+```bash
+python3 storefront/build.py                 # rebuild the storefront
+python3 -m http.server 8080                 # preview at http://localhost:8080/storefront/
+python3 storefront/tools/seed_catalog.py    # regenerate the SAMPLE catalogue (overwrites data/catalog.json)
+```
+
+| To change | Edit |
+| --- | --- |
+| Styles, prices, colours, sizes, stock | `storefront/data/catalog.json` (`stock[colour][size]` is the variant matrix) |
+| Categories, free-delivery threshold, page size, Shopify domain | `storefront/data/store.json` |
+| Photos | `storefront/assets/products/<handle>/<colour>-<n>.jpg` (cropped to 4:5 by the build) |
+| Markup of any component | `storefront/components.py` |
+| Tokens / styles / behaviour | `storefront/assets/css/tokens.css`, `store.css`, `storefront/assets/js/*.js` |
+
+Brand, tokens, components and UX rules: [storefront/docs/DESIGN-SYSTEM.md](storefront/docs/DESIGN-SYSTEM.md).
+All storefront product data is **sample data**.
+
 ## Pages
 
 **Homepage** `index.html`
