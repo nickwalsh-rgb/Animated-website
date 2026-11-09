@@ -203,7 +203,7 @@ BRAND_DEFS = (ROOT / "src" / "brand-defs.html").read_text()
 def wordmark(cls: str = "", label: str | None = None) -> str:
     label = store["name"] if label is None else label
     aria = f'role="img" aria-label="{e(label)}"' if label else 'aria-hidden="true" focusable="false"'
-    return f'<svg class="wordmark {cls}" viewBox="0 0 5263 848" {aria}><use href="#wm"/></svg>'
+    return f'<svg class="wordmark {cls}" viewBox="0 0 5525 849" {aria}><use href="#wm"/></svg>'
 
 
 def art(sil: str, hex_: str, cls: str = "") -> str:
@@ -213,12 +213,30 @@ def art(sil: str, hex_: str, cls: str = "") -> str:
 
 
 def wall(root: str, cls: str = "") -> str:
-    """The sunlit wall: four leaf silhouettes (tools/make_shadows.py) that the CSS blurs, tints and sways as
-    shadows. Decorative. home.js pauses it off screen and wires the pause button."""
+    """The sunlit wall: a window's patch of sun on plaster, with leaf shadows moving inside it. One layer puts the
+    rest of the wall in shade, the other holds what happens in the light (leaf silhouettes from
+    tools/make_shadows.py, and a passing cloud). CSS shapes, blurs and sways them; home.js turns the light to match
+    the visitor's clock, pauses it off screen and wires the pause button. Decorative."""
     leaves = "".join(
         f'<span class="wall__leaf wall__leaf--{i}"><img src="{root}assets/img/shade-{name}.svg" alt="" width="1000" height="960" decoding="async"></span>'
-        for i, name in enumerate(("frond-a", "branch-a", "frond-b", "branch-b"), 1))
-    return f'<div class="wall {cls}" data-wall aria-hidden="true">{leaves}</div>'
+        for i, name in enumerate(("frond-b", "branch-a", "frond-a"), 1))
+    return (f'<div class="wall {cls}" data-wall aria-hidden="true"><div class="wall__frame wall__shade"></div>'
+            f'<div class="wall__frame wall__sun"><span class="wall__cloud"></span><div class="wall__leaves">{leaves}</div></div></div>')
+
+
+CARE = (("Wash cool", "M4 9l3 13h14l3-13M4 9q3.3-3 6.7 0t6.6 0 6.7 0"), ("Do not bleach", "M14 5l11 18H3zM7 12l14 10M21 12L7 22"),
+        ("Dry flat", "M4 4h20v20H4zM9 14h10"), ("Mend, do not replace", "M14 5a9 9 0 1 0 .01 0M9 14l3.5 3.5L19 11"))
+
+
+def care_label() -> str:
+    """The sewn-in label, as an object on the wall: what every piece is made of and how it is kept."""
+    rows = (("Made of", "Wool, cotton, linen, wax"), ("Cut", "Relaxed, in every size"),
+            ("Kept", "Season after season"), ("Care", "Wear often. Send it back to mend."))
+    dl = "".join(f"<div><dt>{e(a)}</dt><dd>{e(b_)}</dd></div>" for a, b_ in rows)
+    syms = "".join(f'<li><svg viewBox="0 0 28 28" role="img" aria-label="{e(n)}"><path d="{d}"/></svg></li>' for n, d in CARE)
+    return (f'<div class="label reveal"><span class="label__stitch" aria-hidden="true"></span>{wordmark("label__mark")}'
+            f'<dl class="label__rows">{dl}</dl><ul class="label__care">{syms}</ul>'
+            f'<p class="label__foot">Mended for life</p></div>')
 
 
 def leads(handle: str, k: int = 1) -> list[tuple[str, str]]:
@@ -647,47 +665,46 @@ def home():
     order = ranked()
     newest = [p for p in order if p.get("new")][:12]
     best = [p for p in order if p.get("best")][:12]
-    # The piece on the wall: the first new style, in its first colour.
-    piece = newest[0] if newest else order[0]
-    pc = piece["colours"][0]
-    piece_url = f'products/{piece["handle"]}/'
-    cells = []
+    items = []
     for i, c in enumerate(CATS):
-        big = i < 2
-        arts = "".join(art(s, h) for s, h in leads(c["handle"], 3 if big else 1))
-        cells.append(
-            f'<li class="bento__cell{" bento__cell--lg" if big else ""} reveal"><a class="tile tile--{i + 1}" href="shop/{c["handle"]}/">'
-            f'<span class="tile__art{" tile__art--fan" if big else ""}">{arts}</span>'
-            f'<span class="tile__text"><span class="tile__title">{e(c["title"])}</span>'
-            f'<span class="tile__count">{n[c["handle"]]} styles</span></span></a></li>')
+        arts = "".join(art(s, h) for s, h in leads(c["handle"], 3))
+        items.append(
+            f'<li class="index__item{" is-active" if i == 0 else ""} reveal"><a href="shop/{c["handle"]}/">'
+            f'<span class="index__name">{e(c["title"])}</span><span class="index__count">{n[c["handle"]]}<span class="sr-only"> styles</span></span>'
+            f'<span class="index__plate index__plate--{i + 1}" aria-hidden="true">{arts}</span></a></li>')
     th = money(store["free_shipping_threshold"], SYM)
     main = f'''<section class="hero" data-nav="light" data-nav-clear aria-labelledby="hero-title">
-  <a class="hero__piece" href="{piece_url}" tabindex="-1" aria-hidden="true">{art(piece["silhouette"], pc["hex"])}</a>
+  <h1 class="hero__title" id="hero-title"><span>Take your</span> <span>time.</span></h1>
   {wall(root)}
-  <div class="hero__content">
-    <h1 class="hero__title" id="hero-title">Take your time.</h1>
+  <div class="hero__foot">
     <p class="hero__lede">One collection in wool, cotton and linen. Relaxed fits, kept in every size, season after season.</p>
     <ul class="hero__links">
-      <li><a class="btn btn--primary" href="shop/">Shop all</a></li>
-      <li><a class="link-arrow" href="shop/?sort=new">New in {icon("arrow")}</a></li>
+      <li><a class="link-line" href="shop/">Shop the collection</a></li>
+      <li><a class="link-line" href="shop/?sort=new">New in</a></li>
     </ul>
+    <div class="dial" data-dial hidden>
+      <svg class="dial__arc" viewBox="0 0 72 34" aria-hidden="true" focusable="false"><path d="M4 26A32 22 0 0 1 68 26"/><path d="M0 26H72"/><circle data-dial-sun cx="50" cy="8" r="3.4"/></svg>
+      <p class="dial__text"><span data-dial-time></span><span data-dial-phrase></span></p>
+      <button type="button" class="hero__toggle" data-wall-toggle aria-pressed="false">
+        {icon("pause")}<span class="sr-only" data-wall-label>Pause the moving shadows</span></button>
+    </div>
   </div>
-  <p class="hero__caption"><a href="{piece_url}">{e(piece["title"])}, {e(pc["name"])} <span>{money(piece["price"], SYM)}</span></a></p>
-  <button type="button" class="hero__toggle" data-wall-toggle aria-pressed="false" hidden>
-    {icon("pause")}<span class="sr-only" data-wall-label>Pause the moving shadows</span></button>
 </section>
 {C.rail("new", "New in", "".join(C.product_card(p, root, SYM, eager=i < 2) for i, p in enumerate(newest)), link=("See all", "shop/?sort=new"))}
 <section class="cats" aria-labelledby="cats-title">
-  <div class="section-head"><h2 class="section-title" id="cats-title">Shop by category</h2></div>
-  <ul class="bento">{"".join(cells)}</ul>
+  <div class="section-head"><h2 class="section-title" id="cats-title">Shop by category</h2><a class="link-arrow" href="shop/">All {len(catalog)} styles {icon("arrow")}</a></div>
+  <ul class="index" data-index>{"".join(items)}</ul>
 </section>
-{C.rail("best", "Bestsellers", "".join(C.product_card(p, root, SYM) for p in best), link=("Shop all", "shop/"))}
+{C.rail("best", "Bestsellers", "".join(C.product_card(p, root, SYM) for p in best), link=("See all", "shop/"))}
 <section class="story" aria-labelledby="story-title">
   {wall(root, "wall--story")}
-  <div class="story__text reveal">
-    <h2 class="story__title" id="story-title"><span>One collection.</span> <span>Every size.</span> <span>Mended for life.</span></h2>
-    <p>Wool, cotton, linen and wax, cut in relaxed fits that stay in the range season after season. If something gives, send it back and we will mend it.</p>
-    <a class="link-arrow" href="{root}about/">About {e(store["name"])} {icon("arrow")}</a>
+  <div class="story__inner">
+    <div class="story__text reveal">
+      <h2 class="story__title" id="story-title"><span>One collection.</span> <span>Every size.</span> <span>Mended for life.</span></h2>
+      <p>Wool, cotton, linen and wax, cut in relaxed fits that stay in the range season after season. If something gives, send it back and we will mend it.</p>
+      <a class="link-line" href="{root}about/">About {e(store["name"])}</a>
+    </div>
+    {care_label()}
   </div>
 </section>
 <section class="about-copy" aria-labelledby="about-title">

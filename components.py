@@ -157,6 +157,7 @@ def product_card(p: dict, root: str, sym: str, *, eager: bool = False, quick_add
     <h3 class="card__title"><a href="{e(url)}">{e(p["title"])}</a></h3>
     {price(p, sym)}
     <p class="card__colour" data-card-colour>{e(first["name"])}</p>
+    <p class="card__no">No. {e(p["style"].split("-")[-1])}</p>
     {swatch_list(p)}
   </div>
 </article>'''

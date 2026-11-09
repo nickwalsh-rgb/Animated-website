@@ -1,13 +1,65 @@
 /* The Easy Life: homepage.
-   Deliberately calm: leaf shadows sway on the sunlit wall (CSS only; this file pauses them off screen and wires the
-   pause button) and sections fade up once as they arrive. No scroll-jacking, pinning or loaders. Needs store.js.
-   With reduced motion the shadows hold still and every section is simply visible. */
+   The sunlit wall keeps the visitor's time: the patch of sun leans, stretches and warms through the day, and the small
+   sundial beside the pause button says what hour it is showing. Add ?light=7.5 to the address to see another hour
+   (0 to 24). This file also pauses the shadows off screen, swaps the category plate, and fades sections up once as
+   they arrive. No scroll-jacking, pinning or loaders. Needs store.js. With reduced motion the shadows hold still. */
 (() => {
   "use strict";
   const { $, $$, reduced } = window.A88S;
 
-  /* ---------- Sunlit wall ---------- */
+  /* ---------- The light follows the clock ---------- */
+  // hour, slant (deg), shift (vmax), length, lit plaster (rgb), shade, leaf strength, dimness
+  const DAY = [
+    [0, -30, 9, 1.3, [236, 238, 241], 0.05, 0.25, 0.8],
+    [5.5, -30, 9, 1.3, [239, 240, 242], 0.06, 0.3, 0.7],
+    [7, -28, 8, 1.28, [253, 250, 243], 0.1, 0.8, 0],
+    [10, -17, 4, 1.13, [253, 253, 250], 0.11, 1, 0],
+    [13, -3, 0, 1.02, [254, 254, 252], 0.12, 1.05, 0],
+    [16, 12, -4, 1.1, [254, 251, 243], 0.115, 1, 0],
+    [19, 26, -8, 1.26, [252, 244, 230], 0.1, 0.85, 0],
+    [20.5, 30, -9, 1.3, [242, 240, 238], 0.07, 0.4, 0.55],
+    [21.5, 30, -9, 1.3, [236, 238, 241], 0.05, 0.25, 0.8],
+    [24, -30, 9, 1.3, [236, 238, 241], 0.05, 0.25, 0.8],
+  ];
+  const PHRASES = [[5.5, "Not light yet"], [8, "First light"], [11.5, "Morning light"], [14, "Midday light"], [17.5, "Afternoon light"], [20, "Evening light"], [21.5, "Last light"], [24, "After dark"]];
+  const asked = parseFloat(new URLSearchParams(location.search).get("light"));
+  const now = () => {
+    if (!Number.isNaN(asked)) return ((asked % 24) + 24) % 24;
+    const d = new Date();
+    return d.getHours() + d.getMinutes() / 60;
+  };
+  const mix = (a, b, k) => a + (b - a) * k;
+  const dial = $("[data-dial]");
+  const root = document.documentElement.style;
+  function light() {
+    const h = now();
+    const i = Math.max(1, DAY.findIndex((row) => row[0] > h));
+    const a = DAY[i - 1], b = DAY[i], k = (h - a[0]) / (b[0] - a[0]);
+    root.setProperty("--sun-skew", `${mix(a[1], b[1], k).toFixed(2)}deg`);
+    root.setProperty("--sun-shift", `${mix(a[2], b[2], k).toFixed(2)}vmax`);
+    root.setProperty("--sun-len", mix(a[3], b[3], k).toFixed(3));
+    root.setProperty("--sun-lit", `rgb(${a[4].map((v, n) => Math.round(mix(v, b[4][n], k))).join(" ")})`);
+    root.setProperty("--sun-shade", mix(a[5], b[5], k).toFixed(3));
+    root.setProperty("--sun-leaf", mix(a[6], b[6], k).toFixed(2));
+    root.setProperty("--sun-dim", mix(a[7], b[7], k).toFixed(2));
+    if (!dial) return;
+    const hh = Math.floor(h), mm = Math.floor((h - hh) * 60);
+    $("[data-dial-time]", dial).textContent = `${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`;
+    $("[data-dial-phrase]", dial).textContent = `${PHRASES.find((p) => h < p[0])[1]}, where you are`;
+    // The dot rides the arc from 5.30 to 21.30 and rests below the line overnight.
+    const day = (h - 5.5) / 16, up = day >= 0 && day <= 1, sun = $("[data-dial-sun]", dial);
+    sun.setAttribute("cx", (up ? 36 - 32 * Math.cos(Math.PI * day) : 36).toFixed(1));
+    sun.setAttribute("cy", (up ? 26 - 22 * Math.sin(Math.PI * day) : 31).toFixed(1));
+    sun.style.opacity = up ? 1 : 0.35;
+    dial.hidden = false;
+  }
   const walls = $$("[data-wall]");
+  if (walls.length) {
+    light();
+    setInterval(light, 60000);
+  }
+
+  /* ---------- Shadows: pause off screen, and on request ---------- */
   const toggle = $("[data-wall-toggle]");
   if (walls.length && "IntersectionObserver" in window) {
     const io = new IntersectionObserver((entries) => {
@@ -15,8 +67,8 @@
     });
     walls.forEach((w) => io.observe(w));
   }
-  if (walls.length && toggle && !reduced.matches) {
-    toggle.hidden = false;
+  if (toggle && reduced.matches) toggle.hidden = true;
+  if (walls.length && toggle) {
     toggle.addEventListener("click", () => {
       const paused = toggle.getAttribute("aria-pressed") !== "true";
       toggle.setAttribute("aria-pressed", String(paused));
@@ -25,6 +77,13 @@
       $("use", toggle).setAttribute("href", paused ? "#i-play" : "#i-pause");
     });
   }
+
+  /* ---------- Category index: the plate shows whichever name is pointed at or focused ---------- */
+  $$("[data-index] .index__item").forEach((item, _, all) => {
+    const on = () => all.forEach((el) => el.classList.toggle("is-active", el === item));
+    item.addEventListener("pointerenter", (ev) => ev.pointerType === "mouse" && on());
+    item.addEventListener("focusin", on);
+  });
 
   /* ---------- Sections fade up once as they arrive ---------- */
   const items = $$(".reveal");

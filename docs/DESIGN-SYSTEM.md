@@ -2,7 +2,7 @@
 
 The Easy Life is a **permanent collection** of 100 styles (1,830 size × colour
 variants in the sample data). The identity is quiet and neutral: soft greys and off-whites, charcoal ink, one slate
-accent, a relaxed grotesque for display, soft corners, and one scene, **the sunlit wall**. The layout is clean
+accent, a relaxed grotesque for display, soft corners, and one idea, **the sunlit wall that keeps your time**. The layout is clean
 retail built for range and conversion: announcement bar, mega-menu, search, product rails, plain product cards,
 category tiles and a calm footer.
 
@@ -16,7 +16,7 @@ shoppers; variance 6, motion 5, density 3. Structure and UX rules come from the 
 
 ## 1. Brand
 
-Brand assets live in one place each: the wordmark, EL mark and social icons in `src/brand-defs.html`,
+Brand assets live in one place each: the wordmark and social icons in `src/brand-defs.html`,
 fonts in `assets/fonts/`, leaf silhouettes in `assets/img/shade-*.svg` (drawn by `tools/make_shadows.py`), social
 links and business details in `data/store.json`.
 
@@ -25,7 +25,22 @@ links and business details in `data/store.json`.
 | Positioning | Easy-wearing clothes in natural fibres, kept in the range season after season. |
 | Tagline | Clothes for taking your time |
 | Voice | Plain, specific, unhurried. Say what it is made of and how it fits. |
-| Signature elements | The sunlit wall (leaf shadows swaying across plaster, falling over the piece that hangs on it), the header that goes see-through over the wall, soft pill buttons in charcoal, the wordmark set large to close every page |
+| Signature elements | See below |
+
+### The idea
+
+*Take your time* is taken literally. The homepage is a plaster wall with a window's patch of sun on it, and that
+light follows the visitor's own clock: it leans one way in the morning, stands upright at midday, leans the other
+way and warms by evening, and dims to a cool trace after dark. Everything distinctive hangs off that:
+
+- **The resting dot.** In the wordmark the dot has dropped off the "i" and come to rest on the baseline at the end
+  of the name. It is the brand's device: the favicon is the dot above a horizon line, and on the homepage it is the
+  sun that rides the small sundial.
+- **Painted lettering.** The hero line and the story are set under the light, so shadows pass over the letters as
+  if they were painted on the wall.
+- **The sewn-in label.** The collection's promises are set as a garment label (made of, cut, kept, care) that hangs
+  on the wall in the story section.
+- **Style numbers.** Every card carries its style number (No. 042), the way a permanent collection would be kept.
 
 ### Colour
 
@@ -171,30 +186,36 @@ is a solid ink bar. Everywhere else it is a solid light bar. `store.js` checks w
 of the header as you scroll (measured where the header really is, below the announcement bar at the top). Opening
 the mega-menu always brings the solid light bar back.
 
-**The sunlit wall** (`wall()` in build.py, `.wall` in store.css, `tools/make_shadows.py`). A plaster wall in
-afternoon light: a soft radial gradient with a fine grain, and four leaf silhouettes that act as shadows. Each is
-pinned at its stem off screen, blurred once and then only rotated a degree or two, so the browser animates it on
-the compositor (no video, no canvas, about 15 KB in total). Far leaves are large, soft and faint; near ones are
-smaller, sharper and darker, which gives the depth. The newest style hangs on the wall and the shadows fall across
-it. The shadows pause off screen, have a Pause/Play button, and hold still with reduced motion. To restage the
-scene, change the `--x --y --w --r --s --d --b --o` values on `.wall__leaf--1` to `--4` (position, size, angle,
-sway, speed, blur, strength).
+**The sunlit wall** (`wall()` in build.py, `.wall` in store.css, `tools/make_shadows.py`, `home.js`). The section's
+background is the wall fully lit, with a fine grain. Two layers sit above it, each the same oversized square wearing
+the same six-pane window mask: one puts everything outside the panes in shade, the other holds what happens inside
+them (three leaf silhouettes and a cloud that dims the sun for a few seconds each minute). Each leaf is pinned at its
+stem, blurred once and then only rotated a degree or two, so the browser animates it on the compositor: no video, no
+canvas, about 15 KB. Headlines sit under these layers.
+
+`home.js` reads the visitor's clock once a minute and sets `--sun-skew`, `--sun-shift`, `--sun-len`, `--sun-lit`,
+`--sun-shade`, `--sun-leaf` and `--sun-dim` from the `DAY` table (one row per key hour). Add `?light=7.5` to the
+homepage address to see any hour from 0 to 24. Without JavaScript the wall shows mid-afternoon. The shadows pause
+off screen, have a Pause/Play button, and hold still with reduced motion. To restage the scene: `--fx`/`--fy` on
+`.wall` move where the light lands; the values on `.wall__leaf--1` to `--3` set each leaf's position, size, angle,
+sway, speed, blur and strength.
 
 **Homepage, top to bottom.**
 
 | Section | Pattern |
 | --- | --- |
-| Hero | The sunlit wall under a see-through header. One line (*Take your time.*), a short sentence, *Shop all* and *New in*, bottom left; the newest style hanging on the right with its name and price beneath. |
+| Hero | The sunlit wall under a see-through header. One line across the full width (*Take your time.*), painted under the light. Beneath it one row: a short sentence, two underlined links, and the sundial (the hour, what the light is doing, and the pause button). |
 | New in | Product rail, *See all* link. |
-| Shop by category | Two wide tiles (three leading styles fanned out) over four small ones, each on its own neutral ground; the fan opens on hover. |
+| Shop by category | An index: the six categories in display type with their counts, beside one plate that shows the leading styles of whichever name is pointed at or focused. On phones each entry is its own tile. |
 | Bestsellers | Product rail (top-ranked styles that aren't new). |
-| Story | The wall again, quieter, with the promise in three short lines and a link to About. |
+| Story | The wall again, with the promise in three painted lines, a link to About, and the sewn-in label hanging in the light. |
 | Brand copy | Two short paragraphs (also useful for search engines). |
 | Promises, sign-up, footer | Shared by every page. The footer closes on the wordmark at full width. |
 
-Motion is calm and each piece has a job: the shadows set the mood, the hero text and piece rise in once on load,
-sections fade up 16px once as they arrive (`home.js`), tiles respond to hover. No loader, no pinned or
-scroll-driven sections, no animation libraries. With reduced motion or without JS everything is simply visible.
+Motion is calm and each piece has a job: the light tells the time, the shadows and the passing cloud make it feel
+like weather, the hero rises in once on load, sections fade up 16px once as they arrive, the index plate answers the
+pointer. No loader, no pinned or scroll-driven sections, no animation libraries. With reduced motion or without JS
+everything is simply visible.
 
 The site is light only. A dark theme is not built; the tokens are layered so one could be added by redefining
 the semantic layer.

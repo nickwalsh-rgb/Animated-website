@@ -26,7 +26,7 @@ makes web-sized photos, commits the result and publishes it. You can also run it
 | About, Size guide, Delivery & returns, Contact, Privacy, Terms | `src/pages/*.html` | `python3 build.py` |
 | Markup of any component | `components.py`, `build.py` | `python3 build.py` |
 | Tokens, styles, behaviour | `assets/css/tokens.css`, `assets/css/store.css`, `assets/js/*.js` | refresh |
-| Wordmark, EL mark, social icons | `src/brand-defs.html` | `python3 build.py` |
+| Wordmark, social icons | `src/brand-defs.html` | `python3 build.py` |
 | Leaf shadows on the homepage wall | `tools/make_shadows.py` (shapes), `.wall` in `assets/css/store.css` (position, blur, sway) | `python3 tools/make_shadows.py` |
 
 ```bash
@@ -47,7 +47,7 @@ unknown category or a missing stock cell.
 
 | Page | What's on it |
 | --- | --- |
-| Home `/` | Sunlit wall hero (leaf shadows swaying over the newest style), New in rail, category tiles, Bestsellers rail, the story on the wall, brand copy |
+| Home `/` | Sunlit wall hero whose light follows the visitor's clock (add `?light=7.5` to preview an hour), New in rail, category index, Bestsellers rail, the story with the sewn-in label, brand copy |
 | Shop `/shop/`, `/shop/<category>/` | Sticky filter sidebar (drawer on phones), sort, Load more; filters kept in the address (`?size=M&colour=green`) |
 | Product `/products/<handle>/` | Gallery, colour and size selectors, stock messages, availability matrix, sticky Add to bag on phones, You may also like |
 | Gift cards `/gift-cards/` | Amount, then Email or Post, each with its own form and a live card preview |
@@ -89,7 +89,7 @@ components.py            one function per UI component (card, rail, drawer, sele
 data/store.json          site settings, business details, gift cards, announcements
 data/catalog.json        the styles (sample data)
 src/pages/               About, Size guide, Delivery & returns, Contact, Privacy, Terms (content)
-src/brand-defs.html      wordmark, EL mark, social icons (SVG symbols)
+src/brand-defs.html      wordmark, social icons (SVG symbols)
 assets/css/              tokens.css (design tokens), store.css (components)
 assets/js/               store.js (shared), plp.js, pdp.js, home.js, gift.js
 assets/sprite.svg        icons + placeholder garment art (tools/make_sprite.py)
