@@ -61,9 +61,9 @@ Brand, tokens, components and UX rules: [docs/DESIGN-SYSTEM.md](docs/DESIGN-SYST
 
 ## Going back to Archive 88
 
-The site as it was before the rebrand (name, forest film, palette, type) is kept under the git tag
-`archive-88-final`. To look at it: `git checkout archive-88-final`. To restore it, revert the pull request that
-brought in The Easy Life (the **Revert** button on the merged pull request does this in one click).
+The site as it was before the rebrand (name, forest film, palette, type) is commit `4691b08`. To look at it:
+`git checkout 4691b08`. To restore it, revert the pull request that brought in The Easy Life (the **Revert**
+button on the merged pull request does this in one click).
 
 ## Before launch
 
