@@ -1,4 +1,4 @@
-/* Archive 88: product listing page.
+/* The Easy Life: product listing page.
    Filters (size, colour), sort and "Load more" pagination run over server-rendered cards, so the page is complete
    without JS and filtering is instant with it. State lives in the URL (?size=M&colour=green&sort=new) so every
    filtered view can be shared, bookmarked and restored with Back. */

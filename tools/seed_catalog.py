@@ -127,7 +127,7 @@ for cat, (sil, sizes, (lo, hi), palette, names, mats, fits, origins) in CATS.ite
         material = fibre_for(name, mats)
         products.append({
             "handle": handle,
-            "style": f"A88-{n:03d}",
+            "style": f"TEL-{n:03d}",
             "title": name,
             "category": cat,
             "silhouette": sil,

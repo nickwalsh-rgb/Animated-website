@@ -1,6 +1,6 @@
-# Archive 88
+# The Easy Life
 
-Online shop for **Archive 88**: a permanent collection of considered clothing in natural fibres, kept in every size.
+Online shop for **The Easy Life**: one permanent collection of easy-wearing clothes in natural fibres, kept in every size.
 100 styles (sample data) with size × colour variants, a listing page with a sticky filter sidebar, product pages
 with a variant matrix and a mobile sticky Add to bag, a slide-out bag, search, gift cards by email or post, and
 the info pages a shop needs.
@@ -26,13 +26,15 @@ makes web-sized photos, commits the result and publishes it. You can also run it
 | About, Size guide, Delivery & returns, Contact, Privacy, Terms | `src/pages/*.html` | `python3 build.py` |
 | Markup of any component | `components.py`, `build.py` | `python3 build.py` |
 | Tokens, styles, behaviour | `assets/css/tokens.css`, `assets/css/store.css`, `assets/js/*.js` | refresh |
-| Wordmark, A88 mark, social icons | `src/brand-defs.html` | `python3 build.py` |
+| Wordmark, EL mark, social icons | `src/brand-defs.html` | `python3 build.py` |
+| Leaf shadows on the homepage wall | `tools/make_shadows.py` (shapes), `.wall` in `assets/css/store.css` (position, blur, sway) | `python3 tools/make_shadows.py` |
 
 ```bash
 python3 build.py              # rebuild everything
 python3 -m http.server 8080   # preview at http://localhost:8080
 python3 tools/seed_catalog.py # regenerate the SAMPLE catalogue (overwrites data/catalog.json)
 python3 tools/make_sprite.py  # rebuild the icon + garment sprite (assets/sprite.svg)
+python3 tools/make_shadows.py # redraw the leaf silhouettes for the sunlit wall (assets/img/shade-*.svg)
 ```
 
 `index.html`, `shop/`, `products/`, `gift-cards/`, the info page folders (`about/`, `contact/`...), `404.html`,
@@ -45,7 +47,7 @@ unknown category or a missing stock cell.
 
 | Page | What's on it |
 | --- | --- |
-| Home `/` | Film hero, New in rail, editorial split, Bestsellers rail, category grid, banner, brand copy |
+| Home `/` | Sunlit wall hero (leaf shadows swaying over the newest style), New in rail, category tiles, Bestsellers rail, the story on the wall, brand copy |
 | Shop `/shop/`, `/shop/<category>/` | Sticky filter sidebar (drawer on phones), sort, Load more; filters kept in the address (`?size=M&colour=green`) |
 | Product `/products/<handle>/` | Gallery, colour and size selectors, stock messages, availability matrix, sticky Add to bag on phones, You may also like |
 | Gift cards `/gift-cards/` | Amount, then Email or Post, each with its own form and a live card preview |
@@ -57,12 +59,18 @@ bag drawer, service bar, newsletter sign-up, footer.
 
 Brand, tokens, components and UX rules: [docs/DESIGN-SYSTEM.md](docs/DESIGN-SYSTEM.md).
 
+## Going back to Archive 88
+
+The site as it was before the rebrand (name, forest film, palette, type) is kept under the git tag
+`archive-88-final`. To look at it: `git checkout archive-88-final`. To restore it, revert the pull request that
+brought in The Easy Life (the **Revert** button on the merged pull request does this in one click).
+
 ## Before launch
 
 All product data is **sample data**.
 
 - [ ] Real styles, prices and stock in `data/catalog.json`; photos in `assets/products/<handle>/`
-- [ ] Real campaign photography (the homepage currently uses stills from the forest film)
+- [ ] Campaign photography, if wanted: the site is designed to look finished without it (drawn product art, the sunlit wall)
 - [ ] Business details in `data/store.json`: currently **placeholders** (fictional company, Ofcom drama phone number, `.example` email)
 - [ ] Real Instagram/Facebook URLs and shipping wording in `data/store.json`
 - [ ] Size guide measurements in `src/pages/size-guide.html` (currently sample numbers)
@@ -81,13 +89,13 @@ components.py            one function per UI component (card, rail, drawer, sele
 data/store.json          site settings, business details, gift cards, announcements
 data/catalog.json        the styles (sample data)
 src/pages/               About, Size guide, Delivery & returns, Contact, Privacy, Terms (content)
-src/brand-defs.html      wordmark letters, A88 mark, social icons (SVG symbols)
+src/brand-defs.html      wordmark, EL mark, social icons (SVG symbols)
 assets/css/              tokens.css (design tokens), store.css (components)
 assets/js/               store.js (shared), plp.js, pdp.js, home.js, gift.js
 assets/sprite.svg        icons + placeholder garment art (tools/make_sprite.py)
 assets/products/         product photos (one folder per style)
-assets/fonts, img, video self-hosted fonts, images, the forest film
-tools/                   sample catalogue generator, sprite generator
+assets/fonts, img        self-hosted fonts, brand marks, leaf silhouettes for the wall
+tools/                   sample catalogue generator, sprite generator, leaf shadow generator
 docs/DESIGN-SYSTEM.md    brand, tokens, components, UX rules
 .github/workflows/       automatic rebuild on GitHub
 ```

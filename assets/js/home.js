@@ -1,34 +1,29 @@
-/* Archive 88: homepage.
-   Deliberately calm: the film hero (autoplays muted, pauses off screen, has a pause button) and a gentle fade-up as
-   sections enter the viewport. No scroll-jacking, pinning or loaders. Needs store.js. With reduced motion the film
-   stays on its poster frame and every section is simply visible. */
+/* The Easy Life: homepage.
+   Deliberately calm: leaf shadows sway on the sunlit wall (CSS only; this file pauses them off screen and wires the
+   pause button) and sections fade up once as they arrive. No scroll-jacking, pinning or loaders. Needs store.js.
+   With reduced motion the shadows hold still and every section is simply visible. */
 (() => {
   "use strict";
   const { $, $$, reduced } = window.A88S;
 
-  /* ---------- Hero film ---------- */
-  const video = $(".hero__video");
-  const toggle = $("[data-film-toggle]");
-  if (video && toggle) {
-    let userPaused = reduced.matches;
-    const sync = () => {
-      const playing = !video.paused;
-      toggle.setAttribute("aria-pressed", String(!playing));
-      $("[data-film-label]", toggle).textContent = playing ? "Pause film" : "Play film";
-      $("use", toggle).setAttribute("href", playing ? "#i-pause" : "#i-play");
-    };
-    const play = () => video.play().catch(() => {});
-    video.addEventListener("play", sync);
-    video.addEventListener("pause", sync);
+  /* ---------- Sunlit wall ---------- */
+  const walls = $$("[data-wall]");
+  const toggle = $("[data-wall-toggle]");
+  if (walls.length && "IntersectionObserver" in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => en.target.classList.toggle("is-offscreen", !en.isIntersecting));
+    });
+    walls.forEach((w) => io.observe(w));
+  }
+  if (walls.length && toggle && !reduced.matches) {
     toggle.hidden = false;
     toggle.addEventListener("click", () => {
-      userPaused = !video.paused;
-      userPaused ? video.pause() : play();
+      const paused = toggle.getAttribute("aria-pressed") !== "true";
+      toggle.setAttribute("aria-pressed", String(paused));
+      walls.forEach((w) => w.classList.toggle("is-paused", paused));
+      $("[data-wall-label]", toggle).textContent = paused ? "Play the moving shadows" : "Pause the moving shadows";
+      $("use", toggle).setAttribute("href", paused ? "#i-play" : "#i-pause");
     });
-    new IntersectionObserver(([en]) => {
-      if (en.isIntersecting && !userPaused) play(); else video.pause();
-    }, { threshold: 0.05 }).observe(video);
-    sync();
   }
 
   /* ---------- Sections fade up once as they arrive ---------- */

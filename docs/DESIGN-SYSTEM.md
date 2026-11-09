@@ -1,55 +1,64 @@
-# Archive 88: brand and design system
+# The Easy Life: brand and design system
 
-Archive 88 is a **permanent collection** of 100 styles (1,830 size × colour
-variants in the sample data). It keeps **the Archive 88 identity** (palette, Archivo Narrow + Archivo, the wordmark
-and the A88 mark) and uses a **clean retail layout** built for range and conversion: announcement bar, mega-menu,
-search, full-bleed campaign imagery, product rails, plain product cards and a calm footer.
+The Easy Life is a **permanent collection** of 100 styles (1,830 size × colour
+variants in the sample data). The identity is quiet and neutral: soft greys and off-whites, charcoal ink, one slate
+accent, a relaxed grotesque for display, soft corners, and one scene, **the sunlit wall**. The layout is clean
+retail built for range and conversion: announcement bar, mega-menu, search, product rails, plain product cards,
+category tiles and a calm footer.
 
-> The layout patterns were studied from leading streetwear and sportswear stores (inverting header over imagery,
-> two-link campaign heroes, editorial splits, bestseller rails, category grid, service bar, newsletter in the
-> footer). Only the patterns are borrowed. Every name, image, colour and word on the site is Archive 88's own.
+The site is designed to look finished **without photography**: products are drawn art on quiet grounds, and the
+homepage scene is made in code. Product photos drop into the same frames when they exist (see section 4).
 
-Built with the `ui-ux-pro-max` skill (design-system search: *premium clothing e-commerce, minimal editorial*; style
-**Minimalism & Swiss**, variance 3, motion 3, density 5) for structure and UX rules. The visual layer is the
-existing brand, not the skill's generated palette and fonts.
+Design read (`design-taste-frontend` skill): brand overhaul of a premium clothing store for design-conscious
+shoppers; variance 6, motion 5, density 3. Structure and UX rules come from the earlier `ui-ux-pro-max` pass.
 
 ---
 
 ## 1. Brand
 
-Brand assets live in one place each: the wordmark letters, A88 mark and social icons in `src/brand-defs.html`,
-fonts in `assets/fonts/`, social links and business details in `data/store.json`.
+Brand assets live in one place each: the wordmark, EL mark and social icons in `src/brand-defs.html`,
+fonts in `assets/fonts/`, leaf silhouettes in `assets/img/shade-*.svg` (drawn by `tools/make_shadows.py`), social
+links and business details in `data/store.json`.
 
 | | |
 | --- | --- |
-| Positioning | Considered clothing in natural fibres, kept in the range season after season. |
-| Tagline | The permanent collection |
+| Positioning | Easy-wearing clothes in natural fibres, kept in the range season after season. |
+| Tagline | Clothes for taking your time |
 | Voice | Plain, specific, unhurried. Say what it is made of and how it fits. |
-| Signature elements | Wordmark header that turns see-through over imagery, the graded forest film, square controls in ink, the woven orange stripe (gift card), the A88 mark that closes every page |
+| Signature elements | The sunlit wall (leaf shadows swaying across plaster, falling over the piece that hangs on it), the header that goes see-through over the wall, soft pill buttons in charcoal, the wordmark set large to close every page |
 
 ### Colour
 
 | Token | Hex | Use |
 | --- | --- | --- |
-| Ink | `#1B211D` | Text, primary buttons (Add to bag, Checkout, Subscribe), announcement bar, footer, selected chips |
-| White | `#FBFAF8` | Page background |
-| Paper | `#F5F4F0` | Newsletter band, type on ink |
-| Mist | `#ECEBE6` | Behind every product image (lighter than bone so garments read) |
-| Pine | `#2F3D33` | Hover on ink, *in stock* and *added* states, the posted gift card |
-| Burnt orange | `#A3471F` (deep `#8A3A18`) | **Signals only**: bag count, *Selling fast*, low-stock dots, delivery meter, sale price, focus ring, search highlight |
+| Ink | `#1C1D1F` | Text, primary buttons (Add to bag, Checkout, Subscribe), announcement bar, footer, selected chips |
+| White | `#F8F8F6` | Page background |
+| Paper | `#F1F1EE` | Newsletter band, type on ink |
+| Mist | `#EAEAE7` | Behind every product image |
+| Graphite | `#3A3D42` | Hover on ink, *in stock* and *added* states, the posted gift card |
+| Slate | `#41566E` (deep `#33455A`) | **Signals only**: bag count, *Selling fast*, low-stock dots, delivery meter, sale price, focus ring, search highlight |
+| Red | `#8F2F2A` | Form errors only |
+| Wall | `#FBFBF9` to `#E4E4E0` | The sunlit wall: lit plaster fading to half shade, with a fine grain |
+| Tile grounds | `--tile-1` to `--tile-6` | Six close neutral greys behind the category tiles, so the grid has rhythm without colour |
 
-Primary actions are solid ink, as shoppers expect from retail; orange is kept for signals so it always means
-*look here*. Text contrast: muted text 5.1:1+ on white and paper, orange 5.5:1 on paper, paper on ink 15:1.
+Primary actions are solid ink, as shoppers expect from retail; slate is kept for signals so it always means
+*look here*. Text contrast: muted text 5.2:1+ on white and paper, slate 7:1 on white, paper on ink 15:1.
 
 ### Typography
 
 | Role | Face | Where |
 | --- | --- | --- |
-| Display | **Archivo Narrow** 600, sentence case | Hero and banner headlines, page, section and product titles |
+| Display | **Bricolage Grotesque** 300 to 400 (variable, with optical sizing), sentence case, tight tracking | The hero line, the story, page, section, tile and product titles, the wordmark |
 | UI + body | **Archivo** 400 / 500 | Navigation, buttons, cards, prices, forms, body copy |
 
 Sentence case throughout (no tracked uppercase): quieter, faster to read in a dense grid. Type scale is in tokens
-(`--fs-xs` 12 to `--fs-hero`, fluid). Self-hosted with metric-matched fallbacks, so text doesn't shift when fonts load.
+(`--fs-xs` 12 to `--fs-hero`, fluid). Self-hosted with size-matched fallbacks, so text barely shifts when fonts load.
+The wordmark is the display face converted to outlines, so it never waits for a font.
+
+### Shape
+
+Soft corners everywhere, by one rule: buttons, chips and badges are pills; inputs and other controls use
+`--radius` (10px); image frames and tiles use `--radius-media` (14px).
 
 ### Product card
 Image on the mist ground (strict 4:5) with one small badge at most (*Selling fast*, *New*, *Bestseller* or *Sold out*),
@@ -62,8 +71,8 @@ quick add sit above it.
 ## 2. Token architecture (`assets/css/tokens.css`)
 
 1. **Primitive**: the brand palette, fonts, type scale, motion speeds.
-2. **Semantic**: what a value is for: `--color-text`, `--color-primary` (ink), `--color-signal` (orange), `--color-media`, `--color-on-dark`, `--color-error`, `--color-focus`.
-3. **Component**: values a component owns: `--media-ratio: 4 / 5`, `--bar-h`, `--nav-h`, `--sidebar-w`, `--drawer-w`, `--radius: 0`, `--tap: 44px`.
+2. **Semantic**: what a value is for: `--color-text`, `--color-primary` (ink), `--color-signal` (slate), `--color-media`, `--color-on-dark`, `--color-error`, `--color-focus`.
+3. **Component**: values a component owns: `--media-ratio: 4 / 5`, `--bar-h`, `--nav-h`, `--sidebar-w`, `--drawer-w`, `--radius`, `--radius-media`, `--tap: 44px`.
 
 Components read layers 2 and 3 only. To restyle, change a semantic token; no component CSS changes.
 
@@ -95,9 +104,9 @@ Markup is generated by `components.py` / `build.py` (one function per component)
 | Filter group | `filter_group()` | `.filter` | `plp.js` | `<details>`; shows a count of active choices. |
 | Size chips / colour options | `size_chips()`, `colour_filters()` | `.chip`, `.colour-opt` | `plp.js` | Real checkboxes, 44px targets. |
 | Drawer | `drawer()` | `.drawer--right/left/top/bottom` | `store.js` (`Drawer`) | One controller for bag, menu, search, mobile filters, size sheet. |
-| Colour / size selectors | `colour_selector()`, `size_selector()` | `.option`, `.size-opt` | `pdp.js` | Real radios. Sold-out sizes disabled and struck; low stock gets an orange dot. |
+| Colour / size selectors | `colour_selector()`, `size_selector()` | `.option`, `.size-opt` | `pdp.js` | Real radios. Sold-out sizes disabled and struck; low stock gets a slate dot. |
 | Variant matrix | `variant_matrix()` | `.matrix` | – | Full size × colour availability table (PDP, *Availability*). |
-| Add to bag | inline in `pdp()` | `.buy-btn` | `pdp.js` | Full-width ink button. |
+| Add to bag | inline in `pdp()` | `.buy-btn` | `pdp.js` | Full-width ink pill. |
 | Sticky Add to bag | `sticky_atc()` | `.sticky-atc` | `pdp.js` | Bar pinned to the bottom, phones/tablets only. |
 | Accordion | `accordion()` | `.accordion` | – | Native `<details>`. |
 | Promises, sign-up, footer | `promises()`, `signup()`, `footer()` | `.promises`, `.signup`, `.footer` | `store.js` | Service bar, newsletter (inline validation; hook `window.A88S.subscribe(email)` to your email provider), four link columns, legal row, A88 mark. |
@@ -105,7 +114,7 @@ Markup is generated by `components.py` / `build.py` (one function per component)
 
 ### Scaling the catalogue
 - Data shape: one style per entry; `stock[colour][size]` **is** the variant matrix. SKUs are derived
-  (`A88-012-OLIVE-M`). Add styles, colours or sizes without touching code.
+  (`TEL-012-OLIVE-M`). Add styles, colours or sizes without touching code.
 - `build.py` validates every style (required fields, unique handle/style, known category, a stock cell for every
   size × colour) and stops with a clear message if anything is wrong.
 - Listing pages are server-rendered (complete without JS, crawlable) and enhanced client-side. Filtering and sorting
@@ -155,28 +164,40 @@ results, stock and bag changes; skip link; auto-rotating content can be paused; 
 
 ## 4b. Header and homepage
 
-**Inverting header (site-wide).** Any section marked `data-nav="dark"` flips the header while the header sits over
-it. Sections that also carry `data-nav-clear` (the film hero, the editorial split, the banner) make it see-through
-with light type, so the imagery runs behind it; other dark sections (the footer) give a solid ink bar. Everywhere
-else it is a solid light bar. `store.js` checks which section is under the middle of the header as you scroll
-(measured where the header really is, below the announcement bar at the top). Opening the mega-menu always brings
-the solid light bar back.
+**Header follows the section under it (site-wide).** A section can carry `data-nav="light"` or `data-nav="dark"`,
+and `data-nav-clear` to ask for a see-through header. Over the sunlit wall the header is see-through with dark
+type, so the wall runs behind it; over a dark section that asks for it the type turns light; over the footer it
+is a solid ink bar. Everywhere else it is a solid light bar. `store.js` checks which section is under the middle
+of the header as you scroll (measured where the header really is, below the announcement bar at the top). Opening
+the mega-menu always brings the solid light bar back.
+
+**The sunlit wall** (`wall()` in build.py, `.wall` in store.css, `tools/make_shadows.py`). A plaster wall in
+afternoon light: a soft radial gradient with a fine grain, and four leaf silhouettes that act as shadows. Each is
+pinned at its stem off screen, blurred once and then only rotated a degree or two, so the browser animates it on
+the compositor (no video, no canvas, about 15 KB in total). Far leaves are large, soft and faint; near ones are
+smaller, sharper and darker, which gives the depth. The newest style hangs on the wall and the shadows fall across
+it. The shadows pause off screen, have a Pause/Play button, and hold still with reduced motion. To restage the
+scene, change the `--x --y --w --r --s --d --b --o` values on `.wall__leaf--1` to `--4` (position, size, angle,
+sway, speed, blur, strength).
 
 **Homepage, top to bottom.**
 
 | Section | Pattern |
 | --- | --- |
-| Film hero | Graded forest film full-bleed under the header; headline and two text links (*Shop all*, *New in*) centred low. Muted, pauses off screen, Pause/Play button, poster only with reduced motion. |
+| Hero | The sunlit wall under a see-through header. One line (*Take your time.*), a short sentence, *Shop all* and *New in*, bottom left; the newest style hanging on the right with its name and price beneath. |
 | New in | Product rail, *See all* link. |
-| Editorial split | Two campaign images side by side (stacked on phones), headline and link over the lower edge. |
+| Shop by category | Two wide tiles (three leading styles fanned out) over four small ones, each on its own neutral ground; the fan opens on hover. |
 | Bestsellers | Product rail (top-ranked styles that aren't new). |
-| Shop by category | Six tiles, product art on mist, name and count. |
-| Banner | Full-bleed image with a short brand story and link. |
+| Story | The wall again, quieter, with the promise in three short lines and a link to About. |
 | Brand copy | Two short paragraphs (also useful for search engines). |
-| Promises, sign-up, footer | Shared by every page. |
+| Promises, sign-up, footer | Shared by every page. The footer closes on the wordmark at full width. |
 
-Motion is deliberately calm: no loader, no pinned or scroll-driven sections, no animation libraries. Sections fade up
-16px once as they arrive (`home.js`); with reduced motion or without JS everything is simply visible.
+Motion is calm and each piece has a job: the shadows set the mood, the hero text and piece rise in once on load,
+sections fade up 16px once as they arrive (`home.js`), tiles respond to hover. No loader, no pinned or
+scroll-driven sections, no animation libraries. With reduced motion or without JS everything is simply visible.
+
+The site is light only. A dark theme is not built; the tokens are layered so one could be added by redefining
+the semantic layer.
 
 ## 4c. Gift cards
 
@@ -198,6 +219,6 @@ but a plain cart link can't pass them to Shopify; that needs Shopify's gift card
 - [x] Hover/press transitions 80–350ms on the motion tokens
 - [x] Text contrast ≥ 4.5:1
 - [x] Visible focus for keyboard navigation; mega-menu reachable and closable by keyboard
-- [x] `prefers-reduced-motion` respected (film, reveals, announcement rotation)
+- [x] `prefers-reduced-motion` respected (wall shadows, reveals, announcement rotation)
 - [x] Responsive at 375 / 768 / 1024 / 1440, no horizontal scroll (checked at 390px)
 - [x] Media space reserved (aspect-ratio), font fallbacks metric-matched (no CLS)

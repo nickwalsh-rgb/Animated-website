@@ -1,4 +1,4 @@
-/* Archive 88: gift cards.
+/* The Easy Life: gift cards.
    Amount chips, two delivery buttons (email / post) that each open their own form, a live card preview, inline
    validation, and Add to bag (a gift card is a normal bag line, with the recipient details attached). */
 (() => {

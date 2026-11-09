@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Builds the Archive 88 site from data/ and src/ into static pages.
+"""Builds the The Easy Life site from data/ and src/ into static pages.
 
     python3 build.py
 
@@ -195,15 +195,43 @@ def size_groups(products) -> list[tuple[str, list[str]]]:
 SPRITE = (ROOT / "assets" / "sprite.svg").read_text() if (ROOT / "assets" / "sprite.svg").exists() else ""
 
 
-# Brand assets: wordmark letters, A88 mark and social icons (src/brand-defs.html), fonts (assets/fonts/), social
+# Brand assets: the wordmark, the EL mark and social icons (src/brand-defs.html), fonts (assets/fonts/), social
 # links and business details (data/store.json). One source of truth for the identity.
 BRAND_DEFS = (ROOT / "src" / "brand-defs.html").read_text()
-WM = "".join(f'<use href="#wm-{c}" class="wm-l"/>' for c in ["A", "R", "C", "H", "I", "V", "E", "8a", "8b"])
 
 
-def wordmark(cls: str = "", label: str = "Archive 88") -> str:
+def wordmark(cls: str = "", label: str | None = None) -> str:
+    label = store["name"] if label is None else label
     aria = f'role="img" aria-label="{e(label)}"' if label else 'aria-hidden="true" focusable="false"'
-    return f'<svg class="wordmark {cls}" viewBox="0 0 640 68" {aria}>{WM}</svg>'
+    return f'<svg class="wordmark {cls}" viewBox="0 0 5263 848" {aria}><use href="#wm"/></svg>'
+
+
+def art(sil: str, hex_: str, cls: str = "") -> str:
+    """A garment drawn on its own (no frame, no ground): the hero piece, category tiles and menu tiles."""
+    return (f'<svg class="art {cls}" viewBox="0 0 400 500" aria-hidden="true" focusable="false" style="color:{e(hex_)}">'
+            f'<use href="#s-{e(sil)}" width="400" height="500"/></svg>')
+
+
+def wall(root: str, cls: str = "") -> str:
+    """The sunlit wall: four leaf silhouettes (tools/make_shadows.py) that the CSS blurs, tints and sways as
+    shadows. Decorative. home.js pauses it off screen and wires the pause button."""
+    leaves = "".join(
+        f'<span class="wall__leaf wall__leaf--{i}"><img src="{root}assets/img/shade-{name}.svg" alt="" width="1000" height="960" decoding="async"></span>'
+        for i, name in enumerate(("frond-a", "branch-a", "frond-b", "branch-b"), 1))
+    return f'<div class="wall {cls}" data-wall aria-hidden="true">{leaves}</div>'
+
+
+def leads(handle: str, k: int = 1) -> list[tuple[str, str]]:
+    """(silhouette, colour) for the top-ranked styles in a category, each in a colour not used yet."""
+    out, used = [], set()
+    for p in sorted((p for p in catalog if p["category"] == handle), key=lambda p: p["rank"]):
+        c = next((c for c in p["colours"] if c["hex"] not in used), None)
+        if c:
+            used.add(c["hex"])
+            out.append((p["silhouette"], c["hex"]))
+        if len(out) == k:
+            break
+    return out
 
 
 def social_links(cls: str = "") -> str:
@@ -224,12 +252,12 @@ def head(title: str, desc: str, root: str, canonical: str, jsonld: list | None =
 <title>{e(title)}</title>
 <meta name="description" content="{e(desc)}">
 <link rel="canonical" href="{e(canonical)}">
-<meta name="theme-color" content="#FBFAF8">
+<meta name="theme-color" content="#F8F8F6">
 <meta property="og:type" content="website"><meta property="og:site_name" content="{e(store["name"])}">
 <meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}">
 <meta property="og:image" content="{e(store["url"])}assets/img/og-image.jpg">
 <link rel="icon" href="{root}assets/img/favicon.svg" type="image/svg+xml">
-<link rel="preload" href="{root}assets/fonts/archivo-narrow-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{root}assets/fonts/bricolage-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="{root}assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
 {preload}<link rel="stylesheet" href="{root}assets/fonts/fonts.css">
 <link rel="stylesheet" href="{root}assets/css/tokens.css">
@@ -267,9 +295,9 @@ def mega(root: str) -> str:
     sizes = "".join(f'<li><a class="size-link" href="{root}shop/?size={s}" aria-label="Shop size {s}">{s}</a></li>' for s in alpha)
     waists = "".join(f'<li><a class="size-link" href="{root}shop/trousers/?size={s}" aria-label="Shop trousers, {s} inch waist">{s}</a></li>' for s in ("28", "30", "32", "34", "36"))
     tiles = "".join(
-        f'<li><a class="mega__tile" href="{root}{href}"><span class="mega__img"><img src="{root}assets/img/{img}" alt="" width="720" height="900" loading="lazy" decoding="async"></span>'
+        f'<li><a class="mega__tile" href="{root}shop/{cat}/"><span class="mega__img mega__img--{i}">{"".join(art(s, h) for s, h in leads(cat, 2))}</span>'
         f'<span class="mega__tile-title">{e(t)}</span><span class="mega__tile-cta">Shop now</span></a></li>'
-        for img, t, href in (("menu-2.jpg", "Outerwear for weather", "shop/outerwear/"), ("menu-4.jpg", "Knitwear, spun slow", "shop/knitwear/")))
+        for i, (cat, t) in enumerate((("outerwear", "Outerwear for weather"), ("knitwear", "Knitwear, spun slow")), 1))
     return f'''<div class="mega" id="mega-shop" data-mega-panel hidden>
   <div class="mega__inner">
     <div class="mega__col"><p class="mega__head">Featured</p><ul class="mega__list">
@@ -344,7 +372,7 @@ def footer(root: str) -> str:
   <div class="footer__cols">
     {col("Shop", f'<li><a href="{root}shop/?sort=new">New in</a></li><li><a href="{root}shop/">Shop all</a></li>{cats}<li><a href="{root}gift-cards/">Gift cards</a></li>')}
     {col("Help", f'<li><a href="{root}size-guide/">Size guide</a></li><li><a href="{root}returns/">Delivery &amp; returns</a></li><li><a href="{root}contact/">Contact</a></li>')}
-    {col("Archive 88", f'<li><a href="{root}about/">About</a></li>')}
+    {col("The Easy Life", f'<li><a href="{root}about/">About</a></li>')}
     {col("Follow", social_links())}
   </div>
   <div class="footer__legal">
@@ -353,7 +381,7 @@ def footer(root: str) -> str:
     <p>© {date.today().year} {e(store["name"])}. Sample catalogue: names, prices and stock are placeholders.</p>
   </div>
   <div class="footer__base">
-    <a class="footer__mono" href="{root}" aria-label="{e(store["name"])}, home"><svg viewBox="0 0 146 68" aria-hidden="true" focusable="false"><use href="#mono"/></svg></a>
+    <a class="footer__mark" href="{root}" aria-label="{e(store["name"])}, home">{wordmark(label="")}</a>
   </div>
 </footer>'''
 
@@ -612,11 +640,6 @@ def mark_bestsellers():
         p["best"] = i < 12
 
 
-def editorial(img: str, title: str, cta: str, href: str, *, w: int = 720, h: int = 900, cls: str = "") -> str:
-    return (f'<a class="split__panel reveal {cls}" href="{href}"><img src="assets/img/{img}" alt="" width="{w}" height="{h}" loading="lazy" decoding="async">'
-            f'<span class="split__text"><span class="split__title">{e(title)}</span><span class="link-arrow">{e(cta)} {icon("arrow")}</span></span></a>')
-
-
 def home():
     root = ""
     prepare(root)
@@ -624,53 +647,51 @@ def home():
     order = ranked()
     newest = [p for p in order if p.get("new")][:12]
     best = [p for p in order if p.get("best")][:12]
-    tiles = []
-    for c in CATS:
-        lead = next(p for p in order if p["category"] == c["handle"])
-        v = lead["media"][lead["colours"][0]["handle"]][0]
-        tiles.append(f'<li class="reveal"><a class="cat-tile" href="shop/{c["handle"]}/">{C.frame(C.media(v, ""), "cat-tile__media")}'
-                     f'<span class="cat-tile__text"><span class="cat-tile__title">{e(c["title"])}</span>'
-                     f'<span class="cat-tile__count">{n[c["handle"]]} styles</span></span></a></li>')
+    # The piece on the wall: the first new style, in its first colour.
+    piece = newest[0] if newest else order[0]
+    pc = piece["colours"][0]
+    piece_url = f'products/{piece["handle"]}/'
+    cells = []
+    for i, c in enumerate(CATS):
+        big = i < 2
+        arts = "".join(art(s, h) for s, h in leads(c["handle"], 3 if big else 1))
+        cells.append(
+            f'<li class="bento__cell{" bento__cell--lg" if big else ""} reveal"><a class="tile tile--{i + 1}" href="shop/{c["handle"]}/">'
+            f'<span class="tile__art{" tile__art--fan" if big else ""}">{arts}</span>'
+            f'<span class="tile__text"><span class="tile__title">{e(c["title"])}</span>'
+            f'<span class="tile__count">{n[c["handle"]]} styles</span></span></a></li>')
     th = money(store["free_shipping_threshold"], SYM)
-    main = f'''<section class="hero" data-nav="dark" data-nav-clear aria-labelledby="hero-title">
-  <div class="hero__film" aria-hidden="true">
-    <video class="hero__video" muted loop playsinline preload="metadata" poster="{root}assets/img/forest-poster.jpg">
-      <source src="{root}assets/video/forest-portrait.mp4" type="video/mp4" media="(max-width: 720px) and (orientation: portrait)">
-      <source src="{root}assets/video/forest.mp4" type="video/mp4">
-    </video>
-    <div class="hero__shade"></div>
-  </div>
+    main = f'''<section class="hero" data-nav="light" data-nav-clear aria-labelledby="hero-title">
+  <a class="hero__piece" href="{piece_url}" tabindex="-1" aria-hidden="true">{art(piece["silhouette"], pc["hex"])}</a>
+  {wall(root)}
   <div class="hero__content">
-    <p class="hero__eyebrow">Natural fibres, kept in every size</p>
-    <h1 class="hero__title" id="hero-title">{e(store["tagline"].capitalize())}</h1>
+    <h1 class="hero__title" id="hero-title">Take your time.</h1>
+    <p class="hero__lede">One collection in wool, cotton and linen. Relaxed fits, kept in every size, season after season.</p>
     <ul class="hero__links">
-      <li><a class="link-arrow" href="shop/">Shop all {icon("arrow")}</a></li>
+      <li><a class="btn btn--primary" href="shop/">Shop all</a></li>
       <li><a class="link-arrow" href="shop/?sort=new">New in {icon("arrow")}</a></li>
     </ul>
   </div>
-  <button type="button" class="hero__toggle" data-film-toggle aria-pressed="false" hidden>
-    {icon("pause")}<span class="sr-only" data-film-label>Pause film</span></button>
+  <p class="hero__caption"><a href="{piece_url}">{e(piece["title"])}, {e(pc["name"])} <span>{money(piece["price"], SYM)}</span></a></p>
+  <button type="button" class="hero__toggle" data-wall-toggle aria-pressed="false" hidden>
+    {icon("pause")}<span class="sr-only" data-wall-label>Pause the moving shadows</span></button>
 </section>
 {C.rail("new", "New in", "".join(C.product_card(p, root, SYM, eager=i < 2) for i, p in enumerate(newest)), link=("See all", "shop/?sort=new"))}
-<section class="split" data-nav="dark" data-nav-clear aria-label="Featured collections">
-  {editorial("menu-1.jpg", "Built for weather", "Shop outerwear", "shop/outerwear/")}
-  {editorial("menu-3.jpg", "Knitwear, spun slow", "Shop knitwear", "shop/knitwear/")}
-</section>
-{C.rail("best", "Bestsellers", "".join(C.product_card(p, root, SYM) for p in best), link=("Shop all", "shop/"))}
 <section class="cats" aria-labelledby="cats-title">
   <div class="section-head"><h2 class="section-title" id="cats-title">Shop by category</h2></div>
-  <ul class="cats__grid">{"".join(tiles)}</ul>
+  <ul class="bento">{"".join(cells)}</ul>
 </section>
-<section class="banner" data-nav="dark" data-nav-clear aria-labelledby="banner-title">
-  <img class="banner__img" src="{root}assets/img/forest-poster.jpg" alt="" width="1280" height="720" loading="lazy" decoding="async">
-  <div class="banner__text reveal">
-    <h2 class="banner__title" id="banner-title">Made to be worn often</h2>
-    <p>Wool, cotton, linen and wax, cut in fits that stay in the range season after season. Free repairs for life.</p>
-    <a class="link-arrow" href="{root}about/">About Archive 88 {icon("arrow")}</a>
+{C.rail("best", "Bestsellers", "".join(C.product_card(p, root, SYM) for p in best), link=("Shop all", "shop/"))}
+<section class="story" aria-labelledby="story-title">
+  {wall(root, "wall--story")}
+  <div class="story__text reveal">
+    <h2 class="story__title" id="story-title"><span>One collection.</span> <span>Every size.</span> <span>Mended for life.</span></h2>
+    <p>Wool, cotton, linen and wax, cut in relaxed fits that stay in the range season after season. If something gives, send it back and we will mend it.</p>
+    <a class="link-arrow" href="{root}about/">About {e(store["name"])} {icon("arrow")}</a>
   </div>
 </section>
 <section class="about-copy" aria-labelledby="about-title">
-  <h2 class="section-title" id="about-title">Archive 88: clothing made to stay</h2>
+  <h2 class="section-title" id="about-title">Clothing made to stay</h2>
   <div class="about-copy__cols">
     <p>{e(store["description"])}</p>
     <p>Every style in the collection is kept in every size, so the coat you buy this winter is the one we'll still make next year. Delivery is free across the UK on orders over {th}, and returns are free for 30 days.</p>
@@ -678,7 +699,7 @@ def home():
 </section>'''
     write("index.html", page(
         title=f'{store["name"]}: {store["tagline"]}', desc=store["description"], root=root, path="", main=main,
-        scripts=("home",), preload=f'<link rel="preload" href="{root}assets/img/forest-poster.jpg" as="image" fetchpriority="high">\n'))
+        scripts=("home",)))
 
 
 def search_index():
@@ -734,7 +755,7 @@ def gift():
   <div class="giftcard__face">
     <div class="giftcard__top">{wordmark("giftcard__mark", "")}<span class="giftcard__kind" data-gift-kind>E-gift card</span></div>
     <p class="giftcard__amount" data-gift-amount>{money(g["default"], SYM)}</p>
-    <div class="giftcard__foot"><span>For <span data-gift-to>someone good</span></span><span>The permanent collection</span></div>
+    <div class="giftcard__foot"><span>For <span data-gift-to>someone good</span></span><span>{e(store["tagline"])}</span></div>
   </div>
 </div>'''
     main = f'''<div class="pdp gift" data-gift data-symbol="{e(SYM)}">
@@ -764,7 +785,7 @@ def gift():
 </div>
 {C.json_script("gift-config", {"amounts": g["amounts"], "ids": g.get("shopify_variant_ids", {})})}'''
     write("gift-cards/index.html", page(
-        title=f'Gift cards | {store["name"]}', desc=f'Archive 88 gift cards by email or post. {g["terms"]}',
+        title=f'Gift cards | {store["name"]}', desc=f'The Easy Life gift cards by email or post. {g["terms"]}',
         root=root, path="gift-cards/", main=main, active="gift", scripts=("gift",)))
 
 

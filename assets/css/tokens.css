@@ -1,6 +1,6 @@
-/* Archive 88: design tokens.
-   Brand layer = the Archive 88 palette and fonts (Archivo Narrow + Archivo). Layout language = clean retail:
-   square controls, quiet type, product first (patterns studied from leading streetwear / sportswear stores).
+/* The Easy Life: design tokens.
+   Brand layer = a quiet neutral palette (soft greys and off-whites, charcoal ink, one slate accent) and two faces:
+   Bricolage Grotesque for display, Archivo for everything else. Layout language = clean retail with soft corners.
    Three layers. Components only read the semantic and component layers, never raw hex.
    1. Primitive  : the brand palette and scales
    2. Semantic   : what a value is FOR (text, surface, action, signal)
@@ -9,20 +9,24 @@
 
 :root {
   /* 1 ─ Primitive ─────────────────────────────────────────────────────────── */
-  --ink: #1b211d;
-  --bone: #e6e3da;
-  --pine: #2f3d33;
-  --paper: #f5f4f0;
-  --white: #fbfaf8;
-  --mist: #ecebe6;                       /* product image ground: lighter than bone, so garments read */
-  --ink-soft: rgba(27, 33, 29, 0.68);    /* 5.4:1 on white, 5.1:1 on paper */
-  --bone-soft: rgba(230, 227, 218, 0.74);
-  --line: rgba(27, 33, 29, 0.12);
-  --line-strong: rgba(27, 33, 29, 0.3);
-  --accent: #a3471f;                     /* burnt orange: 5.5:1 on paper */
-  --accent-deep: #8a3a18;
+  --ink: #1c1d1f;                        /* charcoal */
+  --bone: #dededa;
+  --pine: #3a3d42;                       /* graphite: hover on ink, "added" and "in stock" states */
+  --paper: #f1f1ee;
+  --white: #f8f8f6;
+  --mist: #eaeae7;                       /* product image ground */
+  --ink-soft: rgba(28, 29, 31, 0.68);    /* 5.6:1 on white, 5.2:1 on paper */
+  --bone-soft: rgba(226, 226, 222, 0.74);
+  --line: rgba(28, 29, 31, 0.12);
+  --line-strong: rgba(28, 29, 31, 0.3);
+  --accent: #41566e;                     /* slate: 7:1 on white */
+  --accent-deep: #33455a;
+  --red: #8f2f2a;                        /* form errors only */
+  --wall-light: #fbfbf9;                 /* the sunlit wall: lit plaster, plaster in half shade */
+  --wall: #efefec;
+  --wall-shade: #e4e4e0;
 
-  --font-display: "Archivo Narrow", "Archivo Narrow Fallback", sans-serif;
+  --font-display: "Bricolage Grotesque", "Bricolage Fallback", sans-serif;
   --font-body: "Archivo", "Archivo Fallback", system-ui, sans-serif;
 
   --fs-xs: 0.75rem;                      /* 12: badges, legal */
@@ -31,7 +35,7 @@
   --fs-md: 1.0625rem;                    /* 17: card titles on large screens, lead copy */
   --fs-lg: clamp(1.375rem, 1.1rem + 1vw, 1.875rem);      /* section titles */
   --fs-xl: clamp(2rem, 1.4rem + 2.6vw, 3.5rem);           /* page titles */
-  --fs-hero: clamp(2.5rem, 1.6rem + 4.4vw, 5.5rem);       /* campaign headline */
+  --fs-hero: clamp(3.5rem, 1.2rem + 8.4vw, 10rem);        /* the one line on the wall */
 
   --t-press: 0.08s;
   --t-fast: 0.2s;                        /* hovers, colour changes */
@@ -55,8 +59,8 @@
   --color-on-primary: var(--paper);
   --color-signal: var(--accent);         /* bag count, low stock, sale price, delivery meter */
   --color-media: var(--mist);            /* behind every product image */
-  --color-error: var(--accent-deep);
-  --color-scrim: rgba(27, 33, 29, 0.42);
+  --color-error: var(--red);
+  --color-scrim: rgba(28, 29, 31, 0.42);
   --color-focus: var(--accent);
 
   /* 3 ─ Component ─────────────────────────────────────────────────────────── */
@@ -67,7 +71,8 @@
   --bar-h: 36px;                         /* announcement bar */
   --nav-h: 64px;
   --sidebar-w: 248px;
-  --radius: 0px;                         /* square controls throughout */
+  --radius: 10px;                        /* soft corners: every control */
+  --radius-media: 14px;                  /* ...and every image frame and tile */
   --drawer-w: min(440px, 100%);
   --tap: 44px;
   --z-header: 50; --z-mega: 49; --z-sticky: 44; --z-drawer: 80; --z-toast: 90;

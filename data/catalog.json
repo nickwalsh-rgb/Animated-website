@@ -9,7 +9,7 @@
  "products": [
   {
    "handle": "single-breasted-overcoat",
-   "style": "A88-001",
+   "style": "TEL-001",
    "title": "Single-Breasted Overcoat",
    "category": "outerwear",
    "silhouette": "coat",
@@ -94,7 +94,7 @@
   },
   {
    "handle": "waxed-field-jacket",
-   "style": "A88-002",
+   "style": "TEL-002",
    "title": "Waxed Field Jacket",
    "category": "outerwear",
    "silhouette": "coat",
@@ -165,7 +165,7 @@
   },
   {
    "handle": "wool-car-coat",
-   "style": "A88-003",
+   "style": "TEL-003",
    "title": "Wool Car Coat",
    "category": "outerwear",
    "silhouette": "coat",
@@ -236,7 +236,7 @@
   },
   {
    "handle": "quilted-liner-jacket",
-   "style": "A88-004",
+   "style": "TEL-004",
    "title": "Quilted Liner Jacket",
    "category": "outerwear",
    "silhouette": "coat",
@@ -321,7 +321,7 @@
   },
   {
    "handle": "cotton-trench",
-   "style": "A88-005",
+   "style": "TEL-005",
    "title": "Cotton Trench",
    "category": "outerwear",
    "silhouette": "coat",
@@ -406,7 +406,7 @@
   },
   {
    "handle": "melton-peacoat",
-   "style": "A88-006",
+   "style": "TEL-006",
    "title": "Melton Peacoat",
    "category": "outerwear",
    "silhouette": "coat",
@@ -463,7 +463,7 @@
   },
   {
    "handle": "ripstop-parka",
-   "style": "A88-007",
+   "style": "TEL-007",
    "title": "Ripstop Parka",
    "category": "outerwear",
    "silhouette": "coat",
@@ -520,7 +520,7 @@
   },
   {
    "handle": "wool-chore-coat",
-   "style": "A88-008",
+   "style": "TEL-008",
    "title": "Wool Chore Coat",
    "category": "outerwear",
    "silhouette": "coat",
@@ -591,7 +591,7 @@
   },
   {
    "handle": "raglan-mac",
-   "style": "A88-009",
+   "style": "TEL-009",
    "title": "Raglan Mac",
    "category": "outerwear",
    "silhouette": "coat",
@@ -662,7 +662,7 @@
   },
   {
    "handle": "down-gilet",
-   "style": "A88-010",
+   "style": "TEL-010",
    "title": "Down Gilet",
    "category": "outerwear",
    "silhouette": "coat",
@@ -733,7 +733,7 @@
   },
   {
    "handle": "suede-blouson",
-   "style": "A88-011",
+   "style": "TEL-011",
    "title": "Suede Blouson",
    "category": "outerwear",
    "silhouette": "coat",
@@ -790,7 +790,7 @@
   },
   {
    "handle": "herringbone-topcoat",
-   "style": "A88-012",
+   "style": "TEL-012",
    "title": "Herringbone Topcoat",
    "category": "outerwear",
    "silhouette": "coat",
@@ -875,7 +875,7 @@
   },
   {
    "handle": "waxed-harrington",
-   "style": "A88-013",
+   "style": "TEL-013",
    "title": "Waxed Harrington",
    "category": "outerwear",
    "silhouette": "coat",
@@ -946,7 +946,7 @@
   },
   {
    "handle": "shearling-collar-jacket",
-   "style": "A88-014",
+   "style": "TEL-014",
    "title": "Shearling-Collar Jacket",
    "category": "outerwear",
    "silhouette": "coat",
@@ -1031,7 +1031,7 @@
   },
   {
    "handle": "merino-crew",
-   "style": "A88-015",
+   "style": "TEL-015",
    "title": "Merino Crew",
    "category": "knitwear",
    "silhouette": "knit",
@@ -1088,7 +1088,7 @@
   },
   {
    "handle": "lambswool-v-neck",
-   "style": "A88-016",
+   "style": "TEL-016",
    "title": "Lambswool V-Neck",
    "category": "knitwear",
    "silhouette": "knit",
@@ -1173,7 +1173,7 @@
   },
   {
    "handle": "cashmere-roll-neck",
-   "style": "A88-017",
+   "style": "TEL-017",
    "title": "Cashmere Roll Neck",
    "category": "knitwear",
    "silhouette": "knit",
@@ -1244,7 +1244,7 @@
   },
   {
    "handle": "shetland-crew",
-   "style": "A88-018",
+   "style": "TEL-018",
    "title": "Shetland Crew",
    "category": "knitwear",
    "silhouette": "knit",
@@ -1315,7 +1315,7 @@
   },
   {
    "handle": "ribbed-cardigan",
-   "style": "A88-019",
+   "style": "TEL-019",
    "title": "Ribbed Cardigan",
    "category": "knitwear",
    "silhouette": "knit",
@@ -1386,7 +1386,7 @@
   },
   {
    "handle": "fisherman-jumper",
-   "style": "A88-020",
+   "style": "TEL-020",
    "title": "Fisherman Jumper",
    "category": "knitwear",
    "silhouette": "knit",
@@ -1457,7 +1457,7 @@
   },
   {
    "handle": "merino-polo",
-   "style": "A88-021",
+   "style": "TEL-021",
    "title": "Merino Polo",
    "category": "knitwear",
    "silhouette": "knit",
@@ -1514,7 +1514,7 @@
   },
   {
    "handle": "cotton-half-zip",
-   "style": "A88-022",
+   "style": "TEL-022",
    "title": "Cotton Half-Zip",
    "category": "knitwear",
    "silhouette": "knit",
@@ -1585,7 +1585,7 @@
   },
   {
    "handle": "brushed-mohair-cardigan",
-   "style": "A88-023",
+   "style": "TEL-023",
    "title": "Brushed Mohair Cardigan",
    "category": "knitwear",
    "silhouette": "knit",
@@ -1642,7 +1642,7 @@
   },
   {
    "handle": "cable-crew",
-   "style": "A88-024",
+   "style": "TEL-024",
    "title": "Cable Crew",
    "category": "knitwear",
    "silhouette": "knit",
@@ -1727,7 +1727,7 @@
   },
   {
    "handle": "cashmere-crew",
-   "style": "A88-025",
+   "style": "TEL-025",
    "title": "Cashmere Crew",
    "category": "knitwear",
    "silhouette": "knit",
@@ -1798,7 +1798,7 @@
   },
   {
    "handle": "waffle-knit-henley",
-   "style": "A88-026",
+   "style": "TEL-026",
    "title": "Waffle Knit Henley",
    "category": "knitwear",
    "silhouette": "knit",
@@ -1869,7 +1869,7 @@
   },
   {
    "handle": "lambswool-shawl-cardigan",
-   "style": "A88-027",
+   "style": "TEL-027",
    "title": "Lambswool Shawl Cardigan",
    "category": "knitwear",
    "silhouette": "knit",
@@ -1940,7 +1940,7 @@
   },
   {
    "handle": "merino-zip-cardigan",
-   "style": "A88-028",
+   "style": "TEL-028",
    "title": "Merino Zip Cardigan",
    "category": "knitwear",
    "silhouette": "knit",
@@ -2011,7 +2011,7 @@
   },
   {
    "handle": "linen-crew",
-   "style": "A88-029",
+   "style": "TEL-029",
    "title": "Linen Crew",
    "category": "knitwear",
    "silhouette": "knit",
@@ -2068,7 +2068,7 @@
   },
   {
    "handle": "alpaca-crew",
-   "style": "A88-030",
+   "style": "TEL-030",
    "title": "Alpaca Crew",
    "category": "knitwear",
    "silhouette": "knit",
@@ -2139,7 +2139,7 @@
   },
   {
    "handle": "textured-cotton-crew",
-   "style": "A88-031",
+   "style": "TEL-031",
    "title": "Textured Cotton Crew",
    "category": "knitwear",
    "silhouette": "knit",
@@ -2210,7 +2210,7 @@
   },
   {
    "handle": "fine-gauge-mock-neck",
-   "style": "A88-032",
+   "style": "TEL-032",
    "title": "Fine-Gauge Mock Neck",
    "category": "knitwear",
    "silhouette": "knit",
@@ -2281,7 +2281,7 @@
   },
   {
    "handle": "oxford-button-down",
-   "style": "A88-033",
+   "style": "TEL-033",
    "title": "Oxford Button-Down",
    "category": "shirts",
    "silhouette": "shirt",
@@ -2366,7 +2366,7 @@
   },
   {
    "handle": "poplin-shirt",
-   "style": "A88-034",
+   "style": "TEL-034",
    "title": "Poplin Shirt",
    "category": "shirts",
    "silhouette": "shirt",
@@ -2437,7 +2437,7 @@
   },
   {
    "handle": "brushed-flannel-shirt",
-   "style": "A88-035",
+   "style": "TEL-035",
    "title": "Brushed Flannel Shirt",
    "category": "shirts",
    "silhouette": "shirt",
@@ -2494,7 +2494,7 @@
   },
   {
    "handle": "linen-camp-collar-shirt",
-   "style": "A88-036",
+   "style": "TEL-036",
    "title": "Linen Camp Collar Shirt",
    "category": "shirts",
    "silhouette": "shirt",
@@ -2565,7 +2565,7 @@
   },
   {
    "handle": "denim-western-shirt",
-   "style": "A88-037",
+   "style": "TEL-037",
    "title": "Denim Western Shirt",
    "category": "shirts",
    "silhouette": "shirt",
@@ -2650,7 +2650,7 @@
   },
   {
    "handle": "corduroy-overshirt",
-   "style": "A88-038",
+   "style": "TEL-038",
    "title": "Corduroy Overshirt",
    "category": "shirts",
    "silhouette": "shirt",
@@ -2721,7 +2721,7 @@
   },
   {
    "handle": "twill-workshirt",
-   "style": "A88-039",
+   "style": "TEL-039",
    "title": "Twill Workshirt",
    "category": "shirts",
    "silhouette": "shirt",
@@ -2792,7 +2792,7 @@
   },
   {
    "handle": "band-collar-shirt",
-   "style": "A88-040",
+   "style": "TEL-040",
    "title": "Band Collar Shirt",
    "category": "shirts",
    "silhouette": "shirt",
@@ -2877,7 +2877,7 @@
   },
   {
    "handle": "seersucker-shirt",
-   "style": "A88-041",
+   "style": "TEL-041",
    "title": "Seersucker Shirt",
    "category": "shirts",
    "silhouette": "shirt",
@@ -2934,7 +2934,7 @@
   },
   {
    "handle": "chambray-shirt",
-   "style": "A88-042",
+   "style": "TEL-042",
    "title": "Chambray Shirt",
    "category": "shirts",
    "silhouette": "shirt",
@@ -3005,7 +3005,7 @@
   },
   {
    "handle": "wool-overshirt",
-   "style": "A88-043",
+   "style": "TEL-043",
    "title": "Wool Overshirt",
    "category": "shirts",
    "silhouette": "shirt",
@@ -3062,7 +3062,7 @@
   },
   {
    "handle": "striped-poplin-shirt",
-   "style": "A88-044",
+   "style": "TEL-044",
    "title": "Striped Poplin Shirt",
    "category": "shirts",
    "silhouette": "shirt",
@@ -3119,7 +3119,7 @@
   },
   {
    "handle": "moleskin-overshirt",
-   "style": "A88-045",
+   "style": "TEL-045",
    "title": "Moleskin Overshirt",
    "category": "shirts",
    "silhouette": "shirt",
@@ -3190,7 +3190,7 @@
   },
   {
    "handle": "silk-cotton-shirt",
-   "style": "A88-046",
+   "style": "TEL-046",
    "title": "Silk-Cotton Shirt",
    "category": "shirts",
    "silhouette": "shirt",
@@ -3247,7 +3247,7 @@
   },
   {
    "handle": "cuban-collar-shirt",
-   "style": "A88-047",
+   "style": "TEL-047",
    "title": "Cuban Collar Shirt",
    "category": "shirts",
    "silhouette": "shirt",
@@ -3318,7 +3318,7 @@
   },
   {
    "handle": "heavy-twill-overshirt",
-   "style": "A88-048",
+   "style": "TEL-048",
    "title": "Heavy Twill Overshirt",
    "category": "shirts",
    "silhouette": "shirt",
@@ -3403,7 +3403,7 @@
   },
   {
    "handle": "garment-dyed-shirt",
-   "style": "A88-049",
+   "style": "TEL-049",
    "title": "Garment-Dyed Shirt",
    "category": "shirts",
    "silhouette": "shirt",
@@ -3474,7 +3474,7 @@
   },
   {
    "handle": "herringbone-shirt",
-   "style": "A88-050",
+   "style": "TEL-050",
    "title": "Herringbone Shirt",
    "category": "shirts",
    "silhouette": "shirt",
@@ -3545,7 +3545,7 @@
   },
   {
    "handle": "pleated-wool-trouser",
-   "style": "A88-051",
+   "style": "TEL-051",
    "title": "Pleated Wool Trouser",
    "category": "trousers",
    "silhouette": "trouser",
@@ -3616,7 +3616,7 @@
   },
   {
    "handle": "straight-chino",
-   "style": "A88-052",
+   "style": "TEL-052",
    "title": "Straight Chino",
    "category": "trousers",
    "silhouette": "trouser",
@@ -3701,7 +3701,7 @@
   },
   {
    "handle": "rigid-selvedge-jean",
-   "style": "A88-053",
+   "style": "TEL-053",
    "title": "Rigid Selvedge Jean",
    "category": "trousers",
    "silhouette": "trouser",
@@ -3772,7 +3772,7 @@
   },
   {
    "handle": "wide-fatigue-trouser",
-   "style": "A88-054",
+   "style": "TEL-054",
    "title": "Wide Fatigue Trouser",
    "category": "trousers",
    "silhouette": "trouser",
@@ -3843,7 +3843,7 @@
   },
   {
    "handle": "drawstring-linen-trouser",
-   "style": "A88-055",
+   "style": "TEL-055",
    "title": "Drawstring Linen Trouser",
    "category": "trousers",
    "silhouette": "trouser",
@@ -3914,7 +3914,7 @@
   },
   {
    "handle": "cord-trouser",
-   "style": "A88-056",
+   "style": "TEL-056",
    "title": "Cord Trouser",
    "category": "trousers",
    "silhouette": "trouser",
@@ -3999,7 +3999,7 @@
   },
   {
    "handle": "tapered-chino",
-   "style": "A88-057",
+   "style": "TEL-057",
    "title": "Tapered Chino",
    "category": "trousers",
    "silhouette": "trouser",
@@ -4070,7 +4070,7 @@
   },
   {
    "handle": "carpenter-trouser",
-   "style": "A88-058",
+   "style": "TEL-058",
    "title": "Carpenter Trouser",
    "category": "trousers",
    "silhouette": "trouser",
@@ -4155,7 +4155,7 @@
   },
   {
    "handle": "flannel-trouser",
-   "style": "A88-059",
+   "style": "TEL-059",
    "title": "Flannel Trouser",
    "category": "trousers",
    "silhouette": "trouser",
@@ -4226,7 +4226,7 @@
   },
   {
    "handle": "painter-pant",
-   "style": "A88-060",
+   "style": "TEL-060",
    "title": "Painter Pant",
    "category": "trousers",
    "silhouette": "trouser",
@@ -4311,7 +4311,7 @@
   },
   {
    "handle": "relaxed-jean",
-   "style": "A88-061",
+   "style": "TEL-061",
    "title": "Relaxed Jean",
    "category": "trousers",
    "silhouette": "trouser",
@@ -4382,7 +4382,7 @@
   },
   {
    "handle": "gurkha-trouser",
-   "style": "A88-062",
+   "style": "TEL-062",
    "title": "Gurkha Trouser",
    "category": "trousers",
    "silhouette": "trouser",
@@ -4453,7 +4453,7 @@
   },
   {
    "handle": "cotton-drill-trouser",
-   "style": "A88-063",
+   "style": "TEL-063",
    "title": "Cotton Drill Trouser",
    "category": "trousers",
    "silhouette": "trouser",
@@ -4524,7 +4524,7 @@
   },
   {
    "handle": "seersucker-trouser",
-   "style": "A88-064",
+   "style": "TEL-064",
    "title": "Seersucker Trouser",
    "category": "trousers",
    "silhouette": "trouser",
@@ -4581,7 +4581,7 @@
   },
   {
    "handle": "twill-easy-pant",
-   "style": "A88-065",
+   "style": "TEL-065",
    "title": "Twill Easy Pant",
    "category": "trousers",
    "silhouette": "trouser",
@@ -4666,7 +4666,7 @@
   },
   {
    "handle": "moleskin-trouser",
-   "style": "A88-066",
+   "style": "TEL-066",
    "title": "Moleskin Trouser",
    "category": "trousers",
    "silhouette": "trouser",
@@ -4723,7 +4723,7 @@
   },
   {
    "handle": "heavyweight-tee",
-   "style": "A88-067",
+   "style": "TEL-067",
    "title": "Heavyweight Tee",
    "category": "jersey",
    "silhouette": "tee",
@@ -4794,7 +4794,7 @@
   },
   {
    "handle": "pocket-tee",
-   "style": "A88-068",
+   "style": "TEL-068",
    "title": "Pocket Tee",
    "category": "jersey",
    "silhouette": "tee",
@@ -4879,7 +4879,7 @@
   },
   {
    "handle": "long-sleeve-tee",
-   "style": "A88-069",
+   "style": "TEL-069",
    "title": "Long-Sleeve Tee",
    "category": "jersey",
    "silhouette": "tee",
@@ -4936,7 +4936,7 @@
   },
   {
    "handle": "loopback-sweatshirt",
-   "style": "A88-070",
+   "style": "TEL-070",
    "title": "Loopback Sweatshirt",
    "category": "jersey",
    "silhouette": "tee",
@@ -5007,7 +5007,7 @@
   },
   {
    "handle": "breton-top",
-   "style": "A88-071",
+   "style": "TEL-071",
    "title": "Breton Top",
    "category": "jersey",
    "silhouette": "tee",
@@ -5078,7 +5078,7 @@
   },
   {
    "handle": "pique-polo",
-   "style": "A88-072",
+   "style": "TEL-072",
    "title": "Pique Polo",
    "category": "jersey",
    "silhouette": "tee",
@@ -5149,7 +5149,7 @@
   },
   {
    "handle": "mock-neck-tee",
-   "style": "A88-073",
+   "style": "TEL-073",
    "title": "Mock Neck Tee",
    "category": "jersey",
    "silhouette": "tee",
@@ -5234,7 +5234,7 @@
   },
   {
    "handle": "ringer-tee",
-   "style": "A88-074",
+   "style": "TEL-074",
    "title": "Ringer Tee",
    "category": "jersey",
    "silhouette": "tee",
@@ -5319,7 +5319,7 @@
   },
   {
    "handle": "hooded-sweatshirt",
-   "style": "A88-075",
+   "style": "TEL-075",
    "title": "Hooded Sweatshirt",
    "category": "jersey",
    "silhouette": "tee",
@@ -5376,7 +5376,7 @@
   },
   {
    "handle": "raglan-sweatshirt",
-   "style": "A88-076",
+   "style": "TEL-076",
    "title": "Raglan Sweatshirt",
    "category": "jersey",
    "silhouette": "tee",
@@ -5461,7 +5461,7 @@
   },
   {
    "handle": "slub-tee",
-   "style": "A88-077",
+   "style": "TEL-077",
    "title": "Slub Tee",
    "category": "jersey",
    "silhouette": "tee",
@@ -5532,7 +5532,7 @@
   },
   {
    "handle": "henley-tee",
-   "style": "A88-078",
+   "style": "TEL-078",
    "title": "Henley Tee",
    "category": "jersey",
    "silhouette": "tee",
@@ -5589,7 +5589,7 @@
   },
   {
    "handle": "rugby-shirt",
-   "style": "A88-079",
+   "style": "TEL-079",
    "title": "Rugby Shirt",
    "category": "jersey",
    "silhouette": "tee",
@@ -5646,7 +5646,7 @@
   },
   {
    "handle": "waffle-long-sleeve",
-   "style": "A88-080",
+   "style": "TEL-080",
    "title": "Waffle Long-Sleeve",
    "category": "jersey",
    "silhouette": "tee",
@@ -5731,7 +5731,7 @@
   },
   {
    "handle": "crew-sweatshirt",
-   "style": "A88-081",
+   "style": "TEL-081",
    "title": "Crew Sweatshirt",
    "category": "jersey",
    "silhouette": "tee",
@@ -5802,7 +5802,7 @@
   },
   {
    "handle": "merino-tee",
-   "style": "A88-082",
+   "style": "TEL-082",
    "title": "Merino Tee",
    "category": "jersey",
    "silhouette": "tee",
@@ -5873,7 +5873,7 @@
   },
   {
    "handle": "boxy-tee",
-   "style": "A88-083",
+   "style": "TEL-083",
    "title": "Boxy Tee",
    "category": "jersey",
    "silhouette": "tee",
@@ -5944,7 +5944,7 @@
   },
   {
    "handle": "ribbed-tank",
-   "style": "A88-084",
+   "style": "TEL-084",
    "title": "Ribbed Tank",
    "category": "jersey",
    "silhouette": "tee",
@@ -6015,7 +6015,7 @@
   },
   {
    "handle": "unstructured-blazer",
-   "style": "A88-085",
+   "style": "TEL-085",
    "title": "Unstructured Blazer",
    "category": "tailoring",
    "silhouette": "blazer",
@@ -6086,7 +6086,7 @@
   },
   {
    "handle": "wool-hopsack-jacket",
-   "style": "A88-086",
+   "style": "TEL-086",
    "title": "Wool Hopsack Jacket",
    "category": "tailoring",
    "silhouette": "blazer",
@@ -6171,7 +6171,7 @@
   },
   {
    "handle": "linen-suit-jacket",
-   "style": "A88-087",
+   "style": "TEL-087",
    "title": "Linen Suit Jacket",
    "category": "tailoring",
    "silhouette": "blazer",
@@ -6256,7 +6256,7 @@
   },
   {
    "handle": "tweed-sport-coat",
-   "style": "A88-088",
+   "style": "TEL-088",
    "title": "Tweed Sport Coat",
    "category": "tailoring",
    "silhouette": "blazer",
@@ -6341,7 +6341,7 @@
   },
   {
    "handle": "double-breasted-blazer",
-   "style": "A88-089",
+   "style": "TEL-089",
    "title": "Double-Breasted Blazer",
    "category": "tailoring",
    "silhouette": "blazer",
@@ -6412,7 +6412,7 @@
   },
   {
    "handle": "flannel-suit-jacket",
-   "style": "A88-090",
+   "style": "TEL-090",
    "title": "Flannel Suit Jacket",
    "category": "tailoring",
    "silhouette": "blazer",
@@ -6483,7 +6483,7 @@
   },
   {
    "handle": "cotton-travel-blazer",
-   "style": "A88-091",
+   "style": "TEL-091",
    "title": "Cotton Travel Blazer",
    "category": "tailoring",
    "silhouette": "blazer",
@@ -6554,7 +6554,7 @@
   },
   {
    "handle": "seersucker-jacket",
-   "style": "A88-092",
+   "style": "TEL-092",
    "title": "Seersucker Jacket",
    "category": "tailoring",
    "silhouette": "blazer",
@@ -6625,7 +6625,7 @@
   },
   {
    "handle": "corduroy-sport-coat",
-   "style": "A88-093",
+   "style": "TEL-093",
    "title": "Corduroy Sport Coat",
    "category": "tailoring",
    "silhouette": "blazer",
@@ -6682,7 +6682,7 @@
   },
   {
    "handle": "wool-gilet",
-   "style": "A88-094",
+   "style": "TEL-094",
    "title": "Wool Gilet",
    "category": "tailoring",
    "silhouette": "blazer",
@@ -6739,7 +6739,7 @@
   },
   {
    "handle": "cashmere-blend-blazer",
-   "style": "A88-095",
+   "style": "TEL-095",
    "title": "Cashmere Blend Blazer",
    "category": "tailoring",
    "silhouette": "blazer",
@@ -6796,7 +6796,7 @@
   },
   {
    "handle": "twill-field-blazer",
-   "style": "A88-096",
+   "style": "TEL-096",
    "title": "Twill Field Blazer",
    "category": "tailoring",
    "silhouette": "blazer",
@@ -6867,7 +6867,7 @@
   },
   {
    "handle": "mohair-suit-jacket",
-   "style": "A88-097",
+   "style": "TEL-097",
    "title": "Mohair Suit Jacket",
    "category": "tailoring",
    "silhouette": "blazer",
@@ -6938,7 +6938,7 @@
   },
   {
    "handle": "knitted-blazer",
-   "style": "A88-098",
+   "style": "TEL-098",
    "title": "Knitted Blazer",
    "category": "tailoring",
    "silhouette": "blazer",
@@ -7023,7 +7023,7 @@
   },
   {
    "handle": "herringbone-blazer",
-   "style": "A88-099",
+   "style": "TEL-099",
    "title": "Herringbone Blazer",
    "category": "tailoring",
    "silhouette": "blazer",
@@ -7094,7 +7094,7 @@
   },
   {
    "handle": "wool-bomber-jacket",
-   "style": "A88-100",
+   "style": "TEL-100",
    "title": "Wool Bomber Jacket",
    "category": "tailoring",
    "silhouette": "blazer",

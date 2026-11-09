@@ -1,4 +1,4 @@
-/* Archive 88: product detail page.
+/* The Easy Life: product detail page.
    The size x colour variant matrix (#variant-matrix, written by build.py) drives everything: which sizes are
    available in the chosen colour, stock messages, the gallery set, the mobile sticky bar and the size sheet.
    Selection lives in the URL (?colour=olive&size=M) so a shared link opens the exact variant. */

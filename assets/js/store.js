@@ -1,4 +1,4 @@
-/* Archive 88: shared runtime.
+/* The Easy Life: shared runtime.
    - Drawer: one controller for every slide-out panel (bag, menu, filters, size sheet)
    - Cart: bag state (localStorage, synced across tabs), drawer rendering, free-shipping meter
    - Cards: colour swatches and quick add on product cards (PLP, home, recommendations)
@@ -276,12 +276,13 @@
   document.addEventListener("pointerover", prime, { passive: true });
   document.addEventListener("focusin", prime);
 
-  /* ── Nav tone: inverts over dark sections ([data-nav="dark"]) ───────────
+  /* ── Nav tone: follows the section under it ([data-nav="dark" | "light"]) ───────────
      Checks which section sits under the middle of the header, measured where the header actually is (it starts
-     below the announcement bar, then sticks to the top). Over imagery that asks for it ([data-nav-clear]) the
-     header goes see-through with light type; over other dark sections it is a solid ink bar. */
+     below the announcement bar, then sticks to the top). Over a section that asks for it ([data-nav-clear]) the
+     header goes see-through (dark type over the light wall, light type over dark imagery); over other dark
+     sections it is a solid ink bar. */
   const navEl = $(".nav");
-  const darks = $$('[data-nav="dark"]');
+  const darks = $$("[data-nav]");
   if (navEl && darks.length) {
     let queued = false;
     const tone = () => {
@@ -289,7 +290,7 @@
       const r = navEl.getBoundingClientRect();
       const y = r.top + r.height / 2;
       const under = darks.find((d) => { const box = d.getBoundingClientRect(); return box.top <= y && box.bottom > y; });
-      document.body.classList.toggle("nav-on-dark", !!under);
+      document.body.classList.toggle("nav-on-dark", !!under && under.dataset.nav === "dark");
       document.body.classList.toggle("nav-clear", !!under && under.hasAttribute("data-nav-clear"));
     };
     const queue = () => { if (!queued) { queued = true; requestAnimationFrame(tone); } };

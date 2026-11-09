@@ -1,8 +1,8 @@
 {
   "_readme": "Site settings. Edit, then run: python3 build.py",
-  "name": "Archive 88",
-  "tagline": "The permanent collection",
-  "description": "Archive 88 makes a permanent collection of considered clothing: natural fibres, honest construction and fits that stay in the range season after season.",
+  "name": "The Easy Life",
+  "tagline": "Clothes for taking your time",
+  "description": "The Easy Life makes one permanent collection of easy-wearing clothes: natural fibres, honest construction and relaxed fits that stay in the range season after season.",
   "url": "https://nickwalsh-rgb.github.io/Animated-website/",
   "locale": "en-GB",
   "currency": "GBP",
@@ -96,15 +96,15 @@
   },
   "social": {
     "_note": "PLACEHOLDER handles. Replace with the real profiles.",
-    "instagram": "https://www.instagram.com/archive88/",
-    "facebook": "https://www.facebook.com/archive88"
+    "instagram": "https://www.instagram.com/theeasylife/",
+    "facebook": "https://www.facebook.com/theeasylife"
   },
   "business": {
     "_note": "PLACEHOLDER details, safe to publish while testing: the phone number is from Ofcom's range reserved for TV and film (020 7946 0xxx), the email uses the reserved .example domain, and the address, company and VAT numbers are fictional. Replace all of them before launch: UK distance-selling rules require your real trading name, a geographic address and a way to contact you.",
-    "trading_name": "Archive 88",
+    "trading_name": "The Easy Life",
     "legal_name": "Placeholder Trading Ltd",
     "address": "1 Placeholder Yard\nLondon\nAB1 2CD",
-    "email": "hello@archive88.example",
+    "email": "hello@theeasylife.example",
     "phone": "020 7946 0088",
     "company_number": "00000000",
     "vat_number": "GB 000 0000 00"
