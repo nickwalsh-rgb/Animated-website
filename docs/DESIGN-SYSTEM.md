@@ -1,6 +1,6 @@
 # The Easy Life: brand and design system
 
-The Easy Life is a **permanent collection** of 100 styles (1,830 size × colour
+The Easy Life is a **permanent collection** of 108 styles (1,852 size × colour
 variants in the sample data). The identity is quiet and neutral: soft greys and off-whites, charcoal ink, one slate
 accent, a relaxed grotesque for display, soft corners, and one idea, **the sunlit wall that keeps your time**. The layout is clean
 retail built for range and conversion: announcement bar, mega-menu, search, product rails, plain product cards,
@@ -214,17 +214,18 @@ sway, speed and strength.
 
 | Section | Pattern |
 | --- | --- |
-| Hero | The sunlit wall under a see-through header. One line across the full width (*Take your time.*), painted under the light. Beneath it one row: a short sentence, two underlined links, and the sundial (the hour, what the light is doing, and the pause button). |
-| New in | Product rail, *See all* link. |
-| Shop by category | An index: the six categories in display type with their counts, beside one plate that shows the leading styles of whichever name is pointed at or focused. On phones each entry is its own tile. |
+| Hero | Full-bleed split under a see-through header (`lookbook()` in build.py). **Left, the manifesto:** the line *Take your time.* painted on the sunlit wall, two short paragraphs, the primary action (*Explore the Drop*, which opens the newest styles), a quiet link to the whole collection, and the sundial. **Right, the lookbook:** three looks, each four styles laid flat with its list (name, colour, price). Pointing at a line or a piece picks that piece out and dims the rest; arrows, arrow keys or a swipe change the look. Stacks below 1000px. |
+| Featured collection | Three columns (two on phones) with filter tabs: All, Outerwear, Essentials (jersey, shirts, knitwear), Accessories (`featured()` in build.py). Each tab shows six styles, arriving one after another. Hovering a card eases from the front view to its detail shot (`card--shift`). |
+| Shop by category | An index: the categories in display type with their counts, beside one plate that shows the leading styles of whichever name is pointed at or focused. On phones each entry is its own tile. |
 | Bestsellers | Product rail (top-ranked styles that aren't new). |
 | Story | The wall again, with the promise in three painted lines, a link to About, and the sewn-in label hanging in the light. |
 | Brand copy | Two short paragraphs (also useful for search engines). |
 | Promises, sign-up, footer | Shared by every page. The footer closes on the wordmark at full width. |
 
 Motion is calm and each piece has a job: the light tells the time, the shadows and the passing cloud make it feel
-like weather, the hero rises in once on load, sections fade up 16px once as they arrive, the index plate answers the
-pointer. No loader, no pinned or scroll-driven sections, no animation libraries. With reduced motion or without JS
+like weather, the hero arrives in order once on load (the line, the words, the action, then the pieces of the look
+one by one), sections and cards rise 28px one after another as they scroll into view, and the lookbook, the tabs
+and the index plate answer the pointer. No loader, no pinned or scroll-driven sections, no animation libraries. With reduced motion or without JS
 everything is simply visible.
 
 The site is light only. A dark theme is not built; the tokens are layered so one could be added by redefining

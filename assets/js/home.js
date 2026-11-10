@@ -2,7 +2,7 @@
    The sunlit wall keeps the visitor's time: the patch of sun leans, stretches and warms through the day, and the small
    sundial beside the pause button says what hour it is showing. Add ?light=7.5 to the address to see another hour
    (0 to 24). This file also pauses the shadows off screen, swaps the category plate, and fades sections up once as
-   they arrive. No scroll-jacking, pinning or loaders. Needs store.js. With reduced motion the shadows hold still. */
+   they arrive. It also runs the hero lookbook and the featured collection's filter tabs. No scroll-jacking, pinning or loaders. Needs store.js. With reduced motion the shadows hold still. */
 (() => {
   "use strict";
   const { $, $$, reduced } = window.A88S;
@@ -78,6 +78,69 @@
       $("[data-wall-label]", toggle).textContent = paused ? "Play the moving shadows" : "Pause the moving shadows";
       $("use", toggle).setAttribute("href", paused ? "#i-play" : "#i-pause");
     });
+  }
+
+  /* ---------- Lookbook: arrows, arrow keys and swipes change the look; a line or a piece picks one piece out ---------- */
+  const book = $("[data-lookbook]");
+  if (book) {
+    const looks = $$("[data-look]", book), counter = $("[data-look-index]", book);
+    let at = 0;
+    const show = (i) => {
+      at = (i + looks.length) % looks.length;
+      looks.forEach((look, n) => {
+        look.classList.toggle("is-active", n === at);
+        look.toggleAttribute("inert", n !== at);
+        look.classList.remove("has-focus");
+      });
+      counter.textContent = at + 1;
+    };
+    $("[data-look-prev]", book).addEventListener("click", () => show(at - 1));
+    $("[data-look-next]", book).addEventListener("click", () => show(at + 1));
+    book.addEventListener("keydown", (ev) => {
+      if (ev.key === "ArrowLeft") show(at - 1);
+      else if (ev.key === "ArrowRight") show(at + 1);
+    });
+    let x0 = null;
+    book.addEventListener("pointerdown", (ev) => { x0 = ev.pointerType === "touch" ? ev.clientX : null; });
+    book.addEventListener("pointerup", (ev) => {
+      if (x0 !== null && Math.abs(ev.clientX - x0) > 48) show(at + (ev.clientX < x0 ? 1 : -1));
+      x0 = null;
+    });
+    const pick = (look, piece) => {
+      look.classList.toggle("has-focus", piece !== null);
+      $$("[data-piece]", look).forEach((el) => el.classList.toggle("is-focus", el.dataset.piece === piece));
+    };
+    looks.forEach((look) => {
+      $$("[data-piece]", look).forEach((el) => {
+        el.addEventListener("pointerenter", (ev) => ev.pointerType === "mouse" && pick(look, el.dataset.piece));
+        el.addEventListener("pointerleave", () => pick(look, null));
+        el.addEventListener("focus", () => pick(look, el.dataset.piece));
+        el.addEventListener("blur", () => pick(look, null));
+      });
+    });
+  }
+
+  /* ---------- Featured collection: filter tabs. Each tab shows its six styles, arriving one after another ---------- */
+  const feat = $("[data-featured]");
+  if (feat) {
+    const tabs = $$("[data-tab]", feat), cells = $$(".featured__cell", feat), status = $("[data-featured-status]", feat);
+    tabs.forEach((tab) => tab.addEventListener("click", () => {
+      if (tab.getAttribute("aria-pressed") === "true") return;
+      tabs.forEach((el) => el.setAttribute("aria-pressed", String(el === tab)));
+      let i = 0;
+      cells.forEach((cell) => {
+        const on = cell.dataset.groups.split(" ").includes(tab.dataset.tab);
+        cell.hidden = !on;
+        cell.classList.remove("is-enter");
+        if (!on) return;
+        cell.classList.add("is-in"); // already revealed: the tab change plays its own entrance
+        cell.style.transitionDelay = "0s";
+        cell.style.setProperty("--i", i++);
+        void cell.offsetWidth;
+        cell.classList.add("is-enter");
+      });
+      status.textContent = `Showing ${i} styles: ${tab.textContent}`;
+    }));
   }
 
   /* ---------- Category index: the plate shows whichever name is pointed at or focused ---------- */

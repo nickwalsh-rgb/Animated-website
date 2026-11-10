@@ -1,7 +1,7 @@
 # The Easy Life
 
 Online shop for **The Easy Life**: one permanent collection of easy-wearing clothes in natural fibres, kept in every size.
-100 styles (sample data) with size × colour variants, a listing page with a sticky filter sidebar, product pages
+108 styles (sample data) with size × colour variants, a listing page with a sticky filter sidebar, product pages
 with a variant matrix and a mobile sticky Add to bag, a slide-out bag, search, gift cards by email or post, and
 the info pages a shop needs.
 
@@ -46,7 +46,7 @@ unknown category or a missing stock cell.
 
 | Page | What's on it |
 | --- | --- |
-| Home `/` | Sunlit wall hero whose light follows the visitor's clock (add `?light=7.5` to preview an hour), New in rail, category index, Bestsellers rail, the story with the sewn-in label, brand copy |
+| Home `/` | Split hero: manifesto on the sunlit wall (its light follows the visitor's clock; add `?light=7.5` to preview an hour) beside an interactive lookbook. Then the featured collection with filter tabs, category index, Bestsellers rail, the story with the sewn-in label, brand copy |
 | Shop `/shop/`, `/shop/<category>/` | Sticky filter sidebar (drawer on phones), sort, Load more; filters kept in the address (`?size=M&colour=green`) |
 | Product `/products/<handle>/` | Gallery, colour and size selectors, stock messages, availability matrix, sticky Add to bag on phones, You may also like |
 | Gift cards `/gift-cards/` | Amount, then Email or Post, each with its own form and a live card preview |

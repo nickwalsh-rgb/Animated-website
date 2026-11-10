@@ -77,6 +77,11 @@
       "handle": "tailoring",
       "title": "Tailoring",
       "intro": "Soft-shouldered jackets that dress up or down without trying."
+    },
+    {
+      "handle": "accessories",
+      "title": "Accessories",
+      "intro": "Scarves, beanies and bags in the same wool, cotton and wax as everything else."
     }
   ],
   "gift_cards": {

@@ -670,12 +670,76 @@ def mark_bestsellers():
         p["best"] = i < 12
 
 
+LOOKS = (
+    ("The long walk", ("outerwear", "knitwear", "trousers", "accessories")),
+    ("Sunday papers", ("shirts", "knitwear", "trousers", "accessories")),
+    ("Out for supper", ("tailoring", "jersey", "trousers", "accessories")),
+)
+ESSENTIALS = ("jersey", "shirts", "knitwear")
+
+
+def lookbook(root: str, order: list) -> str:
+    """Interactive lookbook for the hero: three looks, each a flat lay of four styles with its list beside it.
+    Pointing at a line (or a piece) picks that piece out; the arrows, arrow keys or a swipe change the look
+    (home.js). Without JavaScript the first look shows, with working links."""
+    used, looks = set(), []
+    for n_, (name, cats) in enumerate(LOOKS):
+        pieces, rows = [], []
+        for i, cat in enumerate(cats):
+            p = next(p for p in order if p["category"] == cat and p["handle"] not in used and not p["sold_out"])
+            used.add(p["handle"])
+            c = p["colours"][n_ % len(p["colours"])]
+            url = f'{root}products/{p["handle"]}/?colour={c["handle"]}'
+            pieces.append(f'<a class="look__piece look__piece--{i + 1}" href="{e(url)}" data-piece="{i}" tabindex="-1" aria-hidden="true">'
+                          f'{art(p["silhouette"], c["hex"])}</a>')
+            rows.append(f'<li><a href="{e(url)}" data-piece="{i}"><span>{e(p["title"])}</span>'
+                        f'<span class="look__colour">{e(c["name"])}</span><span class="look__price">{money(p["price"], SYM)}</span></a></li>')
+        looks.append(
+            f'<div class="look{" is-active" if n_ == 0 else ""}" data-look role="group" aria-roledescription="slide" aria-label="{e(name)}, look {n_ + 1} of {len(LOOKS)}"{"" if n_ == 0 else " inert"}>'
+            f'<div class="look__stage">{"".join(pieces)}</div>'
+            f'<div class="look__info"><p class="look__name">{e(name)}</p><ul class="look__list">{"".join(rows)}</ul></div></div>')
+    return f'''<div class="lookbook" data-lookbook role="region" aria-roledescription="carousel" aria-label="Lookbook">
+    {"".join(looks)}
+    <div class="lookbook__nav">
+      <button type="button" class="icon-btn" data-look-prev aria-label="Previous look">{icon("chevron")}</button>
+      <p class="lookbook__count" aria-live="polite"><span data-look-index>1</span> / {len(LOOKS)}</p>
+      <button type="button" class="icon-btn" data-look-next aria-label="Next look">{icon("chevron")}</button>
+    </div>
+  </div>'''
+
+
+def featured(root: str, order: list) -> str:
+    """Featured collection: a three-column grid with filter tabs. Each tab holds six styles; "All" is two from each.
+    Hovering a card eases from the front view to the detail shot."""
+    live = [p for p in order if not p["sold_out"]]
+    pools = (("outerwear", "Outerwear", [p for p in live if p["category"] == "outerwear"][:6]),
+             ("essentials", "Essentials", [p for p in live if p["category"] in ESSENTIALS][:6]),
+             ("accessories", "Accessories", [p for p in live if p["category"] == "accessories"][:6]))
+    cells = []
+    for key, _, pool in pools:
+        for i, p in enumerate(pool):
+            groups = f"{key} all" if i < 2 else key
+            hidden = "" if i < 2 else " hidden"
+            cells.append(f'<li class="featured__cell reveal" data-groups="{groups}"{hidden}>'
+                         f'{C.product_card(p, root, SYM, alt=2, cls="card--shift")}</li>')
+    tabs = "".join(f'<li><button type="button" class="tab" data-tab="{k}" aria-pressed="{"true" if k == "all" else "false"}">{t}</button></li>'
+                   for k, t in (("all", "All"), *((k, t) for k, t, _ in pools)))
+    return f'''<section class="featured" aria-labelledby="featured-title" data-featured>
+  <div class="featured__head">
+    <h2 class="featured__title reveal" id="featured-title">Featured collection</h2>
+    <ul class="tabs reveal" aria-label="Filter the featured collection">{tabs}</ul>
+  </div>
+  <p class="sr-only" aria-live="polite" data-featured-status></p>
+  <ul class="featured__grid">{"".join(cells)}</ul>
+  <p class="featured__more reveal"><a class="link-line" href="{root}shop/">See all {len(catalog)} styles</a></p>
+</section>'''
+
+
 def home():
     root = ""
     prepare(root)
     n = counts()
     order = ranked()
-    newest = [p for p in order if p.get("new")][:12]
     best = [p for p in order if p.get("best")][:12]
     items = []
     for i, c in enumerate(CATS):
@@ -685,15 +749,18 @@ def home():
             f'<span class="index__name">{e(c["title"])}</span><span class="index__count">{n[c["handle"]]}<span class="sr-only"> styles</span></span>'
             f'<span class="index__plate index__plate--{i + 1}" aria-hidden="true">{arts}</span></a></li>')
     th = money(store["free_shipping_threshold"], SYM)
-    main = f'''<section class="hero" data-nav="light" data-nav-clear aria-labelledby="hero-title">
-  <h1 class="hero__title" id="hero-title"><span>Take your</span> <span>time.</span></h1>
-  {wall(root)}
-  <div class="hero__foot">
-    <p class="hero__lede">One collection in wool, cotton and linen. Relaxed fits, kept in every size, season after season.</p>
-    <ul class="hero__links">
-      <li><a class="link-line" href="shop/">Shop the collection</a></li>
-      <li><a class="link-line" href="shop/?sort=new">New in</a></li>
-    </ul>
+    main = f'''<section class="hero" aria-labelledby="hero-title">
+  <div class="hero__manifesto" data-nav="light" data-nav-clear>
+    <h1 class="hero__title" id="hero-title"><span>Take your</span> <span>time.</span></h1>
+    {wall(root)}
+    <div class="hero__body">
+      <p class="hero__lede">We make one collection and keep it. Wool, cotton and linen, cut easy, in every size, for as long as you want to wear it.</p>
+      <p class="hero__lede hero__lede--quiet">Nothing to chase and nothing to miss. A few new pieces arrive each season and stay.</p>
+      <ul class="hero__links">
+        <li><a class="btn btn--primary btn--lg" href="shop/?sort=new">Explore the Drop {icon("arrow")}</a></li>
+        <li><a class="link-line" href="shop/">Shop the collection</a></li>
+      </ul>
+    </div>
     <div class="dial" data-dial hidden>
       <svg class="dial__arc" viewBox="0 0 72 34" aria-hidden="true" focusable="false"><path d="M4 26A32 22 0 0 1 68 26"/><path d="M0 26H72"/><circle data-dial-sun cx="50" cy="8" r="3.4"/></svg>
       <p class="dial__text"><span data-dial-time></span><span data-dial-phrase></span></p>
@@ -701,8 +768,9 @@ def home():
         {icon("pause")}<span class="sr-only" data-wall-label>Pause the moving shadows</span></button>
     </div>
   </div>
+  {lookbook(root, order)}
 </section>
-{C.rail("new", "New in", "".join(C.product_card(p, root, SYM, eager=i < 2) for i, p in enumerate(newest)), link=("See all", "shop/?sort=new"))}
+{featured(root, order)}
 <section class="cats" aria-labelledby="cats-title">
   <div class="section-head"><h2 class="section-title" id="cats-title">Shop by category</h2><a class="link-arrow" href="shop/">All {len(catalog)} styles {icon("arrow")}</a></div>
   <ul class="index" data-index>{"".join(items)}</ul>
