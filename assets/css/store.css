@@ -36,6 +36,11 @@ fieldset { border: 0; min-width: 0; }
 .section-title { font-size: var(--fs-lg); }
 .eyebrow { font-size: var(--fs-sm); color: var(--color-text-muted); margin-bottom: 4px; }
 .wordmark { width: 100%; height: auto; overflow: visible; fill: currentColor; }
+.logo { display: flex; align-items: center; gap: 5%; }
+.logo .emblem { width: 13.5%; flex: none; margin-bottom: 1.5%; }
+.logo .wordmark { flex: 1; min-width: 0; }
+.emblem { display: block; height: auto; overflow: visible; fill: currentColor; }
+.emblem__shadow { opacity: .22; transform: translate(calc(var(--mark-x, 120) * 1px), 96px); transition: transform 1.6s var(--ease-out); }
 .count { margin-left: auto; font-size: var(--fs-xs); color: var(--color-text-muted); font-variant-numeric: tabular-nums; }
 
 /* ── Buttons & links ──────────────────────────────────────────────────────── */
@@ -102,7 +107,7 @@ fieldset { border: 0; min-width: 0; }
   transition: background-color var(--t-base) var(--ease-out), color var(--t-base) var(--ease-out), border-color var(--t-base);
 }
 .nav__bar { position: relative; background: inherit; display: flex; align-items: center; gap: clamp(16px, 2.4vw, 40px); height: var(--nav-h); padding: 0 var(--gutter); max-width: var(--page-max); margin: 0 auto; }
-.nav__logo { display: block; width: clamp(124px, 10.5vw, 164px); flex: none; }
+.nav__logo { display: block; width: clamp(168px, 14vw, 216px); flex: none; }
 .nav__primary { flex: 1; min-width: 0; }
 .nav__primary > ul { display: flex; gap: clamp(4px, 1vw, 12px); }
 .nav__link {
@@ -267,18 +272,19 @@ body.mega-open .nav { background: var(--color-bg) !important; color: var(--ink) 
 
 /* Home: the sunlit wall. A plaster wall with a window's patch of sun on it and leaf shadows moving inside the
    patch. The section's background is the wall fully lit. Above it, .wall__shade darkens everything except the six
-   window panes, and .wall__sun holds what happens inside the panes: three leaf silhouettes (tools/make_shadows.py)
-   and a cloud that dims the sun now and then. Both are the same oversized square (220vmax, centred on --fx/--fy,
+   window panes, and .wall__sun holds what happens inside the panes: the shadow of a fig branch in two layers (a soft
+   far one and a crisp near one, made in Figma) and a cloud that dims the sun now and then. Both are the same oversized square (220vmax, centred on --fx/--fy,
    so the window is 44 x 60vmax) wearing the same window mask, one inside out, and both take the same slant.
    home.js sets the --sun-* values from the visitor's clock: the patch leans one way in the morning, stands
    upright at midday and leans the other way by evening, warming as it goes. The values here are mid-afternoon.
-   Leaves are blurred once and then only rotated, so the browser animates them on the compositor.
+   Each fig layer hangs from its top right corner and only rotates a degree or so, at its own pace, so the two
+   drift against each other and the browser animates them on the compositor.
    Headlines sit under these layers, so they read as painted on the wall with the light passing over them. */
 :root {
   --wall-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .11 0 0 0 0 .11 0 0 0 0 .12 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
   --mask-in: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2200 2200' preserveAspectRatio='none'%3E%3Cfilter id='b' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeGaussianBlur stdDeviation='5'/%3E%3C/filter%3E%3Cg filter='url%28%23b%29'%3E%3Crect x='880' y='800' width='212' height='190'/%3E%3Crect x='880' y='1005' width='212' height='190'/%3E%3Crect x='880' y='1210' width='212' height='190'/%3E%3Crect x='1108' y='800' width='212' height='190'/%3E%3Crect x='1108' y='1005' width='212' height='190'/%3E%3Crect x='1108' y='1210' width='212' height='190'/%3E%3C/g%3E%3C/svg%3E");
   --mask-out: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2200 2200' preserveAspectRatio='none'%3E%3Cfilter id='b' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeGaussianBlur stdDeviation='5'/%3E%3C/filter%3E%3Cpath filter='url%28%23b%29' fill-rule='evenodd' d='M-400 -400h3000v3000h-3000zM880 800h212v190h-212zM880 1005h212v190h-212zM880 1210h212v190h-212zM1108 800h212v190h-212zM1108 1005h212v190h-212zM1108 1210h212v190h-212z'/%3E%3C/svg%3E");
-  --sun-lit: #fefbf4; --sun-skew: 9deg; --sun-shift: -3vmax; --sun-len: 1.08; --sun-shade: .115; --sun-leaf: 1; --sun-dim: 0;
+  --sun-lit: #fefbf4; --sun-skew: 9deg; --sun-shift: -3vmax; --sun-len: 1.08; --sun-shade: .19; --sun-leaf: 1; --sun-dim: 0;
   --tile-1: #dddcd8; --tile-2: #d6d9db; --tile-3: #e6e5e1; --tile-4: #dfddd7; --tile-5: #d9dad6; --tile-6: #e9e9e6;
 }
 .wall { --fx: 70%; --fy: 46%; position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
@@ -291,16 +297,15 @@ body.mega-open .nav { background: var(--color-bg) !important; color: var(--ink) 
 .wall__shade { background: rgb(36 40 50 / var(--sun-shade)); -webkit-mask-image: var(--mask-out); mask-image: var(--mask-out); }
 .wall__cloud { position: absolute; inset: 30%; background: rgb(36 40 50 / var(--sun-shade)); opacity: var(--sun-dim); animation: wall-cloud 53s ease-in-out infinite; }
 .wall__leaves { position: absolute; inset: 0; opacity: var(--sun-leaf); animation: wall-clear 53s ease-in-out infinite, wall-in 2.4s var(--ease-out) backwards; }
-.wall__leaf {
-  position: absolute; left: var(--x); top: var(--y); width: var(--w); translate: 0 -50%; rotate: var(--r); transform-origin: 0 50%;
-  opacity: var(--o); animation: wall-sway var(--d) ease-in-out infinite alternate;
+.wall__fig {
+  position: absolute; left: var(--x); top: var(--y); width: var(--w); transform-origin: 100% 0; opacity: var(--o);
+  animation: wall-sway var(--d) ease-in-out infinite alternate;
 }
-.wall__leaf img { width: 100%; height: auto; filter: blur(var(--b)); transform-origin: 0 50%; animation: wall-flutter calc(var(--d) * .41) ease-in-out infinite alternate; }
-.wall__leaf--1 { --x: 62.5%; --y: 45%; --w: 25%; --r: 187deg; --s: 2.1deg; --d: 7s; --b: .22vmax; --o: .34; }
-.wall__leaf--2 { --x: 38%; --y: 37.5%; --w: 22%; --r: 27deg; --s: 1.7deg; --d: 9s; --b: .55vmax; --o: .24; }
-.wall__leaf--3 { --x: 61%; --y: 63%; --w: 31%; --r: 214deg; --s: 1.3deg; --d: 13s; --b: 1.1vmax; --o: .16; }
-@keyframes wall-sway { from { rotate: calc(var(--r) - var(--s)); } to { rotate: calc(var(--r) + var(--s)); } }
-@keyframes wall-flutter { from { transform: skewY(-1.3deg) scaleX(.985); } to { transform: skewY(1.3deg) scaleX(1.015); } }
+.wall__fig img { width: 100%; height: auto; transform-origin: 100% 0; animation: wall-flutter calc(var(--d) * .43) ease-in-out infinite alternate; }
+.wall__fig--far { --x: 25.5%; --y: 33.5%; --w: 37%; --s: .7deg; --d: 15s; --o: .3; }
+.wall__fig--near { --x: 31.5%; --y: 35%; --w: 31%; --s: 1.25deg; --d: 9s; --o: .36; }
+@keyframes wall-sway { from { rotate: calc(var(--s) * -1); } to { rotate: var(--s); } }
+@keyframes wall-flutter { from { transform: skewX(-.7deg) scale(.992); } to { transform: skewX(.7deg) scale(1.008); } }
 @keyframes wall-cloud { 0%, 52%, 90%, 100% { opacity: var(--sun-dim); } 66%, 76% { opacity: .82; } }
 @keyframes wall-clear { 0%, 52%, 90%, 100% { opacity: var(--sun-leaf); } 66%, 76% { opacity: calc(var(--sun-leaf) * .22); } }
 @keyframes wall-in { from { opacity: 0; } }
@@ -393,7 +398,7 @@ body.mega-open .nav { background: var(--color-bg) !important; color: var(--ink) 
   background: #fdfdfb; color: var(--ink); border-radius: 3px; box-shadow: 0 1px 0 rgb(28 29 31 / .05), 10px 16px 30px -8px rgb(28 29 31 / .2);
 }
 .label__stitch { position: absolute; left: 22px; right: 22px; top: 12px; border-top: 1.5px dashed rgb(28 29 31 / .38); }
-.label__mark { width: 62%; }
+.label__seal { width: 58%; height: auto; margin: 4px auto 0; }
 .label__rows { display: grid; gap: 9px; padding-top: 16px; border-top: 1px solid var(--ink); font-size: var(--fs-sm); line-height: 1.35; }
 .label__rows div { display: grid; grid-template-columns: 4.6em 1fr; gap: 10px; }
 .label__rows dt { color: var(--color-text-muted); }
@@ -770,7 +775,7 @@ body.has-sticky-atc { padding-bottom: calc(72px + env(safe-area-inset-bottom)); 
 }
 .giftcard[data-method="post"] .giftcard__face { background: var(--pine); }
 .giftcard__top { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-right: clamp(24px, 4vw, 40px); }
-.giftcard__mark { width: clamp(100px, 16vw, 160px); }
+.giftcard__mark { width: clamp(120px, 19vw, 190px); }
 .giftcard__kind, .giftcard__foot { font-size: clamp(10px, 1vw, 12px); color: var(--color-on-dark-muted); }
 .giftcard__amount { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.04em; font-size: clamp(48px, 8vw, 104px); line-height: 1; font-variant-numeric: tabular-nums; }
 .giftcard__foot { display: flex; justify-content: space-between; gap: 16px; padding-right: clamp(24px, 4vw, 40px); }

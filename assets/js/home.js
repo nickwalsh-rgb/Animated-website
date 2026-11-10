@@ -10,16 +10,16 @@
   /* ---------- The light follows the clock ---------- */
   // hour, slant (deg), shift (vmax), length, lit plaster (rgb), shade, leaf strength, dimness
   const DAY = [
-    [0, -30, 9, 1.3, [236, 238, 241], 0.05, 0.25, 0.8],
-    [5.5, -30, 9, 1.3, [239, 240, 242], 0.06, 0.3, 0.7],
-    [7, -28, 8, 1.28, [253, 250, 243], 0.1, 0.8, 0],
-    [10, -17, 4, 1.13, [253, 253, 250], 0.11, 1, 0],
-    [13, -3, 0, 1.02, [254, 254, 252], 0.12, 1.05, 0],
-    [16, 12, -4, 1.1, [254, 251, 243], 0.115, 1, 0],
-    [19, 26, -8, 1.26, [252, 244, 230], 0.1, 0.85, 0],
-    [20.5, 30, -9, 1.3, [242, 240, 238], 0.07, 0.4, 0.55],
-    [21.5, 30, -9, 1.3, [236, 238, 241], 0.05, 0.25, 0.8],
-    [24, -30, 9, 1.3, [236, 238, 241], 0.05, 0.25, 0.8],
+    [0, -30, 9, 1.3, [236, 238, 241], 0.081, 0.25, 0.8],
+    [5.5, -30, 9, 1.3, [239, 240, 242], 0.097, 0.3, 0.7],
+    [7, -28, 8, 1.28, [253, 250, 243], 0.162, 0.8, 0],
+    [10, -17, 4, 1.13, [253, 253, 250], 0.178, 1, 0],
+    [13, -3, 0, 1.02, [254, 254, 252], 0.194, 1.05, 0],
+    [16, 12, -4, 1.1, [254, 251, 243], 0.186, 1, 0],
+    [19, 26, -8, 1.26, [252, 244, 230], 0.162, 0.85, 0],
+    [20.5, 30, -9, 1.3, [242, 240, 238], 0.113, 0.4, 0.55],
+    [21.5, 30, -9, 1.3, [236, 238, 241], 0.081, 0.25, 0.8],
+    [24, -30, 9, 1.3, [236, 238, 241], 0.081, 0.25, 0.8],
   ];
   const PHRASES = [[5.5, "Not light yet"], [8, "First light"], [11.5, "Morning light"], [14, "Midday light"], [17.5, "Afternoon light"], [20, "Evening light"], [21.5, "Last light"], [24, "After dark"]];
   const asked = parseFloat(new URLSearchParams(location.search).get("light"));
@@ -42,6 +42,8 @@
     root.setProperty("--sun-shade", mix(a[5], b[5], k).toFixed(3));
     root.setProperty("--sun-leaf", mix(a[6], b[6], k).toFixed(2));
     root.setProperty("--sun-dim", mix(a[7], b[7], k).toFixed(2));
+    // The mark's own shadow leans with the light: left of the leaf in the morning, right of it by evening.
+    root.setProperty("--mark-x", Math.round(mix(a[1], b[1], k) * 5.5));
     if (!dial) return;
     const hh = Math.floor(h), mm = Math.floor((h - hh) * 60);
     $("[data-dial-time]", dial).textContent = `${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`;
