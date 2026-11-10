@@ -195,27 +195,22 @@ def size_groups(products) -> list[tuple[str, list[str]]]:
 SPRITE = (ROOT / "assets" / "sprite.svg").read_text() if (ROOT / "assets" / "sprite.svg").exists() else ""
 
 
-# Brand assets: the wordmark, the EL mark and social icons (src/brand-defs.html), fonts (assets/fonts/), social
-# links and business details (data/store.json). One source of truth for the identity.
+# Brand assets: the wordmark (src/wordmark.json, drawn by wordmark()), social icons (src/brand-defs.html), fonts
+# (assets/fonts/), social links and business details (data/store.json). One source of truth for the identity.
 BRAND_DEFS = (ROOT / "src" / "brand-defs.html").read_text()
+WM = json.loads((ROOT / "src" / "wordmark.json").read_text())
 
 
 def wordmark(cls: str = "", label: str | None = None) -> str:
+    """The logo: THE EASY LIFE in capitals, with EASY leaning back. THE and LIFE are plain paths; EASY sits in its
+    own group so CSS can lean it (and, in the header, let it settle back once as the page loads)."""
     label = store["name"] if label is None else label
     aria = f'role="img" aria-label="{e(label)}"' if label else 'aria-hidden="true" focusable="false"'
-    return f'<svg class="wordmark {cls}" viewBox="0 0 11618 1968" {aria}><use href="#wm"/></svg>'
-
-
-def emblem(cls: str = "") -> str:
-    """The mark: a fig leaf and the shadow it casts. The shadow's offset follows the homepage light (home.js sets
-    --mark-x); everywhere else it sits lower right."""
-    return (f'<svg class="emblem {cls}" viewBox="0 0 1213 1262" aria-hidden="true" focusable="false">'
-            f'<use class="emblem__shadow" href="#leaf" width="1073" height="1146"/><use href="#leaf" width="1073" height="1146"/></svg>')
-
-
-def logo(cls: str = "") -> str:
-    """Primary lockup: the mark beside the wordmark."""
-    return f'<span class="logo {cls}">{emblem()}{wordmark(label="")}</span>'
+    w = WM
+    return (f'<svg class="wordmark {cls}" viewBox="-10 -{w["cap"] + 10} {w["W"] + 20} {w["cap"] + 20}" {aria}>'
+            f'<path d="{w["THE"]["d"]}"/>'
+            f'<g transform="translate({w["EASY"]["x"]} 0)"><path class="wm__easy" d="{w["EASY"]["d"]}"/></g>'
+            f'<path transform="translate({w["LIFE"]["x"]} 0)" d="{w["LIFE"]["d"]}"/></svg>')
 
 
 def art(sil: str, hex_: str, cls: str = "") -> str:
@@ -225,15 +220,13 @@ def art(sil: str, hex_: str, cls: str = "") -> str:
 
 
 def wall(root: str, cls: str = "") -> str:
-    """The sunlit wall: a window's patch of sun on plaster, with leaf shadows moving inside it. One layer puts the
-    rest of the wall in shade, the other holds what happens in the light (the shadow of a fig branch in two
-    layers, a soft far one and a crisp near one, and a passing cloud). CSS shapes, blurs and sways them; home.js turns the light to match
-    the visitor's clock, pauses it off screen and wires the pause button. Decorative."""
-    figs = "".join(
-        f'<span class="wall__fig wall__fig--{name}"><img src="{root}assets/img/shade-fig-{name}.webp" alt="" width="1536" height="1024" decoding="async"></span>'
-        for name in ("far", "near"))
+    """The sunlit wall: tall panels of sun on plaster, falling through a sheer linen curtain. One layer puts the rest
+    of the wall in shade; the other holds what happens in the light (the curtain's soft folds, drifting, and a
+    passing cloud). All CSS, no images. home.js turns the light to match the visitor's clock, pauses it off screen
+    and wires the pause button. Decorative."""
     return (f'<div class="wall {cls}" data-wall aria-hidden="true"><div class="wall__frame wall__shade"></div>'
-            f'<div class="wall__frame wall__sun"><span class="wall__cloud"></span><div class="wall__leaves">{figs}</div></div></div>')
+            f'<div class="wall__frame wall__sun"><span class="wall__cloud"></span>'
+            f'<span class="wall__drape wall__drape--far"></span><span class="wall__drape wall__drape--near"></span></div></div>')
 
 
 CARE = (("Wash cool", "M4 9l3 13h14l3-13M4 9q3.3-3 6.7 0t6.6 0 6.7 0"), ("Do not bleach", "M14 5l11 18H3zM7 12l14 10M21 12L7 22"),
@@ -246,7 +239,7 @@ def care_label() -> str:
             ("Kept", "Season after season"), ("Care", "Wear often. Send it back to mend."))
     dl = "".join(f"<div><dt>{e(a)}</dt><dd>{e(b_)}</dd></div>" for a, b_ in rows)
     syms = "".join(f'<li><svg viewBox="0 0 28 28" role="img" aria-label="{e(n)}"><path d="{d}"/></svg></li>' for n, d in CARE)
-    return (f'<div class="label reveal"><span class="label__stitch" aria-hidden="true"></span><img class="label__seal" src="assets/img/seal.svg" alt="{e(store["name"])}: {e(store["tagline"].lower())}" width="540" height="540" loading="lazy" decoding="async">'
+    return (f'<div class="label reveal"><span class="label__stitch" aria-hidden="true"></span><img class="label__mark" src="assets/img/wordmark-stacked.svg" alt="{e(store["name"])}" width="320" height="300" loading="lazy" decoding="async">'
             f'<dl class="label__rows">{dl}</dl><ul class="label__care">{syms}</ul>'
             f'<p class="label__foot">Mended for life</p></div>')
 
@@ -287,7 +280,7 @@ def head(title: str, desc: str, root: str, canonical: str, jsonld: list | None =
 <meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}">
 <meta property="og:image" content="{e(store["url"])}assets/img/og-image.jpg">
 <link rel="icon" href="{root}assets/img/favicon.svg" type="image/svg+xml">
-<link rel="preload" href="{root}assets/fonts/bricolage-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{root}assets/fonts/tenor-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="{root}assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
 {preload}<link rel="stylesheet" href="{root}assets/fonts/fonts.css">
 <link rel="stylesheet" href="{root}assets/css/tokens.css">
@@ -353,7 +346,7 @@ def header(root: str, active: str | None = None) -> str:
 {announce_bar(root)}
 <header class="nav" data-nav-root>
   <div class="nav__bar">
-    <a class="nav__logo" href="{root}" aria-label="{e(store["name"])}, home">{logo()}</a>
+    <a class="nav__logo" href="{root}" aria-label="{e(store["name"])}, home">{wordmark("wordmark--settle", "")}</a>
     <nav class="nav__primary" aria-label="Main">
       <ul>
         <li><button type="button" class="nav__link nav__link--mega" data-mega aria-expanded="false" aria-controls="mega-shop">Shop {icon("chevron")}</button>
@@ -850,7 +843,7 @@ def gift():
 
     card = f'''<div class="giftcard" data-gift-card data-method="email">
   <div class="giftcard__face">
-    <div class="giftcard__top">{logo("giftcard__mark")}<span class="giftcard__kind" data-gift-kind>E-gift card</span></div>
+    <div class="giftcard__top">{wordmark("giftcard__mark", "")}<span class="giftcard__kind" data-gift-kind>E-gift card</span></div>
     <p class="giftcard__amount" data-gift-amount>{money(g["default"], SYM)}</p>
     <div class="giftcard__foot"><span>For <span data-gift-to>someone good</span></span><span>{e(store["tagline"])}</span></div>
   </div>

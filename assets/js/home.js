@@ -1,5 +1,5 @@
 /* The Easy Life: homepage.
-   The sunlit wall keeps the visitor's time: the patch of sun leans, stretches and warms through the day, and the small
+   The sunlit wall keeps the visitor's time: the light leans, stretches and warms through the day, and the small
    sundial beside the pause button says what hour it is showing. Add ?light=7.5 to the address to see another hour
    (0 to 24). This file also pauses the shadows off screen, swaps the category plate, and fades sections up once as
    they arrive. It also runs the hero lookbook and the featured collection's filter tabs. No scroll-jacking, pinning or loaders. Needs store.js. With reduced motion the shadows hold still. */
@@ -42,8 +42,6 @@
     root.setProperty("--sun-shade", mix(a[5], b[5], k).toFixed(3));
     root.setProperty("--sun-leaf", mix(a[6], b[6], k).toFixed(2));
     root.setProperty("--sun-dim", mix(a[7], b[7], k).toFixed(2));
-    // The mark's own shadow leans with the light: left of the leaf in the morning, right of it by evening.
-    root.setProperty("--mark-x", Math.round(mix(a[1], b[1], k) * 5.5));
     if (!dial) return;
     const hh = Math.floor(h), mm = Math.floor((h - hh) * 60);
     $("[data-dial-time]", dial).textContent = `${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`;

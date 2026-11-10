@@ -2,7 +2,7 @@
 
 The Easy Life is a **permanent collection** of 108 styles (1,852 size × colour
 variants in the sample data). The identity is quiet and neutral: soft greys and off-whites, charcoal ink, one slate
-accent, a relaxed grotesque for display, soft corners, and one idea, **the sunlit wall that keeps your time**. The layout is clean
+accent, a fine flared sans for the wordmark and display, soft corners, and one idea, **the sunlit wall that keeps your time**. The layout is clean
 retail built for range and conversion: announcement bar, mega-menu, search, product rails, plain product cards,
 category tiles and a calm footer.
 
@@ -17,12 +17,10 @@ shoppers; variance 6, motion 5, density 3. Structure and UX rules come from the 
 ## 1. Brand
 
 The identity was designed in Figma (file **The Easy Life: Identity**,
-https://www.figma.com/design/7l0thjO9EW3eoVVXGwTqln) and brought into the site as outlines and images. Brand
-assets live in one place each: the wordmark and the leaf mark as symbols in `src/brand-defs.html` (`logo()`,
-`emblem()` and `wordmark()` in build.py draw them); standalone files in `assets/img/` (`logo.svg`,
-`logo-stacked.svg`, `wordmark.svg`, `mark.svg`, `seal.svg`, `favicon.svg`); the fig shadow layers in
-`assets/img/shade-fig-near.webp` and `shade-fig-far.webp`; fonts in `assets/fonts/`; social links and business
-details in `data/store.json`.
+https://www.figma.com/design/7l0thjO9EW3eoVVXGwTqln, page *03 Logo, reclining*) and brought into the site as
+outlines. Brand assets live in one place each: the wordmark in `src/wordmark.json` (drawn by `wordmark()` in
+build.py); standalone files in `assets/img/` (`wordmark.svg`, `wordmark-stacked.svg`, `favicon.svg`); fonts in
+`assets/fonts/`; social links and business details in `data/store.json`.
 
 | | |
 | --- | --- |
@@ -37,17 +35,15 @@ details in `data/store.json`.
 light follows the visitor's own clock: it leans one way in the morning, stands upright at midday, leans the other
 way and warms by evening, and dims to a cool trace after dark. Everything distinctive hangs off that:
 
-- **The fig.** The plant on the wall is a fig: its leaf was the first thing anyone wore. The shadow is a real fig
-  branch in two layers, a soft far one and a crisp near one, which drift against each other for depth.
-- **The mark.** A fig leaf traced from that same shadow, always drawn with the shadow it casts. On the homepage the
-  mark's shadow leans with the light (`--mark-x`). It is the favicon and app icon, and sits in the seal.
-- **The wordmark.** Newsreader Italic, converted to outlines and altered: the dot has left the "i" and rests on the
-  baseline at the end of the name. That resting dot is also the sun on the homepage sundial.
-- **The seal.** The mark ringed by the name and the tagline, for the sewn-in label, tissue and stickers.
+- **The wordmark.** THE EASY LIFE in widely spaced Tenor Sans capitals. THE and LIFE stand upright; EASY leans
+  back ten degrees. Italics lean forward to look fast; this leans back. There is no symbol. In the header the word
+  starts upright and settles back once as the page loads (`.wordmark--settle`). The app icon is the reclining E.
+- **Light through linen.** The homepage wall is lit through a sheer curtain: tall panels of sun with soft folds
+  drifting in them. It is about cloth, and it keeps the visitor's time.
 - **Painted lettering.** The hero line and the story are set under the light, so shadows pass over the letters as
   if they were painted on the wall.
-- **The sewn-in label.** The collection's promises are set as a garment label (made of, cut, kept, care) that hangs
-  on the wall in the story section.
+- **The sewn-in label.** The collection's promises are set as a garment label (made of, cut, kept, care) under the
+  stacked wordmark, hanging on the wall in the story section.
 - **Style numbers.** Every card carries its style number (No. 042), the way a permanent collection would be kept.
 
 ### Colour
@@ -71,13 +67,12 @@ Primary actions are solid ink, as shoppers expect from retail; slate is kept for
 
 | Role | Face | Where |
 | --- | --- | --- |
-| Logo | **Newsreader Italic**, as outlines | The wordmark only |
-| Display | **Bricolage Grotesque** 300 to 400 (variable, with optical sizing), sentence case, tight tracking | The hero line, the story, page, section, tile and product titles |
+| Logo + display | **Tenor Sans** 400, a fine sans with flared strokes | The wordmark (as outlines, in capitals), the hero line, the story, page, section and product titles |
 | UI + body | **Archivo** 400 / 500 | Navigation, buttons, cards, prices, forms, body copy |
 
 Sentence case throughout (no tracked uppercase): quieter, faster to read in a dense grid. Type scale is in tokens
 (`--fs-xs` 12 to `--fs-hero`, fluid). Self-hosted with size-matched fallbacks, so text barely shifts when fonts load.
-The wordmark is outlines, so it never waits for a font.
+The wordmark is outlines, so it never waits for a font. Display type is set in sentence case; only the wordmark is in capitals.
 
 ### Shape
 
@@ -195,20 +190,19 @@ is a solid ink bar. Everywhere else it is a solid light bar. `store.js` checks w
 of the header as you scroll (measured where the header really is, below the announcement bar at the top). Opening
 the mega-menu always brings the solid light bar back.
 
-**The sunlit wall** (`wall()` in build.py, `.wall` in store.css, `home.js`). The section's
-background is the wall fully lit, with a fine grain. Two layers sit above it, each the same oversized square wearing
-the same six-pane window mask: one puts everything outside the panes in shade, the other holds what happens inside
-them (the fig shadow in two layers and a cloud that dims the sun for a few seconds each minute). Each fig layer
-hangs from its top right corner and only rotates a degree or so at its own pace, so the browser animates it on the
-compositor: no video, no canvas, about 570 KB of images. The shade outside the panes and the leaf shadows are kept
-at the same density, as they would be on a real wall. Headlines sit under these layers.
+**The sunlit wall** (`wall()` in build.py, `.wall` in store.css, `home.js`). The section's background is the wall
+fully lit, with a fine grain. Two layers sit above it, each the same oversized square wearing the same mask of two
+tall panels: one puts everything outside the panels in shade, the other holds what happens inside them (the
+curtain's soft vertical folds in two layers that drift at different speeds, a gentle fall-off toward the floor, and
+a cloud that dims the sun for a few seconds each minute). It is all CSS: no images, no video, no canvas, and only
+transforms and opacity animate. Headlines sit under these layers.
 
 `home.js` reads the visitor's clock once a minute and sets `--sun-skew`, `--sun-shift`, `--sun-len`, `--sun-lit`,
 `--sun-shade`, `--sun-leaf` and `--sun-dim` from the `DAY` table (one row per key hour). Add `?light=7.5` to the
 homepage address to see any hour from 0 to 24. Without JavaScript the wall shows mid-afternoon. The shadows pause
 off screen, have a Pause/Play button, and hold still with reduced motion. To restage the scene: `--fx`/`--fy` on
-`.wall` move where the light lands; the values on `.wall__fig--far` and `--near` set each layer's position, size,
-sway, speed and strength.
+`.wall` move where the light lands; the values on `.wall__drape--far` and `--near` set each layer's fold width,
+strength, speed and drift.
 
 **Homepage, top to bottom.**
 

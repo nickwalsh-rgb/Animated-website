@@ -1,6 +1,6 @@
 /* The Easy Life: design tokens.
    Brand layer = a quiet neutral palette (soft greys and off-whites, charcoal ink, one slate accent) and two faces:
-   Bricolage Grotesque for display, Archivo for everything else. Layout language = clean retail with soft corners.
+   Tenor Sans for display (the face of the wordmark), Archivo for everything else. Layout language = clean retail with soft corners.
    Three layers. Components only read the semantic and component layers, never raw hex.
    1. Primitive  : the brand palette and scales
    2. Semantic   : what a value is FOR (text, surface, action, signal)
@@ -26,7 +26,7 @@
   --wall: #efefec;
   --wall-shade: #e4e4e0;
 
-  --font-display: "Bricolage Grotesque", "Bricolage Fallback", sans-serif;
+  --font-display: "Tenor Sans", "Tenor Fallback", sans-serif;
   --font-body: "Archivo", "Archivo Fallback", system-ui, sans-serif;
 
   --fs-xs: 0.75rem;                      /* 12: badges, legal */

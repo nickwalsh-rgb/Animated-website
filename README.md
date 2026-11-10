@@ -26,8 +26,8 @@ makes web-sized photos, commits the result and publishes it. You can also run it
 | About, Size guide, Delivery & returns, Contact, Privacy, Terms | `src/pages/*.html` | `python3 build.py` |
 | Markup of any component | `components.py`, `build.py` | `python3 build.py` |
 | Tokens, styles, behaviour | `assets/css/tokens.css`, `assets/css/store.css`, `assets/js/*.js` | refresh |
-| Wordmark, leaf mark, social icons | `src/brand-defs.html` (designed in Figma, see the design doc) | `python3 build.py` |
-| Fig shadows on the homepage wall | `assets/img/shade-fig-*.webp` (images), `.wall` in `assets/css/store.css` (position, sway) | refresh |
+| Wordmark | `src/wordmark.json` (designed in Figma, see the design doc) | `python3 build.py` |
+| Light on the homepage wall | `.wall` in `assets/css/store.css` (panels, curtain folds, drift) | refresh |
 
 ```bash
 python3 build.py              # rebuild everything
@@ -88,12 +88,13 @@ components.py            one function per UI component (card, rail, drawer, sele
 data/store.json          site settings, business details, gift cards, announcements
 data/catalog.json        the styles (sample data)
 src/pages/               About, Size guide, Delivery & returns, Contact, Privacy, Terms (content)
-src/brand-defs.html      wordmark, leaf mark, social icons (SVG symbols)
+src/wordmark.json        the wordmark as outlines
+src/brand-defs.html      social icons (SVG symbols)
 assets/css/              tokens.css (design tokens), store.css (components)
 assets/js/               store.js (shared), plp.js, pdp.js, home.js, gift.js
 assets/sprite.svg        icons + placeholder garment art (tools/make_sprite.py)
 assets/products/         product photos (one folder per style)
-assets/fonts, img        self-hosted fonts, brand marks, fig shadow layers for the wall
+assets/fonts, img        self-hosted fonts, brand marks
 tools/                   sample catalogue generator, sprite generator
 docs/DESIGN-SYSTEM.md    brand, tokens, components, UX rules
 .github/workflows/       automatic rebuild on GitHub
