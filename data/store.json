@@ -15,38 +15,24 @@
   "announcements": [
     [
       "Free UK delivery on orders over £150",
-      "",
-      ""
+      "Delivery details",
+      "returns/",
+      "Orders are dispatched within 1 to 2 working days, tracked all the way. UK delivery is free over £150 and £5 below it."
     ],
     [
-      "Free 30-day returns, collected from your door",
-      "Details",
-      "returns/"
-    ],
-    [
-      "Gift cards, sent by email or post",
-      "Shop gift cards",
-      "gift-cards/"
-    ]
-  ],
-  "_announcements_note": "Rotating bar above the header: [message, link text, link]. Links are relative to the site root.",
-  "promises": [
-    [
-      "truck",
-      "Free UK delivery",
-      "On orders over £150"
-    ],
-    [
-      "return",
       "Free 30-day returns",
-      "Collected from your door"
+      "How returns work",
+      "returns/",
+      "Not sure of the size? Send it back within 30 days, unworn, and we collect it from your door. Exchanges are free too."
     ],
     [
-      "leaf",
-      "Made to last",
-      "Natural fibres, repairs for life"
+      "Gift cards, by email or post",
+      "Shop gift cards",
+      "gift-cards/",
+      "Choose an amount and send it straight to their inbox, or have it printed on heavy card and posted in a woven envelope."
     ]
   ],
+  "_announcements_note": "Bar above the header. The first message shows in the bar; tapping it opens a panel with all of them: [title, link text, link, detail]. Links are relative to the site root.",
   "categories": [
     {
       "handle": "outerwear",

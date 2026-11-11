@@ -276,7 +276,7 @@
   document.addEventListener("pointerover", prime, { passive: true });
   document.addEventListener("focusin", prime);
 
-  /* ── Nav tone: inverts over dark sections ([data-nav="dark"]) ───────────
+  /* ── Nav tone (optional): inverts over sections marked [data-nav="dark"]. Nothing uses it at present. ──
      Checks which section sits under the middle of the header, measured where the header actually is (it starts
      below the announcement bar, then sticks to the top). Over imagery that asks for it ([data-nav-clear]) the
      header goes see-through with light type; over other dark sections it is a solid ink bar. */
@@ -298,30 +298,14 @@
     tone();
   }
 
-  /* ── Announcement bar: rotates every 6s, pauses on hover/focus or with the pause button ── */
+  /* ── Announcement bar: the button opens a panel with every message; Esc or a click outside closes it ── */
   const bar = $("[data-announce]");
   if (bar) {
-    const items = $$(".announce__item", bar);
-    const pauseBtn = $("[data-announce-pause]", bar);
-    let i = 0, timer = null, userPaused = reduced.matches, hover = false;
-    const show = (n) => {
-      i = (n + items.length) % items.length;
-      items.forEach((it, k) => { it.classList.toggle("is-active", k === i); k === i ? it.removeAttribute("aria-hidden") : it.setAttribute("aria-hidden", "true"); });
-      $$("a", bar).forEach((a) => (a.tabIndex = a.closest(".is-active") ? 0 : -1));
-    };
-    const run = () => { clearInterval(timer); if (!userPaused && !hover && items.length > 1) timer = setInterval(() => show(i + 1), 6000); };
-    const syncPause = () => {
-      pauseBtn.setAttribute("aria-pressed", String(userPaused));
-      $(".sr-only", pauseBtn).textContent = userPaused ? "Play messages" : "Pause messages";
-      $("use", pauseBtn).setAttribute("href", userPaused ? "#i-play" : "#i-pause");
-    };
-    $$("[data-announce-step]", bar).forEach((b) => b.addEventListener("click", () => { show(i + Number(b.dataset.announceStep)); run(); }));
-    pauseBtn.addEventListener("click", () => { userPaused = !userPaused; syncPause(); run(); });
-    bar.addEventListener("pointerenter", () => { hover = true; run(); });
-    bar.addEventListener("pointerleave", () => { hover = false; run(); });
-    bar.addEventListener("focusin", () => { hover = true; run(); });
-    bar.addEventListener("focusout", () => { hover = false; run(); });
-    show(0); syncPause(); run();
+    const btn = $("[data-announce-toggle]", bar), panel = $("[data-announce-panel]", bar);
+    const set = (open) => { btn.setAttribute("aria-expanded", String(open)); panel.hidden = !open; };
+    btn.addEventListener("click", () => set(panel.hidden));
+    document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && !panel.hidden) { set(false); btn.focus(); } });
+    document.addEventListener("click", (ev) => { if (!panel.hidden && !bar.contains(ev.target)) set(false); });
   }
 
   /* ── Mega-menu (desktop): click or hover "Shop"; Esc, click outside or leaving closes it ── */
@@ -432,12 +416,12 @@
     signup.addEventListener("submit", async (ev) => {
       ev.preventDefault();
       if (!valid(input.value)) { state("error", "Enter an email address like name@example.com"); input.focus(); return; }
-      btn.setAttribute("aria-disabled", "true"); btn.textContent = "Subscribing";
+      btn.setAttribute("aria-disabled", "true"); btn.textContent = "Signing up";
       try {
         await (window.A88S.subscribe ? window.A88S.subscribe(input.value.trim()) : new Promise((r) => setTimeout(r, 400)));
         state("done", "You're on the list. We'll write when something new lands."); signup.reset();
       } catch { state("error", "Something went wrong on our side. Please try again in a moment."); }
-      btn.removeAttribute("aria-disabled"); btn.textContent = "Subscribe";
+      btn.removeAttribute("aria-disabled"); btn.textContent = "Sign me up";
     });
   }
 

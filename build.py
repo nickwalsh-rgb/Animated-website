@@ -46,6 +46,7 @@ def fail(msg: str):
 
 store = json.loads((DATA / "store.json").read_text())
 catalog = json.loads((DATA / "catalog.json").read_text())["products"]
+HOME = json.loads((DATA / "home.json").read_text())
 SYM = store["currency_symbol"]
 LOW = store["low_stock_threshold"]
 CATS = store["categories"]
@@ -239,19 +240,25 @@ def head(title: str, desc: str, root: str, canonical: str, jsonld: list | None =
 </head>'''
 
 
+def pic(root: str, name: str, alt: str, w: int, h: int, *, sizes: str = "100vw", eager: bool = False, cls: str = "") -> str:
+    """Campaign, tile and journal imagery from assets/img/site/: WebP at two widths with a JPEG fallback."""
+    base = f"{root}assets/img/site/{name}"
+    loading = 'fetchpriority="high"' if eager else 'loading="lazy" decoding="async"'
+    return (f'<picture class="{cls}"><source type="image/webp" srcset="{base}-640.webp 640w, {base}.webp {w}w" sizes="{e(sizes)}">'
+            f'<img src="{base}.jpg" alt="{e(alt)}" width="{w}" height="{h}" {loading}></picture>')
+
+
 def announce_bar(root: str) -> str:
-    """Rotating messages above the header. Pauses on hover/focus, has a pause button (WCAG 2.2.2), and stays on the
-    first message with reduced motion."""
-    items = []
-    for i, (msg, text, href) in enumerate(store["announcements"]):
-        link = f' <a href="{root}{e(href)}">{e(text)}</a>' if href else ""
-        state = ' is-active"' if i == 0 else '" aria-hidden="true"'
-        items.append(f'<li class="announce__item{state}>{e(msg)}{link}</li>')
-    return f'''<div class="announce" data-announce role="region" aria-label="Offers and services" aria-roledescription="carousel">
-  <button type="button" class="announce__btn announce__btn--prev" data-announce-step="-1" aria-label="Previous message">{icon("chevron")}</button>
-  <ul class="announce__list" aria-live="off">{"".join(items)}</ul>
-  <button type="button" class="announce__btn announce__btn--next" data-announce-step="1" aria-label="Next message">{icon("chevron")}</button>
-  <button type="button" class="announce__pause" data-announce-pause aria-pressed="false"><span class="sr-only">Pause messages</span>{icon("pause")}</button>
+    """Ink bar above the header. Shows the first message; the button opens a panel with every message in full."""
+    first = store["announcements"][0][0]
+    items = "".join(
+        f'<li><h2 class="announce__title">{e(msg)}</h2><p>{e(detail)}</p>'
+        f'<a class="btn btn--on-dark btn--sm" href="{root}{e(href)}">{e(text)}</a></li>'
+        for msg, text, href, detail in store["announcements"])
+    return f'''<div class="announce" data-announce>
+  <button type="button" class="announce__toggle" data-announce-toggle aria-expanded="false" aria-controls="announce-panel">
+    <span>{e(first)}</span>{icon("chevron")}</button>
+  <div class="announce__panel" id="announce-panel" data-announce-panel hidden><ul>{items}</ul></div>
 </div>'''
 
 
@@ -267,9 +274,9 @@ def mega(root: str) -> str:
     sizes = "".join(f'<li><a class="size-link" href="{root}shop/?size={s}" aria-label="Shop size {s}">{s}</a></li>' for s in alpha)
     waists = "".join(f'<li><a class="size-link" href="{root}shop/trousers/?size={s}" aria-label="Shop trousers, {s} inch waist">{s}</a></li>' for s in ("28", "30", "32", "34", "36"))
     tiles = "".join(
-        f'<li><a class="mega__tile" href="{root}{href}"><span class="mega__img"><img src="{root}assets/img/{img}" alt="" width="720" height="900" loading="lazy" decoding="async"></span>'
+        f'<li><a class="mega__tile" href="{root}{href}"><span class="mega__img"><img src="{root}assets/img/{img}" alt="" width="1024" height="1024" loading="lazy" decoding="async"></span>'
         f'<span class="mega__tile-title">{e(t)}</span><span class="mega__tile-cta">Shop now</span></a></li>'
-        for img, t, href in (("menu-2.jpg", "Outerwear for weather", "shop/outerwear/"), ("menu-4.jpg", "Knitwear, spun slow", "shop/knitwear/")))
+        for img, t, href in (("site/tile-outerwear.jpg", "Outerwear for weather", "shop/outerwear/"), ("site/tile-knitwear.jpg", "Knitwear, spun slow", "shop/knitwear/")))
     return f'''<div class="mega" id="mega-shop" data-mega-panel hidden>
   <div class="mega__inner">
     <div class="mega__col"><p class="mega__head">Featured</p><ul class="mega__list">
@@ -289,7 +296,7 @@ def header(root: str, active: str | None = None) -> str:
     def cur(key):
         return ' aria-current="page"' if key == active else ""
     links = [("new", "shop/?sort=new", "New in"), ("outerwear", "shop/outerwear/", "Outerwear"),
-             ("knitwear", "shop/knitwear/", "Knitwear"), ("gift", "gift-cards/", "Gift cards")]
+             ("knitwear", "shop/knitwear/", "Knitwear"), ("journal", "journal/", "Journal"), ("gift", "gift-cards/", "Gift cards")]
     lis = "".join(f'<li><a class="nav__link" href="{root}{u}"{cur(k)}>{t}</a></li>' for k, u, t in links)
     return f'''<a class="skip" href="#main">Skip to content</a>
 {announce_bar(root)}
@@ -313,47 +320,55 @@ def header(root: str, active: str | None = None) -> str:
 </header>'''
 
 
-def promises() -> str:
-    items = "".join(f'<li>{icon(i)}<p><strong>{e(a)}</strong><span>{e(b)}</span></p></li>' for i, a, b in store["promises"])
-    return f'<section class="promises" aria-label="Our promises"><ul>{items}</ul></section>'
+def commitments(root: str) -> str:
+    """The ink band that opens the footer on every page: an icon, a statement and a link, five times."""
+    items = "".join(
+        f'<li class="pledge">{icon(i)}<p class="pledge__text">{e(text)}</p>'
+        f'<a class="pledge__link" href="{root}{e(href)}">{e(link)}</a></li>'
+        for i, text, link, href in HOME["commitments"])
+    return f'<section class="pledges" aria-label="What we stand by"><ul>{items}</ul></section>'
 
 
 def signup() -> str:
-    return '''<section class="signup" aria-labelledby="signup-title">
-  <div class="signup__inner">
-    <div><h2 class="section-title" id="signup-title">First look at new arrivals</h2>
-    <p class="signup__lead">One email when something new lands. Nothing else.</p></div>
+    return '''<section class="footer__block signup" aria-labelledby="signup-title">
+    <h2 class="footer__head" id="signup-title">Newsletter signup</h2>
+    <p class="signup__lead">One email when something new lands, plus care guides and stories from the journal.</p>
     <form class="signup__form" data-signup novalidate>
-      <div class="field signup__field">
-        <label class="field__label" for="signup-email">Email address</label>
-        <div class="signup__row"><input type="email" id="signup-email" name="email" autocomplete="email" inputmode="email" required aria-describedby="signup-msg">
-        <button type="submit" class="btn btn--primary">Subscribe</button></div>
-        <p class="signup__msg" id="signup-msg" data-signup-msg aria-live="polite">You can unsubscribe at any time.</p>
-      </div>
+      <label class="signup__label" for="signup-email">Email *</label>
+      <input type="email" id="signup-email" name="email" autocomplete="email" inputmode="email" required aria-describedby="signup-msg">
+      <p class="signup__msg" id="signup-msg" data-signup-msg aria-live="polite">By signing up you agree to receive emails from Archive 88. You can unsubscribe at any time.</p>
+      <button type="submit" class="btn btn--light">Sign me up</button>
     </form>
-  </div>
-</section>'''
+  </section>'''
 
 
 def footer(root: str) -> str:
-    cats = "".join(f'<li><a href="{root}shop/{c["handle"]}/">{e(c["title"])}</a></li>' for c in CATS)
-    col = lambda title, body: f'<div class="footer__col"><h2 class="footer__head">{title}</h2><ul>{body}</ul></div>'
-    return f'''{promises()}
-{signup()}
-<footer class="footer" data-nav="dark">
-  <div class="footer__cols">
-    {col("Shop", f'<li><a href="{root}shop/?sort=new">New in</a></li><li><a href="{root}shop/">Shop all</a></li>{cats}<li><a href="{root}gift-cards/">Gift cards</a></li>')}
-    {col("Help", f'<li><a href="{root}size-guide/">Size guide</a></li><li><a href="{root}returns/">Delivery &amp; returns</a></li><li><a href="{root}contact/">Contact</a></li>')}
-    {col("Archive 88", f'<li><a href="{root}about/">About</a></li>')}
-    {col("Follow", social_links())}
+    help_links = [("contact/", "Contact"), ("returns/", "Delivery &amp; returns"), ("faqs/", "FAQs"), ("repairs/", "Repairs"),
+                  ("size-guide/", "Size guide"), ("product-care/", "Product care"), ("gift-cards/", "Gift cards"),
+                  ("accessibility/", "Accessibility")]
+    chips = "".join(f'<li><a class="btn btn--on-dark btn--sm" href="{root}{u}">{t}</a></li>' for u, t in help_links)
+    info = ([("about/", "About Archive 88"), ("journal/", "Journal"), ("journal/what-permanent-means/", "The permanent collection"),
+             ("shop/?sort=new", "New in"), ("shop/", "Shop all")]
+            + [(f'shop/{c["handle"]}/', e(c["title"])) for c in CATS]
+            + [("privacy/", "Privacy notice"), ("terms/", "Terms of sale")])
+    info_lis = "".join(f'<li><a href="{root}{u}">{t}</a></li>' for u, t in info) + social_links()
+    return f'''<footer class="footer">
+  {commitments(root)}
+  <div class="footer__main">
+  {signup()}
+  <section class="footer__block" aria-labelledby="help-title">
+    <h2 class="footer__head" id="help-title">Get help</h2>
+    <ul class="footer__chips">{chips}</ul>
+  </section>
+  <section class="footer__block" aria-labelledby="info-title">
+    <h2 class="footer__head" id="info-title">Information</h2>
+    <ul class="footer__links">{info_lis}</ul>
+  </section>
   </div>
   <div class="footer__legal">
-    <p>United Kingdom · £ GBP</p>
-    <ul><li><a href="{root}privacy/">Privacy</a></li><li><a href="{root}terms/">Terms of sale</a></li></ul>
     <p>© {date.today().year} {e(store["name"])}. Sample catalogue: names, prices and stock are placeholders.</p>
-  </div>
-  <div class="footer__base">
-    <a class="footer__mono" href="{root}" aria-label="{e(store["name"])}, home"><svg viewBox="0 0 146 68" aria-hidden="true" focusable="false"><use href="#mono"/></svg></a>
+    <p class="footer__region">United Kingdom · £ GBP
+      <a class="footer__mono" href="{root}" aria-label="{e(store["name"])}, home"><svg viewBox="0 0 146 68" aria-hidden="true" focusable="false"><use href="#mono"/></svg></a></p>
   </div>
 </footer>'''
 
@@ -385,7 +400,7 @@ def menu_drawer(root: str) -> str:
     """Phones and tablets: the whole navigation in one panel from the left."""
     n = counts()
     rows = [("shop/?sort=new", "New in", None), ("shop/", "Shop all", len(catalog))] + \
-           [(f'shop/{c["handle"]}/', c["title"], n[c["handle"]]) for c in CATS] + [("gift-cards/", "Gift cards", None)]
+           [(f'shop/{c["handle"]}/', c["title"], n[c["handle"]]) for c in CATS] + [("gift-cards/", "Gift cards", None), ("journal/", "Journal", None)]
     items = "".join(
         f'<li><a href="{root}{u}"><span>{e(t)}</span>{count_span(k)}{icon("chevron")}</a></li>'
         for u, t, k in rows)
@@ -393,6 +408,7 @@ def menu_drawer(root: str) -> str:
             f'<ul class="menu__sizes" aria-label="Shop by size">'
             + "".join(f'<li><a class="size-link" href="{root}shop/?size={s}" aria-label="Shop size {s}">{s}</a></li>' for s in ("XS", "S", "M", "L", "XL", "XXL"))
             + f'</ul><ul class="menu__links"><li><a href="{root}size-guide/">Size guide</a></li><li><a href="{root}returns/">Delivery &amp; returns</a></li>'
+            f'<li><a href="{root}repairs/">Repairs</a></li><li><a href="{root}product-care/">Product care</a></li><li><a href="{root}faqs/">FAQs</a></li>'
             f'<li><a href="{root}contact/">Contact</a></li><li><a href="{root}about/">About</a></li></ul>'
             f'<ul class="menu__social">{social_links()}</ul>')
     return C.drawer("menu", "Menu", body, side="left")
@@ -612,27 +628,47 @@ def mark_bestsellers():
         p["best"] = i < 12
 
 
-def editorial(img: str, title: str, cta: str, href: str, *, w: int = 720, h: int = 900, cls: str = "") -> str:
-    return (f'<a class="split__panel reveal {cls}" href="{href}"><img src="assets/img/{img}" alt="" width="{w}" height="{h}" loading="lazy" decoding="async">'
-            f'<span class="split__text"><span class="split__title">{e(title)}</span><span class="link-arrow">{e(cta)} {icon("arrow")}</span></span></a>')
+def tile_rail(rid: str, label: str, cards: str, cls: str = "") -> str:
+    """A sideways-scrolling row of tiles with round previous/next buttons over the images (native scroll-snap; the
+    buttons are wired by store.js and hide themselves at either end)."""
+    return f'''<section class="tiles {cls}" aria-label="{e(label)}" data-rail>
+  <div class="tiles__track" data-rail-track tabindex="0" role="region" aria-label="{e(label)}, scroll sideways">{cards}</div>
+  <button type="button" class="tiles__nav tiles__nav--prev" data-rail-prev aria-label="Previous" disabled>{icon("chevron")}</button>
+  <button type="button" class="tiles__nav tiles__nav--next" data-rail-next aria-label="Next">{icon("chevron")}</button>
+</section>'''
+
+
+TILE_SIZES = "(min-width: 1100px) 23vw, (min-width: 720px) 30vw, 82vw"
+
+
+def story_card(s: dict, root: str) -> str:
+    return (f'<a class="story" href="{root}journal/{s["slug"]}/">'
+            f'{pic(root, s["image"], "", s["w"], s["h"], sizes=TILE_SIZES, cls="story__media")}'
+            f'<span class="story__body"><span class="story__title">{e(s["title"])}</span>'
+            f'<span class="story__kicker">{e(s["kicker"])}</span>'
+            f'<span class="story__time">{s["minutes"]} min read</span></span></a>')
 
 
 def home():
     root = ""
     prepare(root)
-    n = counts()
-    order = ranked()
-    newest = [p for p in order if p.get("new")][:12]
-    best = [p for p in order if p.get("best")][:12]
-    tiles = []
-    for c in CATS:
-        lead = next(p for p in order if p["category"] == c["handle"])
-        v = lead["media"][lead["colours"][0]["handle"]][0]
-        tiles.append(f'<li class="reveal"><a class="cat-tile" href="shop/{c["handle"]}/">{C.frame(C.media(v, ""), "cat-tile__media")}'
-                     f'<span class="cat-tile__text"><span class="cat-tile__title">{e(c["title"])}</span>'
-                     f'<span class="cat-tile__count">{n[c["handle"]]} styles</span></span></a></li>')
-    th = money(store["free_shipping_threshold"], SYM)
-    main = f'''<section class="hero" data-nav="dark" data-nav-clear aria-labelledby="hero-title">
+    hero, feat = HOME["hero"], HOME["feature"]
+    hero_links = "".join(f'<li><a class="btn btn--on-dark btn--sm" href="{e(u)}">{e(t)}</a></li>' for t, u in hero["links"])
+    quick = "".join(f'<li><a href="{e(u)}">{e(t)}</a></li>' for t, u in HOME["quick"])
+    shop_tiles = "".join(
+        f'<a class="tile" href="{e(x["href"])}">{pic(root, x["image"], x["alt"], 1024, 1024, sizes=TILE_SIZES, eager=i == 0, cls="tile__media")}'
+        f'<span class="tile__body"><span class="tile__title">{e(x["title"])}</span><span class="btn btn--primary btn--xs">Shop</span></span></a>'
+        for i, x in enumerate(HOME["tiles"]))
+    explore_tiles = "".join(
+        f'<article class="tile tile--explore"><a href="{e(x["links"][0][1])}" tabindex="-1" aria-hidden="true">'
+        f'{pic(root, x["image"], "", 1024, 1024, sizes="(min-width: 1000px) 31vw, 82vw", cls="tile__media")}</a>'
+        f'<div class="tile__body"><h3 class="tile__title">{e(x["title"])}</h3><ul class="tile__links">'
+        + "".join(f'<li><a href="{e(u)}">{e(t)}<span class="sr-only">: {e(x["title"])}</span></a></li>' for t, u in x["links"])
+        + '</ul></div></article>'
+        for x in HOME["explore"])
+    feat_links = "".join(f'<li><a class="btn btn--light btn--sm" href="{e(u)}">{e(t)}</a></li>' for t, u in feat["links"])
+    stories = "".join(story_card(s, root) for s in JOURNAL)
+    main = f'''<section class="hero" aria-labelledby="hero-title">
   <div class="hero__film" aria-hidden="true">
     <video class="hero__video" muted loop playsinline preload="metadata" poster="{root}assets/img/forest-poster.jpg">
       <source src="{root}assets/video/forest-portrait.mp4" type="video/mp4" media="(max-width: 720px) and (orientation: portrait)">
@@ -641,44 +677,106 @@ def home():
     <div class="hero__shade"></div>
   </div>
   <div class="hero__content">
-    <p class="hero__eyebrow">Natural fibres, kept in every size</p>
-    <h1 class="hero__title" id="hero-title">{e(store["tagline"].capitalize())}</h1>
-    <ul class="hero__links">
-      <li><a class="link-arrow" href="shop/">Shop all {icon("arrow")}</a></li>
-      <li><a class="link-arrow" href="shop/?sort=new">New in {icon("arrow")}</a></li>
-    </ul>
+    <h1 class="hero__title" id="hero-title">{e(hero["title"])}</h1>
+    <p class="hero__text">{e(hero["text"])}</p>
+    <ul class="hero__links">{hero_links}</ul>
   </div>
-  <button type="button" class="hero__toggle" data-film-toggle aria-pressed="false" hidden>
+  <button type="button" class="round-btn hero__toggle" data-film-toggle aria-pressed="false" hidden>
     {icon("pause")}<span class="sr-only" data-film-label>Pause film</span></button>
 </section>
-{C.rail("new", "New in", "".join(C.product_card(p, root, SYM, eager=i < 2) for i, p in enumerate(newest)), link=("See all", "shop/?sort=new"))}
-<section class="split" data-nav="dark" data-nav-clear aria-label="Featured collections">
-  {editorial("menu-1.jpg", "Built for weather", "Shop outerwear", "shop/outerwear/")}
-  {editorial("menu-3.jpg", "Knitwear, spun slow", "Shop knitwear", "shop/knitwear/")}
-</section>
-{C.rail("best", "Bestsellers", "".join(C.product_card(p, root, SYM) for p in best), link=("Shop all", "shop/"))}
-<section class="cats" aria-labelledby="cats-title">
-  <div class="section-head"><h2 class="section-title" id="cats-title">Shop by category</h2></div>
-  <ul class="cats__grid">{"".join(tiles)}</ul>
-</section>
-<section class="banner" data-nav="dark" data-nav-clear aria-labelledby="banner-title">
-  <img class="banner__img" src="{root}assets/img/forest-poster.jpg" alt="" width="1280" height="720" loading="lazy" decoding="async">
-  <div class="banner__text reveal">
-    <h2 class="banner__title" id="banner-title">Made to be worn often</h2>
-    <p>Wool, cotton, linen and wax, cut in fits that stay in the range season after season. Free repairs for life.</p>
-    <a class="link-arrow" href="{root}about/">About Archive 88 {icon("arrow")}</a>
+<nav class="quick" aria-label="Shop by category"><ul>{quick}</ul></nav>
+{tile_rail("shop", "Shop the collection", shop_tiles)}
+<section class="feature" aria-labelledby="feature-title">
+  {pic(root, feat["image"], feat["alt"], 1536, 1024, cls="feature__img")}
+  <div class="feature__content">
+    <h2 class="feature__title" id="feature-title">{e(feat["title"])}</h2>
+    <p class="feature__text">{e(feat["text"])}</p>
+    <ul class="feature__links">{feat_links}</ul>
   </div>
+  <button type="button" class="round-btn feature__credit" data-caption-toggle aria-expanded="false" aria-controls="feature-caption">
+    {icon("camera")}<span class="sr-only">About this photograph</span></button>
+  <p class="feature__caption" id="feature-caption" hidden>{e(feat["caption"])}</p>
 </section>
-<section class="about-copy" aria-labelledby="about-title">
-  <h2 class="section-title" id="about-title">Archive 88: clothing made to stay</h2>
-  <div class="about-copy__cols">
-    <p>{e(store["description"])}</p>
-    <p>Every style in the collection is kept in every size, so the coat you buy this winter is the one we'll still make next year. Delivery is free across the UK on orders over {th}, and returns are free for 30 days.</p>
+{tile_rail("explore", "Shop by fabric", explore_tiles, "tiles--explore")}
+<section class="stories" aria-labelledby="stories-title" data-rail>
+  <div class="stories__head"><h2 class="stories__title" id="stories-title">Latest stories</h2><a class="stories__all" href="journal/">View all</a></div>
+  <div class="tiles">
+    <div class="tiles__track" data-rail-track tabindex="0" role="region" aria-label="Latest stories, scroll sideways">{stories}
+      <a class="story story--all" href="journal/"><span class="story__body"><span class="story__title">View all</span><span class="story__time">Journal</span></span></a></div>
+    <button type="button" class="tiles__nav tiles__nav--prev tiles__nav--mid" data-rail-prev aria-label="Previous stories" disabled>{icon("chevron")}</button>
+    <button type="button" class="tiles__nav tiles__nav--next tiles__nav--mid" data-rail-next aria-label="Next stories">{icon("chevron")}</button>
   </div>
 </section>'''
     write("index.html", page(
         title=f'{store["name"]}: {store["tagline"]}', desc=store["description"], root=root, path="", main=main,
         scripts=("home",), preload=f'<link rel="preload" href="{root}assets/img/forest-poster.jpg" as="image" fetchpriority="high">\n'))
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Journal: src/journal/<nn>-<slug>.html -> /journal/<slug>/, plus the /journal/ index
+# ---------------------------------------------------------------------------------------------------------------------
+
+STORIES = ROOT / "src" / "journal"
+META_RE = re.compile(r"\s*<!--\s*(\{.*?\})\s*-->\s*", re.S)
+
+
+def load_journal() -> list[dict]:
+    """Each story starts with <!-- {"title", "kicker", "description", "image", "alt"} -->. The number at the front of
+    the file name sets the order; reading time is worked out from the word count."""
+    out = []
+    for f in sorted(STORIES.glob("*.html")):
+        text = f.read_text()
+        m = META_RE.match(text)
+        if not m:
+            fail(f"src/journal/{f.name} must start with <!-- {{\"title\": ..., \"kicker\": ...}} -->")
+        s = json.loads(m.group(1))
+        for k in ("title", "kicker", "description", "image", "alt"):
+            if k not in s:
+                fail(f"src/journal/{f.name} is missing '{k}'")
+        img = ROOT / "assets" / "img" / "site" / f'{s["image"]}.jpg'
+        if not img.exists():
+            fail(f"src/journal/{f.name}: image assets/img/site/{s['image']}.jpg not found")
+        s["slug"] = re.sub(r"^\d+-", "", f.stem)
+        s["body"] = text[m.end():]
+        words = len(re.sub(r"<[^>]+>", " ", s["body"]).split())
+        s["minutes"] = max(2, round(words / 200))
+        s["w"], s["h"] = 1536, 1024
+        out.append(s)
+    return out
+
+
+def journal():
+    shutil.rmtree(ROOT / "journal", ignore_errors=True)
+    root = "../"
+    cards = "".join(f"<li>{story_card(s, root)}</li>" for s in JOURNAL)
+    lede = "Care guides, repairs and notes on the fabrics we use."
+    main = f'''<div class="journal">
+  {breadcrumbs([("Home", root), ("Journal", None)])}
+  <header class="info__head"><h1 class="page-title">Journal</h1><p class="info__lede">{lede}</p></header>
+  <ul class="journal__grid">{cards}</ul>
+</div>'''
+    write("journal/index.html", page(title=f'Journal | {store["name"]}', desc=lede, root=root, path="journal/", main=main, active="journal"))
+    root = "../../"
+    for i, s in enumerate(JOURNAL):
+        more = [JOURNAL[(i + k) % len(JOURNAL)] for k in (1, 2, 3)]
+        main = f'''<article class="info article">
+  {breadcrumbs([("Home", root), ("Journal", root + "journal/"), (s["title"], None)])}
+  <header class="info__head article__head">
+    <p class="article__meta"><span>{e(s["kicker"])}</span><span>{s["minutes"]} min read</span></p>
+    <h1 class="page-title">{e(s["title"])}</h1>
+    <p class="info__lede">{e(s["description"])}</p>
+  </header>
+  <figure class="info__figure article__figure">{pic(root, s["image"], s["alt"], s["w"], s["h"], sizes="(min-width: 920px) 880px, 100vw", eager=True)}</figure>
+  <div class="info__body">{fill(s["body"], root)}</div>
+</article>
+<section class="journal journal--more" aria-labelledby="more-title">
+  <div class="stories__head"><h2 class="stories__title" id="more-title">More stories</h2><a class="stories__all" href="{root}journal/">View all</a></div>
+  <ul class="journal__grid">{"".join(f"<li>{story_card(x, root)}</li>" for x in more)}</ul>
+</section>'''
+        ld = [{"@context": "https://schema.org", "@type": "Article", "headline": s["title"], "description": s["description"],
+               "image": f'{store["url"]}assets/img/site/{s["image"]}.jpg', "publisher": {"@type": "Organization", "name": store["name"]}}]
+        write(f'journal/{s["slug"]}/index.html', page(title=f'{s["title"]} | {store["name"]}', desc=s["description"], root=root,
+                                                      path=f'journal/{s["slug"]}/', main=main, active="journal", jsonld=ld))
 
 
 def search_index():
@@ -850,6 +948,7 @@ if(/\\/(lookbook|record)(\\/|$)/.test(p.slice(b.length-1))){{location.replace(b+
 
 def sitemap(info: list[str]):
     urls = ["", "shop/", *(f'shop/{c["handle"]}/' for c in CATS), "gift-cards/", *(f"{s}/" for s in info),
+            "journal/", *(f'journal/{s["slug"]}/' for s in JOURNAL),
             *(f'products/{p["handle"]}/' for p in ranked())]
     rows = "\n".join(f"  <url><loc>{e(store['url'] + u)}</loc></url>" for u in urls)
     write("sitemap.xml", f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{rows}\n</urlset>\n')
@@ -863,6 +962,7 @@ if __name__ == "__main__":
     validate()
     mark_bestsellers()
     PHOTO_CACHE = {p["handle"]: process_photos(p["handle"]) for p in catalog}
+    JOURNAL = load_journal()
     for d in ("products", "shop", "gift-cards"):
         shutil.rmtree(ROOT / d, ignore_errors=True)
     home()
@@ -876,11 +976,12 @@ if __name__ == "__main__":
         pdp(p)
     prepare("")
     info = info_pages()
+    journal()
     not_found()
     n_urls = sitemap(info)
     variants = sum(len(p["colours"]) * len(p["sizes"]) for p in catalog)
     with_photos = sum(1 for h in PHOTO_CACHE.values() if h)
-    print(f"Built {len(catalog)} product pages, {len(CATS) + 1} listing pages, home, gift cards, {len(info)} info pages, 404. "
+    print(f"Built {len(catalog)} product pages, {len(CATS) + 1} listing pages, home, gift cards, {len(info)} info pages, {len(JOURNAL)} journal stories, 404. "
           f"Sitemap: {n_urls} URLs.")
     print(f"  "
           f"{variants} variants. {with_photos}/{len(catalog)} styles have photos; the rest show placeholder art.")

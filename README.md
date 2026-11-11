@@ -1,9 +1,10 @@
 # Archive 88
 
 Online shop for **Archive 88**: a permanent collection of considered clothing in natural fibres, kept in every size.
-100 styles (sample data) with size × colour variants, a listing page with a sticky filter sidebar, product pages
-with a variant matrix and a mobile sticky Add to bag, a slide-out bag, search, gift cards by email or post, and
-the info pages a shop needs.
+A photography-led homepage (campaign hero, category and fabric rails, journal stories), 100 styles (sample data)
+with size × colour variants, a listing page with a sticky filter sidebar, product pages with a variant matrix and a
+mobile sticky Add to bag, a slide-out bag, search, gift cards by email or post, a journal, and the help pages a
+shop needs.
 
 Live: https://nickwalsh-rgb.github.io/Animated-website/
 
@@ -22,8 +23,11 @@ makes web-sized photos, commits the result and publishes it. You can also run it
 | --- | --- | --- |
 | Styles, prices, colours, sizes, stock | `data/catalog.json` (`stock[colour][size]` is the variant matrix) | `python3 build.py` |
 | Product photos | `assets/products/<handle>/<colour>-<n>.jpg` (see that folder's README; cropped to 4:5 by the build) | `python3 build.py` |
+| Homepage: hero, category strip, tiles, campaign, fabric rail, the five commitments | `data/home.json` | `python3 build.py` |
+| Journal stories | `src/journal/<nn>-<slug>.html` (the number sets the order; reading time is worked out for you) | `python3 build.py` |
+| Homepage and journal photos | `assets/img/site/<name>.jpg` plus `<name>.webp` and `<name>-640.webp` | refresh |
 | Announcement bar, categories, free-delivery threshold, page size, gift cards, social links, business details, shipping wording, Shopify domain | `data/store.json` | `python3 build.py` |
-| About, Size guide, Delivery & returns, Contact, Privacy, Terms | `src/pages/*.html` | `python3 build.py` |
+| About, Size guide, Delivery & returns, FAQs, Repairs, Product care, Accessibility, Contact, Privacy, Terms | `src/pages/*.html` | `python3 build.py` |
 | Markup of any component | `components.py`, `build.py` | `python3 build.py` |
 | Tokens, styles, behaviour | `assets/css/tokens.css`, `assets/css/store.css`, `assets/js/*.js` | refresh |
 | Wordmark, A88 mark, social icons | `src/brand-defs.html` | `python3 build.py` |
@@ -35,7 +39,7 @@ python3 tools/seed_catalog.py # regenerate the SAMPLE catalogue (overwrites data
 python3 tools/make_sprite.py  # rebuild the icon + garment sprite (assets/sprite.svg)
 ```
 
-`index.html`, `shop/`, `products/`, `gift-cards/`, the info page folders (`about/`, `contact/`...), `404.html`,
+`index.html`, `shop/`, `products/`, `gift-cards/`, `journal/`, the info page folders (`about/`, `contact/`...), `404.html`,
 `search.json`, `sitemap.xml` and `robots.txt` are **generated**. Don't edit them by hand.
 
 The build stops with a clear message if a style is missing a field, has a duplicate handle or style number, an
@@ -45,15 +49,16 @@ unknown category or a missing stock cell.
 
 | Page | What's on it |
 | --- | --- |
-| Home `/` | Film hero, New in rail, editorial split, Bestsellers rail, category grid, banner, brand copy |
+| Home `/` | Film hero with pill links, category strip, shop tiles rail, campaign image, shop-by-fabric rail, latest stories |
+| Journal `/journal/`, `/journal/<slug>/` | Care guides, repairs and notes on fabric |
 | Shop `/shop/`, `/shop/<category>/` | Sticky filter sidebar (drawer on phones), sort, Load more; filters kept in the address (`?size=M&colour=green`) |
 | Product `/products/<handle>/` | Gallery, colour and size selectors, stock messages, availability matrix, sticky Add to bag on phones, You may also like |
 | Gift cards `/gift-cards/` | Amount, then Email or Post, each with its own form and a live card preview |
-| Info | About, Size guide, Delivery & returns, Contact, Privacy, Terms of sale |
+| Info | About, Size guide, Delivery & returns, FAQs, Repairs, Product care, Accessibility, Contact, Privacy, Terms of sale |
 | 404 | Page not found, with search. Also forwards old `/storefront/...` links to their new address |
 
-Shared on every page: announcement bar, header that turns see-through over imagery, desktop mega-menu, search,
-bag drawer, service bar, newsletter sign-up, footer.
+Shared on every page: announcement bar that opens a panel, header, desktop mega-menu, search, bag drawer, and an ink
+footer with the five commitments, newsletter sign-up, help links and information.
 
 Brand, tokens, components and UX rules: [docs/DESIGN-SYSTEM.md](docs/DESIGN-SYSTEM.md).
 
@@ -62,7 +67,8 @@ Brand, tokens, components and UX rules: [docs/DESIGN-SYSTEM.md](docs/DESIGN-SYST
 All product data is **sample data**.
 
 - [ ] Real styles, prices and stock in `data/catalog.json`; photos in `assets/products/<handle>/`
-- [ ] Real campaign photography (the homepage currently uses stills from the forest film)
+- [ ] Real campaign photography: the images in `assets/img/site/` are **AI-generated placeholders** (made in Figma), not photos of real Archive 88 clothing
+- [ ] Journal stories (`src/journal/`), Repairs, Product care, FAQs and Accessibility (`src/pages/`) are **drafts**: check every claim (repairs offered, care advice, the five commitments in `data/home.json`) against what you really do
 - [ ] Business details in `data/store.json`: currently **placeholders** (fictional company, Ofcom drama phone number, `.example` email)
 - [ ] Real Instagram/Facebook URLs and shipping wording in `data/store.json`
 - [ ] Size guide measurements in `src/pages/size-guide.html` (currently sample numbers)
@@ -79,6 +85,8 @@ All product data is **sample data**.
 build.py                 generates every page from data/ + src/
 components.py            one function per UI component (card, rail, drawer, selectors...)
 data/store.json          site settings, business details, gift cards, announcements
+data/home.json           homepage content and the five commitments in the footer
+src/journal/             journal stories
 data/catalog.json        the styles (sample data)
 src/pages/               About, Size guide, Delivery & returns, Contact, Privacy, Terms (content)
 src/brand-defs.html      wordmark letters, A88 mark, social icons (SVG symbols)

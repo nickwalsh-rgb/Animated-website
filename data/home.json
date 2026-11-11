@@ -1,0 +1,210 @@
+{
+  "_readme": "Homepage content, top to bottom. Images live in assets/img/site/<image>.jpg (+ .webp and -640.webp). Links are relative to the site root. Edit, then run: python3 build.py",
+  "hero": {
+    "title": "The permanent collection",
+    "text": "Coats, knitwear, shirts and trousers in natural fibres. One collection, kept in every size, season after season.",
+    "links": [
+      [
+        "Shop all",
+        "shop/"
+      ],
+      [
+        "New in",
+        "shop/?sort=new"
+      ],
+      [
+        "Explore",
+        "about/"
+      ]
+    ]
+  },
+  "quick": [
+    [
+      "Outerwear",
+      "shop/outerwear/"
+    ],
+    [
+      "Knitwear",
+      "shop/knitwear/"
+    ],
+    [
+      "Shirts",
+      "shop/shirts/"
+    ],
+    [
+      "Trousers",
+      "shop/trousers/"
+    ],
+    [
+      "Jersey",
+      "shop/jersey/"
+    ],
+    [
+      "Tailoring",
+      "shop/tailoring/"
+    ],
+    [
+      "Gift cards",
+      "gift-cards/"
+    ]
+  ],
+  "tiles": [
+    {
+      "title": "New in",
+      "image": "tile-new",
+      "href": "shop/?sort=new",
+      "alt": "Two friends in a cream knit and a navy chore jacket walking on a pebble beach."
+    },
+    {
+      "title": "Outerwear",
+      "image": "tile-outerwear",
+      "href": "shop/outerwear/",
+      "alt": "A man in an olive waxed jacket on a path above a misty coast."
+    },
+    {
+      "title": "Knitwear",
+      "image": "tile-knitwear",
+      "href": "shop/knitwear/",
+      "alt": "A woman in an oatmeal roll-neck jumper among ferns in the forest."
+    },
+    {
+      "title": "Shirts",
+      "image": "tile-shirts",
+      "href": "shop/shirts/",
+      "alt": "A man in a pale blue oxford shirt leaning on a boat shed by the sea."
+    },
+    {
+      "title": "Trousers",
+      "image": "tile-trousers",
+      "href": "shop/trousers/",
+      "alt": "Tan chinos and leather boots, mid-stride on a forest path."
+    },
+    {
+      "title": "Jersey",
+      "image": "tile-jersey",
+      "href": "shop/jersey/",
+      "alt": "A woman in a grey marl sweatshirt sitting on driftwood on the beach."
+    },
+    {
+      "title": "Tailoring",
+      "image": "tile-tailoring",
+      "href": "shop/tailoring/",
+      "alt": "A man in a soft charcoal wool jacket on a foggy headland."
+    },
+    {
+      "title": "Gift cards",
+      "image": "tile-gift",
+      "href": "gift-cards/",
+      "alt": "A dark green card in a woven envelope with an orange stripe, on a wool blanket."
+    }
+  ],
+  "feature": {
+    "title": "Knitwear, spun slow",
+    "text": "Warmth that stays in the range.",
+    "image": "campaign-fire",
+    "alt": "Two people in wool jumpers beside a small fire on a misty beach at dusk.",
+    "caption": "Merino roll-necks and fisherman knits by the fire, on the coast where most of the collection is worn in.",
+    "links": [
+      [
+        "Shop knitwear",
+        "shop/knitwear/"
+      ],
+      [
+        "Wool care",
+        "journal/how-to-wash-wool/"
+      ],
+      [
+        "Explore",
+        "journal/"
+      ]
+    ]
+  },
+  "explore": [
+    {
+      "title": "Wool",
+      "image": "fibre-wool",
+      "alt": "Hands holding skeins of cream and grey wool yarn.",
+      "links": [
+        [
+          "Explore",
+          "journal/how-to-wash-wool/"
+        ],
+        [
+          "Knitwear",
+          "shop/knitwear/"
+        ],
+        [
+          "Tailoring",
+          "shop/tailoring/"
+        ]
+      ]
+    },
+    {
+      "title": "Cotton",
+      "image": "fibre-cotton",
+      "alt": "A stack of folded cotton shirts and tees on a wooden bench.",
+      "links": [
+        [
+          "Explore",
+          "product-care/"
+        ],
+        [
+          "Shirts",
+          "shop/shirts/"
+        ],
+        [
+          "Jersey",
+          "shop/jersey/"
+        ]
+      ]
+    },
+    {
+      "title": "Waxed cotton",
+      "image": "fibre-wax",
+      "alt": "Rain beading on the shoulder of an olive waxed jacket.",
+      "links": [
+        [
+          "Explore",
+          "journal/rewax-a-jacket/"
+        ],
+        [
+          "Outerwear",
+          "shop/outerwear/"
+        ]
+      ]
+    }
+  ],
+  "_commitments_note": "The ink band above the footer, on every page: [icon, statement, link text, link]. Icons come from tools/make_sprite.py.",
+  "commitments": [
+    [
+      "infinity",
+      "We keep every style in the range.",
+      "Read what permanent means",
+      "journal/what-permanent-means/"
+    ],
+    [
+      "leaf",
+      "We make it in natural fibres.",
+      "About Archive 88",
+      "about/"
+    ],
+    [
+      "needle",
+      "We repair what we make.",
+      "How repairs work",
+      "repairs/"
+    ],
+    [
+      "ruler",
+      "We keep every size, every season.",
+      "Find your size",
+      "size-guide/"
+    ],
+    [
+      "return",
+      "We take it back free for 30 days.",
+      "Delivery & returns",
+      "returns/"
+    ]
+  ]
+}

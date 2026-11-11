@@ -1,6 +1,6 @@
 /* Archive 88: homepage.
-   Deliberately calm: the film hero (autoplays muted, pauses off screen, has a pause button) and a gentle fade-up as
-   sections enter the viewport. No scroll-jacking, pinning or loaders. Needs store.js. With reduced motion the film
+   Deliberately calm: the film hero (autoplays muted, pauses off screen, has a pause button), the campaign photo
+   caption, and a gentle fade-up for anything marked .reveal. No scroll-jacking, pinning or loaders. Needs store.js. With reduced motion the film
    stays on its poster frame and every section is simply visible. */
 (() => {
   "use strict";
@@ -29,6 +29,15 @@
       if (en.isIntersecting && !userPaused) play(); else video.pause();
     }, { threshold: 0.05 }).observe(video);
     sync();
+  }
+
+  /* ---------- Campaign photo caption (the round camera button) ---------- */
+  const capBtn = $("[data-caption-toggle]");
+  if (capBtn) {
+    const cap = document.getElementById(capBtn.getAttribute("aria-controls"));
+    const set = (open) => { capBtn.setAttribute("aria-expanded", String(open)); cap.hidden = !open; };
+    capBtn.addEventListener("click", () => set(cap.hidden));
+    document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && !cap.hidden) { set(false); capBtn.focus(); } });
   }
 
   /* ---------- Sections fade up once as they arrive ---------- */
