@@ -2,8 +2,8 @@
 
 Archive 88 sells **curated pieces, made in limited runs** (est. 1988). This document covers the identity that came
 out of the 2026 rebrand and the shop built on it. The identity was drawn from the original Figma logo (slab
-ARCHIVE, a pine and mountain roundel, 88) and lives in the same Figma file on the page **Rebrand 2026**: nine
-boards, six logo components, colour variables and text styles with the same names as the tokens below.
+ARCHIVE, a pine and mountain emblem, 88) and lives in the same Figma file on the page **Rebrand 2026**: twelve
+boards, eight logo components, colour variables and text styles with the same names as the tokens below.
 
 Design read: an online shop for an outdoor heritage label, in a catalogue-like "archive" language. Layout variance 7,
 motion 7, density 4. Native CSS and JavaScript only, no frameworks or animation libraries.
@@ -21,24 +21,31 @@ icons from `tools/make_icons.js`, social links and business details in `data/sto
 | Positioning | A small collection of outdoor clothing, chosen piece by piece and made in limited runs. |
 | Tagline | Curated pieces, made in limited runs. Est. 1988. (the two lines from the original logo) |
 | Voice | Plain, specific, unhurried. Say what it is made of and how it fits. No filler words. |
-| Signature elements | The roundel (it turns once when you hover the logo, and sits in the turning seal on the hero), slab headlines, style numbers in mono (`No. 042`), the graded forest film, one blaze accent, the full-width logo that closes every page |
+| Signature elements | The eights and their star (the star turns when you hover the logo, and the mark sits in the turning seal on the hero), the pine and star illustration, slab headlines, style numbers in mono (`No. 042`), the graded forest film, one blaze accent, the full-width logo that closes every page |
 
 ### Logo
 
+**The idea.** The original logo had four separate parts: a slab name, a pine in a circle, the number 88 and two
+small lozenges. The new mark makes them one. An eight is two rings; two eights are four rings, two by two. Push them
+together until they touch and the space left in the middle is a four-pointed star: the old lozenge, now a north
+star. Nothing is added to make it. The name keeps the original slab, and the pine is redrawn from the same arcs as
+the star, so every curve in the identity comes from one circle.
+
 | Mark | File | Use |
 | --- | --- | --- |
-| Lockup | `assets/brand/lockup.svg` | Primary. ARCHIVE, the roundel, 88 on one line. 120px wide or more. |
-| Wordmark | `wordmark.svg` | Letters only, for sizes under 120px. |
-| Stacked | `stacked.svg` | Roundel over name over descriptor. Labels, swing tags, packaging. |
-| Seal | `seal.svg`, `seal-ring.svg` | Roundel in a ring of type. Stickers, embossing; the ring turns on the homepage hero. |
-| Roundel | `emblem.svg` | Favicon, app icon, 404, footer. Holds at 16px. |
+| Lockup | `assets/brand/lockup.svg` | Primary. ARCHIVE and the eights on one line. 110px wide or more. |
+| Mark | `mark.svg`, `mark-one-colour.svg` | The eights with the star. App icon, favicon, patches, prints, 404, footer. Holds at 16px. |
+| Stacked | `stacked.svg` | Mark over name over descriptor. Labels, swing tags, packaging. |
+| Seal | `seal.svg`, `seal-ring.svg` | Mark in a ring of type. Stickers, embossing; the ring turns on the homepage hero. |
 | Monogram | `monogram.svg` | A88. Embroidery, zip pulls, small woven tabs. |
+| Name | `wordmark.svg` | ARCHIVE alone, only right beside the mark. |
+| Star, Pine | `star.svg`, `pine.svg` | The star separates two facts in small type. Pine and star together make the brand illustration, used where a photograph would otherwise go. |
 
-Construction: letters are Rokkitt Black with 1.2% tracking. The roundel is 1.18 times the cap height (round shapes
-overshoot), with a gap of 0.3 cap heights either side. Clear space is half a roundel on every side. The roundel is one
-shape: a solid disc with the ridge and pine knocked out, colours swapped where they cross. All files use
-`currentColor`, so they take the colour of the text around them. To change the drawing, edit `tools/make_brand.py`
-and run it; never edit the SVGs by hand.
+Construction: ring radius 50, counter radius 16, the two ring centres of each eight 88 apart (they overlap by 12,
+which is what joins two rings into a numeral). In the lockup the eights stand 10% taller than the capitals, as round
+letters do, with a gap of 0.3 cap heights after the E. The star is always blaze where colour is available and is
+left as empty space in one-colour work. Files use `currentColor` for everything except the star. To change the
+drawing, edit `tools/make_brand.py` and run it; never edit the SVGs by hand.
 
 ### Colour
 
@@ -71,7 +78,7 @@ Self-hosted variable fonts with tuned fallbacks, so text barely moves when they 
 
 ### Shape
 
-Square corners on every control, card and image. Round is reserved for the roundel, colour swatches and status dots.
+Square corners on every control, card and image. Round is reserved for the mark, colour swatches and status dots.
 
 ### Product card
 Image on the stone ground (strict 4:5) with one small badge at most (*Selling fast*, *New*, *Bestseller* or *Sold out*),
@@ -187,18 +194,18 @@ uses a different layout so the page never repeats itself.
 
 | Section | Pattern |
 | --- | --- |
-| Film hero | Forest film full-bleed under the header. Two-line slab headline, one line of copy, two buttons, bottom left. The seal turns slowly bottom right. Muted, pauses off screen, Pause/Play button, poster only with reduced motion. |
+| Film hero | Forest film, graded to the brand green, full-bleed under the header. Two-line slab headline, one line of copy, two buttons, bottom left. The seal turns slowly bottom right. Muted, pauses off screen, Pause/Play button, poster only with reduced motion. |
 | Name band | The three phrases from the logo in outlined slab, moving slowly. The only marquee on the site; pauses on hover; static with reduced motion. |
 | New in | Product rail, *See all* link. |
 | Statement | One large paragraph. Words ink in as it crosses the screen. |
 | Archive index | Six category names as large rows with counts; on desktop a sticky frame shows the lead style of the row under the pointer. |
-| Stories | Two pictures set off the grid, title and a line of copy underneath. Pictures drift slightly as you scroll. |
+| Stories | Two panels set off the grid, title and a line of copy underneath. By default they are brand illustrations (the eights cropped large; pines under the star); either can be a photo instead. |
 | Most wanted | One large product and four beside it (top-ranked styles that aren't new). |
 | Banner | Full-bleed picture that settles as it arrives, statement, link to About. |
 | Promises, sign-up, footer | Shared by every page. The full-width logo rises into place at the very end. |
 
 **Motion.** Each movement has a job: the headline rising line by line sets hierarchy; sections arriving once give
-sequence; the statement inking in and the pictures drifting tie content to scroll; hovers give feedback (the roundel
+sequence; the statement inking in and the pictures drifting tie content to scroll; hovers give feedback (the star
 turns, arrows nudge, cards zoom slightly); page changes cross-fade and a product picture carries over from its card
 to its page. Scroll-linked effects are CSS scroll-driven animations (they simply don't run in browsers without
 support); reveals use IntersectionObserver in `motion.js`. With reduced motion nothing moves and everything is

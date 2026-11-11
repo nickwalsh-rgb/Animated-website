@@ -202,15 +202,21 @@ BRAND_DEFS = (ROOT / "src" / "brand-defs.html").read_text()
 
 
 def logo(cls: str = "", label: str = "Archive 88") -> str:
-    """The primary lockup: ARCHIVE, the roundel, 88. The roundel is its own element so it can turn on hover."""
+    """The primary lockup: ARCHIVE and the eights. The star between the eights is its own element (blaze), so it
+    can turn on hover. Sizes come from tools/make_brand.py."""
     aria = f'role="img" aria-label="{e(label)}"' if label else 'aria-hidden="true" focusable="false"'
-    return (f'<svg class="logo {cls}" viewBox="0 0 657.17 68.79" {aria}><use href="#lg-name"/>'
-            f'<use href="#lg-roundel" class="logo__roundel"/><use href="#lg-88"/></svg>')
+    return (f'<svg class="logo {cls}" viewBox="0 0 539.51 64.13" {aria}><use href="#lg-name"/>'
+            f'<use href="#lg-star" class="logo__star"/><use href="#lg-88"/></svg>')
 
 
 def emblem(cls: str = "") -> str:
-    """The roundel on its own (decorative)."""
-    return f'<svg class="emblem {cls}" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><use href="#lg-emblem"/></svg>'
+    """The eights on their own, with the star (decorative)."""
+    return (f'<svg class="emblem {cls}" viewBox="0 0 200 188" aria-hidden="true" focusable="false">'
+            f'<use href="#lg-mark-star" class="emblem__star"/><use href="#lg-mark"/></svg>')
+
+
+def pine(cls: str = "") -> str:
+    return f'<svg class="pine {cls}" viewBox="0 0 80 150" aria-hidden="true" focusable="false"><use href="#lg-pine"/></svg>'
 
 
 def social_links(cls: str = "") -> str:
@@ -654,9 +660,20 @@ def home():
     phrases = "".join(f'<span>{e(t)}</span>{emblem()}' for t in h["band"] * 2)
     band = f'<div class="band__group">{phrases}</div><div class="band__group" aria-hidden="true">{phrases}</div>'
 
+    def visual(s):
+        """A story's picture: a photo ("image") or one of the brand illustrations ("art": "eights" or "forest")."""
+        if s.get("art") == "eights":
+            return f'<span class="story__img story__art story__art--eights" aria-hidden="true">{emblem()}</span>'
+        if s.get("art") == "forest":
+            return (f'<span class="story__img story__art story__art--forest" aria-hidden="true">'
+                    f'<svg class="story__star" viewBox="0 0 52.5 88"><use href="#lg-loz"/></svg>'
+                    f'<span class="story__pines">{pine() * 7}</span></span>')
+        return (f'<span class="story__img"><img src="{root}assets/img/{e(s["image"])}" alt="{e(s.get("alt", ""))}" '
+                f'width="720" height="900" loading="lazy" decoding="async"></span>')
+
     stories = "".join(
         f'<a class="story__item story__item--{"ab"[i]} reveal" href="{e(s["href"])}">'
-        f'<span class="story__img"><img src="{root}assets/img/{e(s["image"])}" alt="{e(s["alt"])}" width="720" height="900" loading="lazy" decoding="async"></span>'
+        f'{visual(s)}'
         f'<span class="story__title">{e(s["title"])}</span><span class="story__text">{e(s["text"])}</span>'
         f'<span class="link-arrow">{e(s["cta"])} {icon("arrow")}</span></a>'
         for i, s in enumerate(h["stories"][:2]))

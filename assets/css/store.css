@@ -579,7 +579,7 @@ body.has-sticky-atc .toast { bottom: calc(84px + env(safe-area-inset-bottom)); }
 
 /* ══ 2026 identity ════════════════════════════════════════════════════════════
    Everything below is the look: the slab from the logo for display, Geist for reading, Geist Mono for facts,
-   spruce on chalk with one blaze accent. Square controls throughout; only the roundel, swatches and dots are round. */
+   spruce on chalk with one blaze accent. Square controls throughout; only the mark, swatches and dots are round. */
 
 /* ── Type ─────────────────────────────────────────────────────────────────── */
 .page-title, .section-title, .hero__title, .banner__title, .pdp__title, .cart-empty__title, .plp__empty-title, .drawer__title {
@@ -591,9 +591,10 @@ body.has-sticky-atc .toast { bottom: calc(84px + env(safe-area-inset-bottom)); }
 .label { font: 500 var(--fs-xs)/1.3 var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; }
 .count { margin-left: auto; font: 400 var(--fs-xs) var(--font-mono); color: var(--color-text-muted); font-variant-numeric: tabular-nums; }
 .logo { display: block; width: 100%; height: auto; fill: currentColor; overflow: visible; }
-.logo__roundel { transform-origin: 505.69px 34.4px; transition: transform 0.9s var(--ease-out); }
-a:hover > .logo .logo__roundel, a:focus-visible > .logo .logo__roundel { transform: rotate(360deg); }
-.emblem { display: block; fill: currentColor; }
+.logo__star, .emblem__star { fill: var(--blaze); stroke: var(--blaze); stroke-width: 0.5px; }
+.logo__star { transform-origin: 505.4px 32.06px; transition: transform 0.9s var(--ease-out); }
+a:hover > .logo .logo__star, a:focus-visible > .logo .logo__star { transform: rotate(180deg) scale(1.02); }
+.emblem, .pine { display: block; fill: currentColor; }
 
 /* ── Buttons & links ──────────────────────────────────────────────────────── */
 .btn, .buy-btn {
@@ -685,7 +686,7 @@ body.nav-on-dark.nav-clear:not(.mega-open) .nav { background: rgba(14, 24, 19, 0
 .hero__seal { position: absolute; right: var(--gutter); bottom: clamp(28px, 6vh, 64px); display: grid; place-items: center; width: clamp(112px, 11vw, 176px); aspect-ratio: 1; pointer-events: none; }
 .hero__seal > * { grid-area: 1 / 1; }
 .hero__seal img { width: 100%; height: 100%; }
-.hero__seal .emblem { width: 50%; height: 50%; fill: var(--on-dark); }
+.hero__seal .emblem { width: 46%; height: auto; fill: var(--on-dark); }
 @media (max-width: 719px) { .hero__seal { display: none; } }
 .hero :focus-visible, .banner :focus-visible { outline-color: var(--bone); }
 .hero__toggle {
@@ -703,7 +704,7 @@ body.nav-on-dark.nav-clear:not(.mega-open) .nav { background: rgba(14, 24, 19, 0
   font: 900 clamp(2.5rem, 1rem + 6.6vw, 7rem)/1 var(--font-display); letter-spacing: -0.01em; white-space: nowrap;
   color: transparent; -webkit-text-stroke: 1.5px var(--ink);
 }
-.band__group .emblem { width: 0.78em; height: 0.78em; flex: none; fill: var(--ink); }
+.band__group .emblem { width: 0.84em; height: auto; flex: none; fill: var(--ink); }
 @supports not (-webkit-text-stroke: 1px black) { .band__group { color: var(--ink); } }
 
 /* Home 4: statement. Words ink in as the paragraph crosses the screen. */
@@ -736,6 +737,21 @@ body.nav-on-dark.nav-clear:not(.mega-open) .nav { background: rgba(14, 24, 19, 0
 .story__item { display: grid; gap: 14px; align-content: start; }
 .story__img { overflow: hidden; aspect-ratio: 4 / 5; background: var(--color-media); }
 .story__img img { width: 100%; height: 100%; object-fit: cover; }
+/* Brand illustrations, drawn from the logo's own shapes: the eights cropped large, and pines under the star. */
+.story__art { position: relative; display: grid; place-items: center; }
+.story__art--eights { background: var(--spruce); color: var(--bone); }
+.story__art--eights .emblem { width: 118%; max-width: none; height: auto; transition: transform 1.2s var(--ease-out); }
+.story__item:hover .story__art--eights .emblem { transform: scale(1.04); }
+.story__art--forest { background: var(--color-bg-alt); color: var(--ink); }
+.story__star { position: absolute; left: 62%; top: 13%; width: 8%; height: auto; fill: var(--blaze); transition: transform 1.2s var(--ease-out); }
+.story__item:hover .story__star { transform: rotate(180deg); }
+.story__pines { position: absolute; left: -5%; right: -5%; bottom: -3%; display: flex; align-items: flex-end; justify-content: center; }
+.story__pines .pine { flex: none; width: 21%; height: auto; margin: 0 -2.4%; }
+.story__pines .pine:nth-child(2) { width: 15%; } .story__pines .pine:nth-child(3) { width: 26%; }
+.story__pines .pine:nth-child(4) { width: 17%; } .story__pines .pine:nth-child(5) { width: 30%; }
+.story__pines .pine:nth-child(6) { width: 14%; } .story__pines .pine:nth-child(7) { width: 22%; }
+/* Campaign film and stills are graded to the brand's green so they read as one picture story. */
+.hero__video, .banner__img, .mega__img img, .info__figure img { filter: grayscale(1) sepia(0.5) hue-rotate(68deg) saturate(0.85) contrast(1.12) brightness(0.96); }
 .story__title { font: 900 var(--fs-lg)/1 var(--font-display); letter-spacing: -0.012em; }
 .story__text { max-width: 40ch; color: var(--color-text-muted); }
 .story__item:hover .story__title { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 6px; }
@@ -798,7 +814,7 @@ main:has(> .banner:last-child) + .promises { margin-top: 0; border-top: 0; }
 .footer__top { display: grid; gap: 40px; max-width: var(--page-max); margin: 0 auto; }
 @media (min-width: 1000px) { .footer__top { grid-template-columns: minmax(240px, 0.8fr) 2fr; gap: 64px; } }
 .footer__brand { display: grid; gap: 18px; align-content: start; justify-items: start; }
-.footer__brand .emblem { width: 64px; height: 64px; }
+.footer__brand .emblem { width: 72px; height: auto; }
 .footer__brand p { max-width: 20ch; font: 800 1.5rem/1.1 var(--font-display); text-wrap: balance; }
 .footer__cols { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; }
 .footer__head { margin-bottom: 14px; color: var(--on-dark-muted); }
@@ -862,7 +878,7 @@ main:has(> .banner:last-child) + .promises { margin-top: 0; border-top: 0; }
 .info__lede { font-size: clamp(1.0625rem, 1rem + 0.5vw, 1.375rem); color: var(--color-text); }
 .info__steps li::before { font-family: var(--font-mono); }
 .info__table thead th { font: 500 var(--fs-xs) var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; }
-.info--center .emblem { width: 96px; height: 96px; }
+.info--center .emblem { width: 112px; height: auto; }
 .toast { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.04em; }
 
 /* ── Motion ───────────────────────────────────────────────────────────────────
@@ -890,6 +906,8 @@ main:has(> .banner:last-child) + .promises { margin-top: 0; border-top: 0; }
     .manifesto__text .w { opacity: 0.16; animation: ink-in linear both; animation-timeline: --statement; animation-range: cover calc(16% + var(--p) * 30%) cover calc(24% + var(--p) * 30%); }
     @keyframes ink-in { to { opacity: 1; } }
     .story__img img { animation: drift linear both; animation-timeline: view(); animation-range: entry 0% exit 100%; }
+    .story__pines { animation: tread linear both; animation-timeline: view(); animation-range: entry 0% exit 100%; }
+    @keyframes tread { from { transform: translateY(9%); } to { transform: translateY(-2%); } }
     @keyframes drift { from { transform: translateY(-5%) scale(1.12); } to { transform: translateY(5%) scale(1.12); } }
     .banner__img { animation: settle linear both; animation-timeline: view(); animation-range: entry 0% cover 70%; }
     @keyframes settle { from { transform: scale(1.2); } to { transform: scale(1); } }

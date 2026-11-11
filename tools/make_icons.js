@@ -20,7 +20,7 @@ const og = `<body style="margin:0;width:1200px;height:630px;position:relative;ov
 <p style="position:absolute;left:72px;bottom:64px;margin:0;font:500 22px G;letter-spacing:.14em;text-transform:uppercase">${store.tagline}. ${store.established}.</p>
 </body>`;
 const icon = (size) => `<body style="margin:0;width:${size}px;height:${size}px;display:grid;place-items:center;background:#17271f">
-<div style="width:64%">${svg("assets/brand/emblem.svg", "#efebe1")}</div></body>`;
+<div style="width:66%">${svg("assets/brand/mark.svg", "#efebe1")}</div></body>`;
 
 (async () => {
   const browser = await chromium.launch();
