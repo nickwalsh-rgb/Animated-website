@@ -1,7 +1,7 @@
 /* Archive 88: homepage.
-   Deliberately calm: the film hero (autoplays muted, pauses off screen, has a pause button) and a gentle fade-up as
-   sections enter the viewport. No scroll-jacking, pinning or loaders. Needs store.js. With reduced motion the film
-   stays on its poster frame and every section is simply visible. */
+   The film hero (autoplays muted, pauses off screen, has a pause button) and the archive index preview.
+   Section reveals live in motion.js; scroll-linked effects are CSS (store.css, "Motion"). No scroll-jacking or
+   loaders. Needs store.js. With reduced motion the film stays on its poster frame. */
 (() => {
   "use strict";
   const { $, $$, reduced } = window.A88S;
@@ -31,19 +31,14 @@
     sync();
   }
 
-  /* ---------- Sections fade up once as they arrive ---------- */
-  const items = $$(".reveal");
-  if (reduced.matches || !items.length || !("IntersectionObserver" in window)) return;
-  document.documentElement.classList.add("has-motion");
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach((en) => {
-      if (!en.isIntersecting) return;
-      // Neighbours entering together arrive one after another.
-      const siblings = [...en.target.parentElement.children].filter((n) => n.classList.contains("reveal"));
-      en.target.style.transitionDelay = `${Math.min(siblings.indexOf(en.target), 5) * 60}ms`;
-      en.target.classList.add("is-in");
-      io.unobserve(en.target);
+  /* ---------- Archive index: the frame on the right shows the row under the pointer or focus ---------- */
+  const index = $("[data-archive-index]");
+  if (index) {
+    const frames = $$("[data-index-frame]", index);
+    const show = (i) => frames.forEach((f) => f.classList.toggle("is-active", f.dataset.indexFrame === i));
+    $$("[data-index-row]", index).forEach((row) => {
+      row.addEventListener("pointerenter", () => show(row.dataset.indexRow));
+      row.addEventListener("focus", () => show(row.dataset.indexRow));
     });
-  }, { rootMargin: "0px 0px -8% 0px" });
-  items.forEach((el) => io.observe(el));
+  }
 })();

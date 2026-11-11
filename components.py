@@ -110,8 +110,8 @@ def colour_count(p: dict) -> str:
     return f"{n} colours" if n > 1 else p["colours"][0]["name"]
 
 
-def product_card(p: dict, root: str, sym: str, *, eager: bool = False, quick_add: bool = True) -> str:
-    """The product card: image on a quiet ground, then name, colour and price. Hover (fine pointers only) swaps the
+def product_card(p: dict, root: str, sym: str, *, eager: bool = False, quick_add: bool = True, cls: str = "") -> str:
+    """The product card: image on a quiet ground, then name and price, colour and style number. Hover (fine pointers only) swaps the
     photo to the alternate angle instantly; the second image is already loaded in the same frame, so there's no
     flash. Quick add sits along the bottom of the image. Data attributes drive filtering, sorting and quick add."""
     first = p["colours"][0]
@@ -145,7 +145,7 @@ def product_card(p: dict, root: str, sym: str, *, eager: bool = False, quick_add
         qa = (f'<div class="quick-add" data-quick-add>'
               f'<p class="quick-add__label">Quick add <span class="quick-add__colour">{e(first["name"])}</span></p>'
               f'<div class="quick-add__sizes"></div></div>')
-    return f'''<article class="card{" is-soldout" if p["sold_out"] else ""}" data-product="{e(p["handle"])}" data-title="{e(p["title"])}" data-style="{e(p["style"])}" data-sil="{e(p["silhouette"])}" data-url="{e(url)}" data-colours="{colours_json}" {attrs}>
+    return f'''<article class="card{" is-soldout" if p["sold_out"] else ""}{" " + cls if cls else ""}" data-product="{e(p["handle"])}" data-title="{e(p["title"])}" data-style="{e(p["style"])}" data-sil="{e(p["silhouette"])}" data-url="{e(url)}" data-colours="{colours_json}" {attrs}>
   <div class="card__media">
     <a class="card__link" href="{e(url)}" tabindex="-1" aria-hidden="true">
       {frame(media(v[0], alt_front, eager=eager, cls="media__item--primary") + media(v[1], alt_back, cls="media__item--alt"), "media--hover")}
@@ -157,6 +157,7 @@ def product_card(p: dict, root: str, sym: str, *, eager: bool = False, quick_add
     <h3 class="card__title"><a href="{e(url)}">{e(p["title"])}</a></h3>
     {price(p, sym)}
     <p class="card__colour" data-card-colour>{e(first["name"])}</p>
+    <p class="card__no">No. {e(p["style"].split("-")[-1])}</p>
     {swatch_list(p)}
   </div>
 </article>'''

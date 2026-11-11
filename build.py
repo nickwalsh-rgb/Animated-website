@@ -195,15 +195,22 @@ def size_groups(products) -> list[tuple[str, list[str]]]:
 SPRITE = (ROOT / "assets" / "sprite.svg").read_text() if (ROOT / "assets" / "sprite.svg").exists() else ""
 
 
-# Brand assets: wordmark letters, A88 mark and social icons (src/brand-defs.html), fonts (assets/fonts/), social
-# links and business details (data/store.json). One source of truth for the identity.
+# Brand assets: the logo as inline SVG parts and the social icons (src/brand-defs.html, written by
+# tools/make_brand.py), logo files (assets/brand/), fonts (assets/fonts/), social links and business details
+# (data/store.json). One source of truth for the identity.
 BRAND_DEFS = (ROOT / "src" / "brand-defs.html").read_text()
-WM = "".join(f'<use href="#wm-{c}" class="wm-l"/>' for c in ["A", "R", "C", "H", "I", "V", "E", "8a", "8b"])
 
 
-def wordmark(cls: str = "", label: str = "Archive 88") -> str:
+def logo(cls: str = "", label: str = "Archive 88") -> str:
+    """The primary lockup: ARCHIVE, the roundel, 88. The roundel is its own element so it can turn on hover."""
     aria = f'role="img" aria-label="{e(label)}"' if label else 'aria-hidden="true" focusable="false"'
-    return f'<svg class="wordmark {cls}" viewBox="0 0 640 68" {aria}>{WM}</svg>'
+    return (f'<svg class="logo {cls}" viewBox="0 0 657.17 68.79" {aria}><use href="#lg-name"/>'
+            f'<use href="#lg-roundel" class="logo__roundel"/><use href="#lg-88"/></svg>')
+
+
+def emblem(cls: str = "") -> str:
+    """The roundel on its own (decorative)."""
+    return f'<svg class="emblem {cls}" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><use href="#lg-emblem"/></svg>'
 
 
 def social_links(cls: str = "") -> str:
@@ -224,17 +231,22 @@ def head(title: str, desc: str, root: str, canonical: str, jsonld: list | None =
 <title>{e(title)}</title>
 <meta name="description" content="{e(desc)}">
 <link rel="canonical" href="{e(canonical)}">
-<meta name="theme-color" content="#FBFAF8">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#F7F5EF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1813" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website"><meta property="og:site_name" content="{e(store["name"])}">
 <meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}">
-<meta property="og:image" content="{e(store["url"])}assets/img/og-image.jpg">
+<meta property="og:image" content="{e(store["url"])}assets/img/og-image.jpg"><meta property="og:url" content="{e(canonical)}">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="{root}assets/img/favicon.svg" type="image/svg+xml">
-<link rel="preload" href="{root}assets/fonts/archivo-narrow-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="{root}assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="apple-touch-icon" href="{root}assets/img/apple-touch-icon.png">
+<link rel="manifest" href="{root}site.webmanifest">
+<link rel="preload" href="{root}assets/fonts/rokkitt-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{root}assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
 {preload}<link rel="stylesheet" href="{root}assets/fonts/fonts.css">
 <link rel="stylesheet" href="{root}assets/css/tokens.css">
 <link rel="stylesheet" href="{root}assets/css/store.css">
-<script>document.documentElement.classList.replace("no-js","js")</script>
+<script>document.documentElement.classList.replace("no-js","js");try{{var t=localStorage.getItem("a88-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}}catch(e){{}}</script>
 {ld}
 </head>'''
 
@@ -295,7 +307,7 @@ def header(root: str, active: str | None = None) -> str:
 {announce_bar(root)}
 <header class="nav" data-nav-root>
   <div class="nav__bar">
-    <a class="nav__logo" href="{root}" aria-label="{e(store["name"])}, home">{wordmark(label="")}</a>
+    <a class="nav__logo" href="{root}" aria-label="{e(store["name"])}, home">{logo(label="")}</a>
     <nav class="nav__primary" aria-label="Main">
       <ul>
         <li><button type="button" class="nav__link nav__link--mega" data-mega aria-expanded="false" aria-controls="mega-shop">Shop {icon("chevron")}</button>
@@ -321,8 +333,8 @@ def promises() -> str:
 def signup() -> str:
     return '''<section class="signup" aria-labelledby="signup-title">
   <div class="signup__inner">
-    <div><h2 class="section-title" id="signup-title">First look at new arrivals</h2>
-    <p class="signup__lead">One email when something new lands. Nothing else.</p></div>
+    <div><h2 class="section-title" id="signup-title">First to know</h2>
+    <p class="signup__lead">One email when a new piece is ready. Nothing else.</p></div>
     <form class="signup__form" data-signup novalidate>
       <div class="field signup__field">
         <label class="field__label" for="signup-email">Email address</label>
@@ -341,20 +353,22 @@ def footer(root: str) -> str:
     return f'''{promises()}
 {signup()}
 <footer class="footer" data-nav="dark">
-  <div class="footer__cols">
-    {col("Shop", f'<li><a href="{root}shop/?sort=new">New in</a></li><li><a href="{root}shop/">Shop all</a></li>{cats}<li><a href="{root}gift-cards/">Gift cards</a></li>')}
-    {col("Help", f'<li><a href="{root}size-guide/">Size guide</a></li><li><a href="{root}returns/">Delivery &amp; returns</a></li><li><a href="{root}contact/">Contact</a></li>')}
-    {col("Archive 88", f'<li><a href="{root}about/">About</a></li>')}
-    {col("Follow", social_links())}
+  <div class="footer__top">
+    <div class="footer__brand">{emblem()}<p>{e(store["tagline"])}.<br>{e(store["established"])}.</p></div>
+    <div class="footer__cols">
+      {col("Shop", f'<li><a href="{root}shop/?sort=new">New in</a></li><li><a href="{root}shop/">Shop all</a></li>{cats}<li><a href="{root}gift-cards/">Gift cards</a></li>')}
+      {col("Help", f'<li><a href="{root}size-guide/">Size guide</a></li><li><a href="{root}returns/">Delivery &amp; returns</a></li><li><a href="{root}contact/">Contact</a></li>')}
+      {col("Archive 88", f'<li><a href="{root}about/">About</a></li>')}
+      {col("Follow", social_links())}
+    </div>
   </div>
   <div class="footer__legal">
-    <p>United Kingdom · £ GBP</p>
+    <p>© {date.today().year} {e(store["name"])}</p>
     <ul><li><a href="{root}privacy/">Privacy</a></li><li><a href="{root}terms/">Terms of sale</a></li></ul>
-    <p>© {date.today().year} {e(store["name"])}. Sample catalogue: names, prices and stock are placeholders.</p>
+    <p>United Kingdom, £ GBP</p>
+    <button type="button" class="theme-switch" data-theme-switch hidden>Theme: <span data-theme-label>Auto</span></button>
   </div>
-  <div class="footer__base">
-    <a class="footer__mono" href="{root}" aria-label="{e(store["name"])}, home"><svg viewBox="0 0 146 68" aria-hidden="true" focusable="false"><use href="#mono"/></svg></a>
-  </div>
+  <a class="footer__logo" href="{root}" aria-label="{e(store["name"])}, home">{logo(label="")}</a>
 </footer>'''
 
 
@@ -367,7 +381,7 @@ def cart_drawer() -> str:
 <ul class="cart-lines" data-cart-lines aria-label="Items in your bag"></ul>
 <div class="cart-empty" data-cart-empty hidden>
   <p class="cart-empty__title">Your bag is empty</p>
-  <p>Start with the pieces people reach for first.</p>
+  <p>Start with the pieces people ask for most.</p>
   <a class="btn btn--secondary" href="__ROOT__shop/">Shop all</a>
 </div>'''
     foot = f'''<dl class="cart-total"><dt>Subtotal</dt><dd data-cart-subtotal>{money(0, SYM)}</dd></dl>
@@ -417,7 +431,7 @@ def page(*, title, desc, root, path, main, active=None, scripts=(), jsonld=None,
     canonical = store["url"] + path
     cfg = {"root": root, "currency": store["currency"], "symbol": SYM, "locale": store["locale"],
            "freeShipping": store["free_shipping_threshold"], "lowStock": LOW, "shopify": store.get("shopify_domain", "")}
-    js = "".join(f'<script src="{root}assets/js/{s}.js" defer></script>' for s in ("store", *scripts))
+    js = "".join(f'<script src="{root}assets/js/{s}.js" defer></script>' for s in ("store", "motion", *scripts))
     return (head(title, desc, root, canonical, jsonld, preload) +
             f'\n<body data-tone="{tone}">\n{pre}{BRAND_DEFS}\n{SPRITE}\n{header(root, active)}\n<main id="main">\n{main}\n</main>\n{footer(root)}\n'
             f'{cart_drawer().replace("__ROOT__", root)}\n{menu_drawer(root)}\n{search_drawer(root)}\n{extra}\n'
@@ -531,7 +545,7 @@ def pdp(p: dict):
             frames += f'<li class="gallery__slide">{C.frame(img)}</li>'
         sets.append(f'<ul class="gallery__set" data-colour="{e(c["handle"])}" {"hidden" if i else ""} aria-label="{e(c["name"])} images">{frames}</ul>')
     count = len(p["media"][p["colours"][0]["handle"]])
-    gallery = (f'<section class="gallery" aria-label="Product images" data-gallery>{"".join(sets)}'
+    gallery = (f'<section class="gallery" aria-label="Product images" data-gallery data-vt-target>{"".join(sets)}'
                f'<p class="gallery__pager" aria-hidden="true"><span data-gallery-index>1</span> / <span data-gallery-total>{count}</span></p></section>')
 
     th = store["free_shipping_threshold"]
@@ -546,7 +560,7 @@ def pdp(p: dict):
     number = p["style"].split("-")[-1]
     info = f'''<div class="pdp__info">
   <div class="pdp__sticky">
-    <p class="pdp__meta"><a href="{root}shop/{cat["handle"]}/">{e(cat["title"])}</a><span>Style {e(number)}</span></p>
+    <p class="pdp__meta"><a href="{root}shop/{cat["handle"]}/">{e(cat["title"])}</a><span>No. {e(number)}</span></p>
     <h1 class="pdp__title">{e(p["title"])}</h1>
     <div class="pdp__price">{C.price(p, SYM)}</div>
     <form class="buy" data-buy novalidate>
@@ -612,26 +626,45 @@ def mark_bestsellers():
         p["best"] = i < 12
 
 
-def editorial(img: str, title: str, cta: str, href: str, *, w: int = 720, h: int = 900, cls: str = "") -> str:
-    return (f'<a class="split__panel reveal {cls}" href="{href}"><img src="assets/img/{img}" alt="" width="{w}" height="{h}" loading="lazy" decoding="async">'
-            f'<span class="split__text"><span class="split__title">{e(title)}</span><span class="link-arrow">{e(cta)} {icon("arrow")}</span></span></a>')
+def words(text: str) -> str:
+    """Wraps each word so the statement can ink in word by word as it crosses the screen (CSS only)."""
+    ws = text.split()
+    n = max(len(ws) - 1, 1)
+    return " ".join(f'<span class="w" style="--p:{i / n:.3f}">{e(w)}</span>' for i, w in enumerate(ws))
 
 
 def home():
+    """Homepage. All of its words and pictures come from the "home" block in data/store.json."""
     root = ""
     prepare(root)
     n = counts()
     order = ranked()
+    h = store["home"]
     newest = [p for p in order if p.get("new")][:12]
-    best = [p for p in order if p.get("best")][:12]
-    tiles = []
-    for c in CATS:
+    best = [p for p in order if p.get("best")][:5]
+
+    rows, frames = [], []
+    for i, c in enumerate(CATS):
         lead = next(p for p in order if p["category"] == c["handle"])
         v = lead["media"][lead["colours"][0]["handle"]][0]
-        tiles.append(f'<li class="reveal"><a class="cat-tile" href="shop/{c["handle"]}/">{C.frame(C.media(v, ""), "cat-tile__media")}'
-                     f'<span class="cat-tile__text"><span class="cat-tile__title">{e(c["title"])}</span>'
-                     f'<span class="cat-tile__count">{n[c["handle"]]} styles</span></span></a></li>')
-    th = money(store["free_shipping_threshold"], SYM)
+        rows.append(f'<li><a class="index__row" href="shop/{c["handle"]}/" data-index-row="{i}"><span class="index__name">{e(c["title"])}</span>'
+                    f'<span class="index__meta">{n[c["handle"]]} styles</span>{icon("arrow")}</a></li>')
+        frames.append(f'<div class="index__frame{" is-active" if i == 0 else ""}" data-index-frame="{i}">{C.frame(C.media(v, ""))}</div>')
+
+    phrases = "".join(f'<span>{e(t)}</span>{emblem()}' for t in h["band"] * 2)
+    band = f'<div class="band__group">{phrases}</div><div class="band__group" aria-hidden="true">{phrases}</div>'
+
+    stories = "".join(
+        f'<a class="story__item story__item--{"ab"[i]} reveal" href="{e(s["href"])}">'
+        f'<span class="story__img"><img src="{root}assets/img/{e(s["image"])}" alt="{e(s["alt"])}" width="720" height="900" loading="lazy" decoding="async"></span>'
+        f'<span class="story__title">{e(s["title"])}</span><span class="story__text">{e(s["text"])}</span>'
+        f'<span class="link-arrow">{e(s["cta"])} {icon("arrow")}</span></a>'
+        for i, s in enumerate(h["stories"][:2]))
+
+    wanted = "".join(C.product_card(p, root, SYM, cls="card--feature reveal" if i == 0 else "reveal") for i, p in enumerate(best))
+    lines = "".join(f'<span class="line"><span>{e(t)}</span></span>' for t in h["hero_title"])
+    b = h["banner"]
+
     main = f'''<section class="hero" data-nav="dark" data-nav-clear aria-labelledby="hero-title">
   <div class="hero__film" aria-hidden="true">
     <video class="hero__video" muted loop playsinline preload="metadata" poster="{root}assets/img/forest-poster.jpg">
@@ -641,44 +674,50 @@ def home():
     <div class="hero__shade"></div>
   </div>
   <div class="hero__content">
-    <p class="hero__eyebrow">Natural fibres, kept in every size</p>
-    <h1 class="hero__title" id="hero-title">{e(store["tagline"].capitalize())}</h1>
-    <ul class="hero__links">
-      <li><a class="link-arrow" href="shop/">Shop all {icon("arrow")}</a></li>
-      <li><a class="link-arrow" href="shop/?sort=new">New in {icon("arrow")}</a></li>
-    </ul>
+    <h1 class="hero__title" id="hero-title">{lines}</h1>
+    <p class="hero__lead">{e(h["hero_lead"])}</p>
+    <div class="hero__cta"><a class="btn btn--light" href="shop/">Shop the archive</a><a class="btn btn--ghost" href="shop/?sort=new">New in</a></div>
   </div>
+  <div class="hero__seal" aria-hidden="true"><img src="{root}assets/brand/seal-ring.svg" alt="" width="240" height="240">{emblem()}</div>
   <button type="button" class="hero__toggle" data-film-toggle aria-pressed="false" hidden>
     {icon("pause")}<span class="sr-only" data-film-label>Pause film</span></button>
 </section>
+<div class="band" aria-label="{e(", ".join(h["band"]))}" role="img"><div class="band__track" aria-hidden="true">{band}</div></div>
 {C.rail("new", "New in", "".join(C.product_card(p, root, SYM, eager=i < 2) for i, p in enumerate(newest)), link=("See all", "shop/?sort=new"))}
-<section class="split" data-nav="dark" data-nav-clear aria-label="Featured collections">
-  {editorial("menu-1.jpg", "Built for weather", "Shop outerwear", "shop/outerwear/")}
-  {editorial("menu-3.jpg", "Knitwear, spun slow", "Shop knitwear", "shop/knitwear/")}
+<section class="manifesto" aria-label="About {e(store["name"])}">
+  <p class="manifesto__text">{words(h["statement"])}</p>
+  <a class="link-arrow" href="{root}about/">Our story {icon("arrow")}</a>
 </section>
-{C.rail("best", "Bestsellers", "".join(C.product_card(p, root, SYM) for p in best), link=("Shop all", "shop/"))}
-<section class="cats" aria-labelledby="cats-title">
-  <div class="section-head"><h2 class="section-title" id="cats-title">Shop by category</h2></div>
-  <ul class="cats__grid">{"".join(tiles)}</ul>
+<section class="index" aria-labelledby="index-title">
+  <div class="section-head"><h2 class="section-title" id="index-title">The archive, by category</h2>
+    <a class="link-arrow" href="shop/">All {len(catalog)} styles {icon("arrow")}</a></div>
+  <div class="index__layout" data-archive-index>
+    <ul class="index__list">{"".join(rows)}</ul>
+    <div class="index__stage" aria-hidden="true">{"".join(frames)}</div>
+  </div>
+</section>
+<section class="story" aria-label="From the collection">{stories}</section>
+<section class="wanted" aria-labelledby="wanted-title">
+  <div class="section-head"><h2 class="section-title" id="wanted-title">Most wanted</h2>
+    <a class="link-arrow" href="shop/">Shop all {icon("arrow")}</a></div>
+  <div class="wanted__grid">{wanted}</div>
 </section>
 <section class="banner" data-nav="dark" data-nav-clear aria-labelledby="banner-title">
-  <img class="banner__img" src="{root}assets/img/forest-poster.jpg" alt="" width="1280" height="720" loading="lazy" decoding="async">
+  <img class="banner__img" src="{root}assets/img/{e(b["image"])}" alt="" width="1280" height="720" loading="lazy" decoding="async">
   <div class="banner__text reveal">
-    <h2 class="banner__title" id="banner-title">Made to be worn often</h2>
-    <p>Wool, cotton, linen and wax, cut in fits that stay in the range season after season. Free repairs for life.</p>
-    <a class="link-arrow" href="{root}about/">About Archive 88 {icon("arrow")}</a>
-  </div>
-</section>
-<section class="about-copy" aria-labelledby="about-title">
-  <h2 class="section-title" id="about-title">Archive 88: clothing made to stay</h2>
-  <div class="about-copy__cols">
-    <p>{e(store["description"])}</p>
-    <p>Every style in the collection is kept in every size, so the coat you buy this winter is the one we'll still make next year. Delivery is free across the UK on orders over {th}, and returns are free for 30 days.</p>
+    <h2 class="banner__title" id="banner-title">{e(b["title"])}</h2>
+    <p>{e(b["text"])}</p>
+    <a class="btn btn--light" href="{root}about/">About Archive 88</a>
   </div>
 </section>'''
+    ld = [{"@context": "https://schema.org", "@type": "Organization", "name": store["name"], "url": store["url"],
+           "logo": store["url"] + "assets/img/icon-512.png", "description": store["description"],
+           "sameAs": [store["social"]["instagram"], store["social"]["facebook"]]},
+          {"@context": "https://schema.org", "@type": "WebSite", "name": store["name"], "url": store["url"]}]
     write("index.html", page(
         title=f'{store["name"]}: {store["tagline"]}', desc=store["description"], root=root, path="", main=main,
-        scripts=("home",), preload=f'<link rel="preload" href="{root}assets/img/forest-poster.jpg" as="image" fetchpriority="high">\n'))
+        scripts=("home",), jsonld=ld,
+        preload=f'<link rel="preload" href="{root}assets/img/forest-poster.jpg" as="image" fetchpriority="high">\n'))
 
 
 def search_index():
@@ -732,9 +771,9 @@ def gift():
 
     card = f'''<div class="giftcard" data-gift-card data-method="email">
   <div class="giftcard__face">
-    <div class="giftcard__top">{wordmark("giftcard__mark", "")}<span class="giftcard__kind" data-gift-kind>E-gift card</span></div>
+    <div class="giftcard__top">{logo("giftcard__mark", "")}<span class="giftcard__kind" data-gift-kind>E-gift card</span></div>
     <p class="giftcard__amount" data-gift-amount>{money(g["default"], SYM)}</p>
-    <div class="giftcard__foot"><span>For <span data-gift-to>someone good</span></span><span>The permanent collection</span></div>
+    <div class="giftcard__foot"><span>For <span data-gift-to>someone good</span></span><span>{e(store["tagline"])}</span></div>
   </div>
 </div>'''
     main = f'''<div class="pdp gift" data-gift data-symbol="{e(SYM)}">
@@ -764,7 +803,7 @@ def gift():
 </div>
 {C.json_script("gift-config", {"amounts": g["amounts"], "ids": g.get("shopify_variant_ids", {})})}'''
     write("gift-cards/index.html", page(
-        title=f'Gift cards | {store["name"]}', desc=f'Archive 88 gift cards by email or post. {g["terms"]}',
+        title=f'Gift cards | {store["name"]}', desc=f'{store["name"]} gift cards by email or post. {g["terms"]}',
         root=root, path="gift-cards/", main=main, active="gift", scripts=("gift",)))
 
 
@@ -839,6 +878,7 @@ if(p.indexOf(s)===0){{location.replace(b+p.slice(s.length)+location.search+locat
 if(/\\/(lookbook|record)(\\/|$)/.test(p.slice(b.length-1))){{location.replace(b+"shop/");}}}})();</script>
 '''
     main = f'''<section class="info info--center">
+  {emblem()}
   <h1 class="page-title">Page not found</h1>
   <p class="info__lede">That page has moved or doesn't exist. Try the shop, or search for what you were after.</p>
   <p class="info__actions"><a class="btn btn--primary" href="{base}shop/">Shop all</a>

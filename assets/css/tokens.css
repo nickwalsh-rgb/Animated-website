@@ -1,75 +1,131 @@
-/* Archive 88: design tokens.
-   Brand layer = the Archive 88 palette and fonts (Archivo Narrow + Archivo). Layout language = clean retail:
-   square controls, quiet type, product first (patterns studied from leading streetwear / sportswear stores).
-   Three layers. Components only read the semantic and component layers, never raw hex.
-   1. Primitive  : the brand palette and scales
-   2. Semantic   : what a value is FOR (text, surface, action, signal)
-   3. Component  : the few values a component owns (frame ratio, header heights, drawer width)
-   Fonts come from ../fonts/fonts.css. See docs/DESIGN-SYSTEM.md. */
+/* Archive 88: design tokens (2026 identity).
+   Three layers. Components read the semantic and component layers, never raw hex.
+   1. Primitive  : the brand palette and scales. These never change with the theme.
+   2. Semantic   : what a value is FOR (text, surface, action, signal). These flip between light and dark.
+   3. Component  : the few values a component owns (frame ratio, header heights, drawer width).
+   The same names exist as Figma variables on the "Rebrand 2026" page. Fonts: ../fonts/fonts.css.
+   See docs/DESIGN-SYSTEM.md. */
 
 :root {
   /* 1 ─ Primitive ─────────────────────────────────────────────────────────── */
-  --ink: #1b211d;
-  --bone: #e6e3da;
-  --pine: #2f3d33;
-  --paper: #f5f4f0;
-  --white: #fbfaf8;
-  --mist: #ecebe6;                       /* product image ground: lighter than bone, so garments read */
-  --ink-soft: rgba(27, 33, 29, 0.68);    /* 5.4:1 on white, 5.1:1 on paper */
-  --bone-soft: rgba(230, 227, 218, 0.74);
-  --line: rgba(27, 33, 29, 0.12);
-  --line-strong: rgba(27, 33, 29, 0.3);
-  --accent: #a3471f;                     /* burnt orange: 5.5:1 on paper */
-  --accent-deep: #8a3a18;
+  --spruce: #17271f;                     /* the brand's black: type, buttons, footer, labels */
+  --night: #0e1813;                      /* dark theme ground */
+  --pine: #2f4a3c;                       /* hover on spruce, in stock */
+  --moss: #7a8870;                       /* quiet detail on dark */
+  --bone: #efebe1;                       /* the ground of the original logo: panels, type on dark */
+  --chalk: #f7f5ef;                      /* page background */
+  --stone: #e2ddd0;                      /* behind every product photo */
+  --blaze: #e5541b;                      /* the one accent: signals only */
+  --ember: #b4410f;                      /* blaze for small text on light (5.2:1 on chalk) */
 
-  --font-display: "Archivo Narrow", "Archivo Narrow Fallback", sans-serif;
-  --font-body: "Archivo", "Archivo Fallback", system-ui, sans-serif;
+  --font-display: "Rokkitt", "Rokkitt Fallback", Georgia, serif;          /* the slab from the logo */
+  --font-body: "Geist", "Geist Fallback", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;   /* facts: style numbers, counts */
 
-  --fs-xs: 0.75rem;                      /* 12: badges, legal */
+  --fs-xs: 0.75rem;                      /* 12: badges, legal, mono labels */
   --fs-sm: 0.8125rem;                    /* 13: meta, nav */
   --fs-base: 0.9375rem;                  /* 15: UI + body */
-  --fs-md: 1.0625rem;                    /* 17: card titles on large screens, lead copy */
-  --fs-lg: clamp(1.375rem, 1.1rem + 1vw, 1.875rem);      /* section titles */
-  --fs-xl: clamp(2rem, 1.4rem + 2.6vw, 3.5rem);           /* page titles */
-  --fs-hero: clamp(2.5rem, 1.6rem + 4.4vw, 5.5rem);       /* campaign headline */
+  --fs-md: 1.0625rem;                    /* 17: lead copy */
+  --fs-lg: clamp(1.625rem, 1.2rem + 1.5vw, 2.5rem);        /* section titles */
+  --fs-xl: clamp(2.25rem, 1.4rem + 3.6vw, 4.5rem);          /* page titles */
+  --fs-hero: clamp(2.75rem, 1.2rem + 6.4vw, 7.5rem);        /* campaign headline */
+  --fs-mega: clamp(3.5rem, 1rem + 11vw, 13rem);             /* index rows, closing statement */
 
   --t-press: 0.08s;
   --t-fast: 0.2s;                        /* hovers, colour changes */
   --t-base: 0.35s;                       /* drawers, menus */
-  --t-slow: 0.7s;                        /* section reveals */
+  --t-slow: 0.8s;                        /* section reveals */
   --t-instant: 0s;                       /* card alternate-angle swap: by design, no fade */
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 
-  /* 2 ─ Semantic ──────────────────────────────────────────────────────────── */
-  --color-bg: var(--white);
-  --color-bg-alt: var(--paper);
-  --color-surface-dark: var(--ink);
+  /* Fixed dark surfaces (announcement bar, hero, footer, gift card): dark in both themes. */
+  --surface-dark: var(--spruce);
+  --on-dark: var(--bone);
+  --on-dark-muted: rgba(239, 235, 225, 0.72);
+  --on-dark-line: rgba(239, 235, 225, 0.18);
+
+  /* 2 ─ Semantic (light) ──────────────────────────────────────────────────── */
+  color-scheme: light;
+  --color-bg: var(--chalk);
+  --color-bg-alt: var(--bone);
+  --ink: var(--spruce);                  /* text, and solid fills that carry --paper type */
+  --paper: var(--chalk);                 /* type on an --ink fill */
   --color-text: var(--ink);
-  --color-text-muted: var(--ink-soft);
-  --color-on-dark: var(--paper);
-  --color-on-dark-muted: var(--bone-soft);
-  --color-border: var(--line);
-  --color-border-strong: var(--line-strong);
-  --color-primary: var(--ink);           /* Add to bag, Checkout, Subscribe: solid ink, as retail expects */
+  --color-text-muted: rgba(23, 39, 31, 0.7);       /* 5.6:1 on chalk */
+  --color-border: rgba(23, 39, 31, 0.14);
+  --color-border-strong: rgba(23, 39, 31, 0.34);
+  --color-primary: var(--ink);           /* Add to bag, Checkout, Subscribe */
   --color-primary-hover: var(--pine);
   --color-on-primary: var(--paper);
-  --color-signal: var(--accent);         /* bag count, low stock, sale price, delivery meter */
-  --color-media: var(--mist);            /* behind every product image */
-  --color-error: var(--accent-deep);
-  --color-scrim: rgba(27, 33, 29, 0.42);
-  --color-focus: var(--accent);
+  --color-signal: var(--ember);          /* signal as text: low stock, sale price, errors */
+  --color-signal-fill: var(--blaze);     /* signal as a fill: bag count, meters */
+  --color-on-signal: var(--night);
+  --color-success: var(--pine);
+  --color-media: var(--stone);
+  --color-error: var(--ember);
+  --color-scrim: rgba(14, 24, 19, 0.5);
+  --color-focus: var(--blaze);
+  --shadow-lift: 0 24px 48px -28px rgba(14, 24, 19, 0.45);
+
+  /* Legacy names still read by a few rules and scripts */
+  --color-surface-dark: var(--surface-dark);
+  --color-on-dark: var(--on-dark);
+  --color-on-dark-muted: var(--on-dark-muted);
+  --accent: var(--color-signal);
 
   /* 3 ─ Component ─────────────────────────────────────────────────────────── */
   --media-ratio: 4 / 5;                  /* strict: every product image, everywhere */
-  --gutter: clamp(16px, 2.4vw, 40px);
+  --gutter: clamp(16px, 2.6vw, 44px);
   --grid-gap: clamp(8px, 1vw, 16px);
-  --page-max: 1920px;
+  --section: clamp(72px, 12vh, 152px);   /* space between page sections */
+  --page-max: 1760px;
   --bar-h: 36px;                         /* announcement bar */
-  --nav-h: 64px;
+  --nav-h: 68px;
   --sidebar-w: 248px;
-  --radius: 0px;                         /* square controls throughout */
-  --drawer-w: min(440px, 100%);
+  --radius: 0px;                         /* shape rule: square controls, round only for the roundel, swatches and dots */
+  --drawer-w: min(460px, 100%);
   --tap: 44px;
   --z-header: 50; --z-mega: 49; --z-sticky: 44; --z-drawer: 80; --z-toast: 90;
 }
-@media (max-width: 999px) { :root { --nav-h: 56px; } }
+@media (max-width: 999px) { :root { --nav-h: 58px; } }
+
+/* Dark theme: follows the device unless the visitor picks one (footer switch sets data-theme on <html>). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --surface-dark: #13211a;
+    --color-bg: var(--night);
+    --color-bg-alt: #14221b;
+    --ink: var(--bone);
+    --paper: var(--night);
+    --color-text-muted: rgba(239, 235, 225, 0.7);
+    --color-border: rgba(239, 235, 225, 0.14);
+    --color-border-strong: rgba(239, 235, 225, 0.36);
+    --color-primary-hover: #ffffff;
+    --color-signal: #f0703a;
+    --color-success: #8fb7a0;
+    --color-media: #1c2b23;
+    --color-error: #f0703a;
+    --color-scrim: rgba(0, 0, 0, 0.6);
+    --shadow-lift: 0 24px 48px -28px rgba(0, 0, 0, 0.8);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-dark: #13211a;
+  --color-bg: var(--night);
+  --color-bg-alt: #14221b;
+  --ink: var(--bone);
+  --paper: var(--night);
+  --color-text-muted: rgba(239, 235, 225, 0.7);
+  --color-border: rgba(239, 235, 225, 0.14);
+  --color-border-strong: rgba(239, 235, 225, 0.36);
+  --color-primary-hover: #ffffff;
+  --color-signal: #f0703a;
+  --color-success: #8fb7a0;
+  --color-media: #1c2b23;
+  --color-error: #f0703a;
+  --color-scrim: rgba(0, 0, 0, 0.6);
+  --shadow-lift: 0 24px 48px -28px rgba(0, 0, 0, 0.8);
+}

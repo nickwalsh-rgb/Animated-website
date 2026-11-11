@@ -1,8 +1,47 @@
 {
   "_readme": "Site settings. Edit, then run: python3 build.py",
   "name": "Archive 88",
-  "tagline": "The permanent collection",
-  "description": "Archive 88 makes a permanent collection of considered clothing: natural fibres, honest construction and fits that stay in the range season after season.",
+  "tagline": "Curated pieces, made in limited runs",
+  "established": "Est. 1988",
+  "_tagline_note": "The two lines from the logo. Used in the page title, the footer and the gift card.",
+  "description": "Archive 88 is a small collection of outdoor clothing, chosen piece by piece and made in limited runs. Wool, wax and cotton, cut to be worn for years. Est. 1988.",
+  "home": {
+    "_note": "Every word and picture on the homepage. Images live in assets/img/. Keep hero_title to two short lines and hero_lead under 20 words.",
+    "hero_title": [
+      "Curated pieces,",
+      "made in limited runs."
+    ],
+    "hero_lead": "Outdoor clothing in wool, wax and cotton. Chosen one piece at a time since 1988.",
+    "band": [
+      "Curated pieces",
+      "Limited runs",
+      "Est. 1988"
+    ],
+    "statement": "Archive 88 is a small collection, chosen piece by piece. Each style is made in a limited run, in cloth that gets better with wear, and given its own number in the archive.",
+    "stories": [
+      {
+        "image": "menu-1.jpg",
+        "alt": "Tall pines over a path that leads down to the sea.",
+        "title": "Built for weather",
+        "text": "Coats and jackets in wool, wax and gabardine, cut with room for a layer underneath.",
+        "cta": "Shop outerwear",
+        "href": "shop/outerwear/"
+      },
+      {
+        "image": "menu-3.jpg",
+        "alt": "Two people walking a forest path toward the water.",
+        "title": "Knitwear, spun slow",
+        "text": "Merino, lambswool and cashmere from mills that have been spinning for generations.",
+        "cta": "Shop knitwear",
+        "href": "shop/knitwear/"
+      }
+    ],
+    "banner": {
+      "image": "forest-poster.jpg",
+      "title": "Made to be worn often",
+      "text": "Wear it in the rain, on the coast, on the long way round. If something gives, send it back and we will mend it."
+    }
+  },
   "url": "https://nickwalsh-rgb.github.io/Animated-website/",
   "locale": "en-GB",
   "currency": "GBP",
@@ -91,7 +130,7 @@
     "default": 100,
     "post_note": "Printed on heavy card in a woven envelope. Free UK postage, dispatched in 1 to 2 working days.",
     "email_note": "Arrives in their inbox straight away, or on a date you choose.",
-    "terms": "Spend online across the whole collection. Use it in one go or over several orders.",
+    "terms": "Spend online on anything in the archive. Use it in one go or over several orders.",
     "shopify_variant_ids": {}
   },
   "social": {

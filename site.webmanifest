@@ -1,11 +1,11 @@
 {
   "name": "Archive 88",
   "short_name": "Archive 88",
-  "description": "A permanent collection of considered clothing in natural fibres, kept in every size.",
+  "description": "Curated pieces, made in limited runs. Est. 1988.",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#FBFAF8",
-  "theme_color": "#1B211D",
+  "background_color": "#F7F5EF",
+  "theme_color": "#17271F",
   "icons": [
     {
       "src": "assets/img/apple-touch-icon.png",

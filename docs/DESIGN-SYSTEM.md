@@ -1,73 +1,95 @@
-# Archive 88: brand and design system
+# Archive 88: brand and design system (2026 identity)
 
-Archive 88 is a **permanent collection** of 100 styles (1,830 size × colour
-variants in the sample data). It keeps **the Archive 88 identity** (palette, Archivo Narrow + Archivo, the wordmark
-and the A88 mark) and uses a **clean retail layout** built for range and conversion: announcement bar, mega-menu,
-search, full-bleed campaign imagery, product rails, plain product cards and a calm footer.
+Archive 88 sells **curated pieces, made in limited runs** (est. 1988). This document covers the identity that came
+out of the 2026 rebrand and the shop built on it. The identity was drawn from the original Figma logo (slab
+ARCHIVE, a pine and mountain roundel, 88) and lives in the same Figma file on the page **Rebrand 2026**: nine
+boards, six logo components, colour variables and text styles with the same names as the tokens below.
 
-> The layout patterns were studied from leading streetwear and sportswear stores (inverting header over imagery,
-> two-link campaign heroes, editorial splits, bestseller rails, category grid, service bar, newsletter in the
-> footer). Only the patterns are borrowed. Every name, image, colour and word on the site is Archive 88's own.
-
-Built with the `ui-ux-pro-max` skill (design-system search: *premium clothing e-commerce, minimal editorial*; style
-**Minimalism & Swiss**, variance 3, motion 3, density 5) for structure and UX rules. The visual layer is the
-existing brand, not the skill's generated palette and fonts.
+Design read: an online shop for an outdoor heritage label, in a catalogue-like "archive" language. Layout variance 7,
+motion 7, density 4. Native CSS and JavaScript only, no frameworks or animation libraries.
 
 ---
 
 ## 1. Brand
 
-Brand assets live in one place each: the wordmark letters, A88 mark and social icons in `src/brand-defs.html`,
-fonts in `assets/fonts/`, social links and business details in `data/store.json`.
+Brand assets live in one place each: logo files in `assets/brand/` and the inline logo parts in
+`src/brand-defs.html` (both written by `tools/make_brand.py`), fonts in `assets/fonts/`, the share image and app
+icons from `tools/make_icons.js`, social links and business details in `data/store.json`.
 
 | | |
 | --- | --- |
-| Positioning | Considered clothing in natural fibres, kept in the range season after season. |
-| Tagline | The permanent collection |
-| Voice | Plain, specific, unhurried. Say what it is made of and how it fits. |
-| Signature elements | Wordmark header that turns see-through over imagery, the graded forest film, square controls in ink, the woven orange stripe (gift card), the A88 mark that closes every page |
+| Positioning | A small collection of outdoor clothing, chosen piece by piece and made in limited runs. |
+| Tagline | Curated pieces, made in limited runs. Est. 1988. (the two lines from the original logo) |
+| Voice | Plain, specific, unhurried. Say what it is made of and how it fits. No filler words. |
+| Signature elements | The roundel (it turns once when you hover the logo, and sits in the turning seal on the hero), slab headlines, style numbers in mono (`No. 042`), the graded forest film, one blaze accent, the full-width logo that closes every page |
+
+### Logo
+
+| Mark | File | Use |
+| --- | --- | --- |
+| Lockup | `assets/brand/lockup.svg` | Primary. ARCHIVE, the roundel, 88 on one line. 120px wide or more. |
+| Wordmark | `wordmark.svg` | Letters only, for sizes under 120px. |
+| Stacked | `stacked.svg` | Roundel over name over descriptor. Labels, swing tags, packaging. |
+| Seal | `seal.svg`, `seal-ring.svg` | Roundel in a ring of type. Stickers, embossing; the ring turns on the homepage hero. |
+| Roundel | `emblem.svg` | Favicon, app icon, 404, footer. Holds at 16px. |
+| Monogram | `monogram.svg` | A88. Embroidery, zip pulls, small woven tabs. |
+
+Construction: letters are Rokkitt Black with 1.2% tracking. The roundel is 1.18 times the cap height (round shapes
+overshoot), with a gap of 0.3 cap heights either side. Clear space is half a roundel on every side. The roundel is one
+shape: a solid disc with the ridge and pine knocked out, colours swapped where they cross. All files use
+`currentColor`, so they take the colour of the text around them. To change the drawing, edit `tools/make_brand.py`
+and run it; never edit the SVGs by hand.
 
 ### Colour
 
 | Token | Hex | Use |
 | --- | --- | --- |
-| Ink | `#1B211D` | Text, primary buttons (Add to bag, Checkout, Subscribe), announcement bar, footer, selected chips |
-| White | `#FBFAF8` | Page background |
-| Paper | `#F5F4F0` | Newsletter band, type on ink |
-| Mist | `#ECEBE6` | Behind every product image (lighter than bone so garments read) |
-| Pine | `#2F3D33` | Hover on ink, *in stock* and *added* states, the posted gift card |
-| Burnt orange | `#A3471F` (deep `#8A3A18`) | **Signals only**: bag count, *Selling fast*, low-stock dots, delivery meter, sale price, focus ring, search highlight |
+| Spruce | `#17271F` | The brand's black: text, primary buttons, announcement bar, footer, gift card |
+| Night | `#0E1813` | Dark theme background |
+| Pine | `#2F4A3C` | Hover on spruce, *in stock* and *added* states |
+| Moss | `#7A8870` | Quiet detail on dark (print and labels) |
+| Bone | `#EFEBE1` | The ground of the original logo: newsletter band, type on dark |
+| Chalk | `#F7F5EF` | Page background |
+| Stone | `#E2DDD0` | Behind every product image |
+| Blaze | `#E5541B` | **The one accent, signals only**: bag count, *Selling fast*, low-stock dots, delivery meter, focus ring |
+| Ember | `#B4410F` | Blaze for small text on light (sale price, errors): 5.2:1 on chalk |
 
-Primary actions are solid ink, as shoppers expect from retail; orange is kept for signals so it always means
-*look here*. Text contrast: muted text 5.1:1+ on white and paper, orange 5.5:1 on paper, paper on ink 15:1.
+Primary actions are solid spruce; blaze is kept for signals so it always means *look here*. Light and dark themes
+are both designed: the site follows the device and the footer has a switch (Auto, Light, Dark). The hero, footer,
+announcement bar and gift card stay dark in both themes.
 
 ### Typography
 
 | Role | Face | Where |
 | --- | --- | --- |
-| Display | **Archivo Narrow** 600, sentence case | Hero and banner headlines, page, section and product titles |
-| UI + body | **Archivo** 400 / 500 | Navigation, buttons, cards, prices, forms, body copy |
+| Display | **Rokkitt** 800 / 900 (the slab from the logo) | Headlines, page, section and product titles, index rows, menu |
+| Text + UI | **Geist** 400 / 500 | Navigation, buttons, cards, prices, forms, body copy |
+| Facts | **Geist Mono** 400 / 500, uppercase with wide tracking for labels | Style numbers, counts, sizes, badges, field labels, breadcrumbs |
 
-Sentence case throughout (no tracked uppercase): quieter, faster to read in a dense grid. Type scale is in tokens
-(`--fs-xs` 12 to `--fs-hero`, fluid). Self-hosted with metric-matched fallbacks, so text doesn't shift when fonts load.
+The serif is deliberate: it is the logo's own letterform. Sentence case for everything set in the slab or Geist.
+Self-hosted variable fonts with tuned fallbacks, so text barely moves when they load.
+
+### Shape
+
+Square corners on every control, card and image. Round is reserved for the roundel, colour swatches and status dots.
 
 ### Product card
-Image on the mist ground (strict 4:5) with one small badge at most (*Selling fast*, *New*, *Bestseller* or *Sold out*),
-then name and price on one line, the colour name, and swatches. Desktop hover swaps the photo to the alternate angle
-instantly and reveals quick-add sizes along the bottom of the image. The whole card is one link target; swatches and
+Image on the stone ground (strict 4:5) with one small badge at most (*Selling fast*, *New*, *Bestseller* or *Sold out*),
+then name and price on one line, the colour name and the style number, and swatches. Desktop hover swaps the photo to
+the alternate angle instantly and reveals quick-add sizes along the bottom of the image. The whole card is one link target; swatches and
 quick add sit above it.
 
 ---
 
 ## 2. Token architecture (`assets/css/tokens.css`)
 
-1. **Primitive**: the brand palette, fonts, type scale, motion speeds.
-2. **Semantic**: what a value is for: `--color-text`, `--color-primary` (ink), `--color-signal` (orange), `--color-media`, `--color-on-dark`, `--color-error`, `--color-focus`.
-3. **Component**: values a component owns: `--media-ratio: 4 / 5`, `--bar-h`, `--nav-h`, `--sidebar-w`, `--drawer-w`, `--radius: 0`, `--tap: 44px`.
+1. **Primitive**: the palette, fonts, type scale, motion speeds. These never change with the theme.
+2. **Semantic**: what a value is for: `--ink` (text and solid fills), `--paper` (type on ink), `--color-bg`, `--color-primary`, `--color-signal` (as text), `--color-signal-fill`, `--color-success`, `--color-media`, `--surface-dark`, `--on-dark`, `--color-focus`. These flip between light and dark.
+3. **Component**: values a component owns: `--media-ratio: 4 / 5`, `--bar-h`, `--nav-h`, `--sidebar-w`, `--drawer-w`, `--radius: 0`, `--tap: 44px`, `--section`.
 
 Components read layers 2 and 3 only. To restyle, change a semantic token; no component CSS changes.
 
-Motion: `--t-press` 80ms, `--t-fast` 200ms (hovers), `--t-base` 350ms (drawers, menus), `--t-slow` 700ms (section
+Motion: `--t-press` 80ms, `--t-fast` 200ms (hovers), `--t-base` 350ms (drawers, menus), `--t-slow` 800ms (section
 reveals), plus `--t-instant` 0ms for the card angle swap. `prefers-reduced-motion` removes movement but keeps every
 state change.
 
@@ -97,7 +119,7 @@ Markup is generated by `components.py` / `build.py` (one function per component)
 | Drawer | `drawer()` | `.drawer--right/left/top/bottom` | `store.js` (`Drawer`) | One controller for bag, menu, search, mobile filters, size sheet. |
 | Colour / size selectors | `colour_selector()`, `size_selector()` | `.option`, `.size-opt` | `pdp.js` | Real radios. Sold-out sizes disabled and struck; low stock gets an orange dot. |
 | Variant matrix | `variant_matrix()` | `.matrix` | – | Full size × colour availability table (PDP, *Availability*). |
-| Add to bag | inline in `pdp()` | `.buy-btn` | `pdp.js` | Full-width ink button. |
+| Add to bag | inline in `pdp()` | `.buy-btn` | `pdp.js` | Full-width spruce button. |
 | Sticky Add to bag | `sticky_atc()` | `.sticky-atc` | `pdp.js` | Bar pinned to the bottom, phones/tablets only. |
 | Accordion | `accordion()` | `.accordion` | – | Native `<details>`. |
 | Promises, sign-up, footer | `promises()`, `signup()`, `footer()` | `.promises`, `.signup`, `.footer` | `store.js` | Service bar, newsletter (inline validation; hook `window.A88S.subscribe(email)` to your email provider), four link columns, legal row, A88 mark. |
@@ -153,30 +175,34 @@ results, stock and bag changes; skip link; auto-rotating content can be paused; 
 
 ---
 
-## 4b. Header and homepage
+## 4b. Header, homepage and motion
 
 **Inverting header (site-wide).** Any section marked `data-nav="dark"` flips the header while the header sits over
-it. Sections that also carry `data-nav-clear` (the film hero, the editorial split, the banner) make it see-through
-with light type, so the imagery runs behind it; other dark sections (the footer) give a solid ink bar. Everywhere
-else it is a solid light bar. `store.js` checks which section is under the middle of the header as you scroll
-(measured where the header really is, below the announcement bar at the top). Opening the mega-menu always brings
-the solid light bar back.
+it. Sections that also carry `data-nav-clear` (the film hero, the banner) make it see-through and lightly frosted
+with light type, so the imagery runs behind it; other dark sections (the footer) give a solid spruce bar. Everywhere
+else it is a solid light bar. Opening the mega-menu always brings the solid light bar back.
 
-**Homepage, top to bottom.**
+**Homepage, top to bottom.** Every word and picture comes from the `home` block in `data/store.json`. Each section
+uses a different layout so the page never repeats itself.
 
 | Section | Pattern |
 | --- | --- |
-| Film hero | Graded forest film full-bleed under the header; headline and two text links (*Shop all*, *New in*) centred low. Muted, pauses off screen, Pause/Play button, poster only with reduced motion. |
+| Film hero | Forest film full-bleed under the header. Two-line slab headline, one line of copy, two buttons, bottom left. The seal turns slowly bottom right. Muted, pauses off screen, Pause/Play button, poster only with reduced motion. |
+| Name band | The three phrases from the logo in outlined slab, moving slowly. The only marquee on the site; pauses on hover; static with reduced motion. |
 | New in | Product rail, *See all* link. |
-| Editorial split | Two campaign images side by side (stacked on phones), headline and link over the lower edge. |
-| Bestsellers | Product rail (top-ranked styles that aren't new). |
-| Shop by category | Six tiles, product art on mist, name and count. |
-| Banner | Full-bleed image with a short brand story and link. |
-| Brand copy | Two short paragraphs (also useful for search engines). |
-| Promises, sign-up, footer | Shared by every page. |
+| Statement | One large paragraph. Words ink in as it crosses the screen. |
+| Archive index | Six category names as large rows with counts; on desktop a sticky frame shows the lead style of the row under the pointer. |
+| Stories | Two pictures set off the grid, title and a line of copy underneath. Pictures drift slightly as you scroll. |
+| Most wanted | One large product and four beside it (top-ranked styles that aren't new). |
+| Banner | Full-bleed picture that settles as it arrives, statement, link to About. |
+| Promises, sign-up, footer | Shared by every page. The full-width logo rises into place at the very end. |
 
-Motion is deliberately calm: no loader, no pinned or scroll-driven sections, no animation libraries. Sections fade up
-16px once as they arrive (`home.js`); with reduced motion or without JS everything is simply visible.
+**Motion.** Each movement has a job: the headline rising line by line sets hierarchy; sections arriving once give
+sequence; the statement inking in and the pictures drifting tie content to scroll; hovers give feedback (the roundel
+turns, arrows nudge, cards zoom slightly); page changes cross-fade and a product picture carries over from its card
+to its page. Scroll-linked effects are CSS scroll-driven animations (they simply don't run in browsers without
+support); reveals use IntersectionObserver in `motion.js`. With reduced motion nothing moves and everything is
+visible; without JavaScript everything is visible.
 
 ## 4c. Gift cards
 
