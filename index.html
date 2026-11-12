@@ -83,7 +83,7 @@
 <main id="main">
 <section class="hero" aria-labelledby="hero-title">
   <div class="hero__film" aria-hidden="true">
-    <video class="hero__video" muted loop playsinline preload="metadata" poster="assets/img/forest-poster.jpg">
+    <video class="hero__video" data-film muted loop playsinline preload="metadata" poster="assets/img/forest-poster.jpg">
       <source src="assets/video/forest-portrait.mp4" type="video/mp4" media="(max-width: 720px) and (orientation: portrait)">
       <source src="assets/video/forest.mp4" type="video/mp4">
     </video>
@@ -118,6 +118,24 @@
   <div class="tiles__track" data-rail-track tabindex="0" role="region" aria-label="Shop by fabric, scroll sideways"><article class="tile tile--explore"><a href="journal/how-to-wash-wool/" tabindex="-1" aria-hidden="true"><picture class="tile__media"><source type="image/webp" srcset="assets/img/site/fibre-wool-640.webp 640w, assets/img/site/fibre-wool.webp 1024w" sizes="(min-width: 1000px) 31vw, 82vw"><img src="assets/img/site/fibre-wool.jpg" alt="" width="1024" height="1024" loading="lazy" decoding="async"></picture></a><div class="tile__body"><h3 class="tile__title">Wool</h3><ul class="tile__links"><li><a href="journal/how-to-wash-wool/">Explore<span class="sr-only">: Wool</span></a></li><li><a href="shop/knitwear/">Knitwear<span class="sr-only">: Wool</span></a></li><li><a href="shop/tailoring/">Tailoring<span class="sr-only">: Wool</span></a></li></ul></div></article><article class="tile tile--explore"><a href="product-care/" tabindex="-1" aria-hidden="true"><picture class="tile__media"><source type="image/webp" srcset="assets/img/site/fibre-cotton-640.webp 640w, assets/img/site/fibre-cotton.webp 1024w" sizes="(min-width: 1000px) 31vw, 82vw"><img src="assets/img/site/fibre-cotton.jpg" alt="" width="1024" height="1024" loading="lazy" decoding="async"></picture></a><div class="tile__body"><h3 class="tile__title">Cotton</h3><ul class="tile__links"><li><a href="product-care/">Explore<span class="sr-only">: Cotton</span></a></li><li><a href="shop/shirts/">Shirts<span class="sr-only">: Cotton</span></a></li><li><a href="shop/jersey/">Jersey<span class="sr-only">: Cotton</span></a></li></ul></div></article><article class="tile tile--explore"><a href="journal/rewax-a-jacket/" tabindex="-1" aria-hidden="true"><picture class="tile__media"><source type="image/webp" srcset="assets/img/site/fibre-wax-640.webp 640w, assets/img/site/fibre-wax.webp 1024w" sizes="(min-width: 1000px) 31vw, 82vw"><img src="assets/img/site/fibre-wax.jpg" alt="" width="1024" height="1024" loading="lazy" decoding="async"></picture></a><div class="tile__body"><h3 class="tile__title">Waxed cotton</h3><ul class="tile__links"><li><a href="journal/rewax-a-jacket/">Explore<span class="sr-only">: Waxed cotton</span></a></li><li><a href="shop/outerwear/">Outerwear<span class="sr-only">: Waxed cotton</span></a></li></ul></div></article></div>
   <button type="button" class="tiles__nav tiles__nav--prev" data-rail-prev aria-label="Previous" disabled><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-chevron"/></svg></button>
   <button type="button" class="tiles__nav tiles__nav--next" data-rail-next aria-label="Next"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-chevron"/></svg></button>
+</section>
+<section class="spotlight" aria-labelledby="spotlight-title">
+  <div class="spotlight__inner">
+    <div class="spotlight__film">
+      <video class="spotlight__video" data-film muted loop playsinline preload="none" poster="assets/img/site/tee-poster.jpg" width="1080" height="1920" aria-label="A dark heavyweight t-shirt, the camera moving slowly from collar to hem.">
+        <source src="assets/video/tee.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="spotlight__content">
+      <p class="spotlight__eyebrow">Jersey</p>
+      <h2 class="spotlight__title" id="spotlight-title">The Heavyweight Tee</h2>
+      <p class="spotlight__text">Dense organic cotton jersey with a ribbed collar that holds its shape. Cut once, kept in every size.</p>
+      <p class="spotlight__price">£75 · 3 colours · XS to XXL</p>
+      <ul class="spotlight__links"><li><a class="btn btn--light btn--sm" href="products/heavyweight-tee/">Shop the tee</a></li><li><a class="btn btn--on-dark btn--sm" href="shop/jersey/">All jersey</a></li></ul>
+    </div>
+    <button type="button" class="round-btn spotlight__toggle" data-film-toggle aria-pressed="false" hidden>
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-pause"/></svg><span class="sr-only" data-film-label>Pause film</span></button>
+  </div>
 </section>
 <section class="stories" aria-labelledby="stories-title" data-rail>
   <div class="stories__head"><h2 class="stories__title" id="stories-title">Latest stories</h2><a class="stories__all" href="journal/">View all</a></div>

@@ -6,10 +6,11 @@
   "use strict";
   const { $, $$, reduced } = window.A88S;
 
-  /* ---------- Hero film ---------- */
-  const video = $(".hero__video");
-  const toggle = $("[data-film-toggle]");
-  if (video && toggle) {
+  /* ---------- Films (hero, product spotlight): each [data-film] video plays while on screen and has its own
+     pause button, the [data-film-toggle] in the same section ---------- */
+  $$("video[data-film]").forEach((video) => {
+    const toggle = $("[data-film-toggle]", video.closest("section"));
+    if (!toggle) return;
     let userPaused = reduced.matches;
     const sync = () => {
       const playing = !video.paused;
@@ -29,7 +30,7 @@
       if (en.isIntersecting && !userPaused) play(); else video.pause();
     }, { threshold: 0.05 }).observe(video);
     sync();
-  }
+  });
 
   /* ---------- Campaign photo caption (the round camera button) ---------- */
   const capBtn = $("[data-caption-toggle]");

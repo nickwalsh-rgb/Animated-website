@@ -353,6 +353,31 @@ body.mega-open .nav { background: var(--color-bg) !important; color: var(--ink) 
 @media (min-width: 900px) { .feature { min-height: min(74vh, 760px); padding-bottom: 48px; } .feature__credit { bottom: 32px; } .feature__caption { bottom: 76px; } }
 @media (max-width: 599px) { .feature__content { padding-bottom: 28px; } }
 
+/* Home: one product on film. Phone: the film fills the screen with the words along its lower edge.
+   Desktop: film and words side by side on ink (the film is graded so its edges melt into the panel). */
+.spotlight { margin-top: clamp(64px, 10vh, 96px); background: var(--ink); color: var(--paper); }
+.spotlight :focus-visible { outline-color: var(--paper); }
+.spotlight__inner { position: relative; isolation: isolate; display: flex; align-items: flex-end; justify-content: center; min-height: min(177.78vw, 86svh); padding: 32px var(--gutter) 40px; overflow: hidden; }
+.spotlight__film { position: absolute; inset: 0; z-index: -1; }
+.spotlight__film::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, var(--ink) 4%, rgba(27,33,29,.7) 28%, rgba(27,33,29,0) 58%); }
+.spotlight__video { width: 100%; height: 100%; object-fit: cover; }
+.spotlight__content { display: grid; justify-items: center; gap: 12px; text-align: center; }
+.spotlight__eyebrow { font-size: var(--fs-sm); font-weight: 500; }
+.spotlight__title { font-family: var(--font-display); font-weight: 600; font-size: clamp(2.75rem, 1.8rem + 4vw, 4.5rem); line-height: .95; letter-spacing: -0.01em; }
+.spotlight__text { max-width: 34ch; font-size: 1.0625rem; line-height: 1.4; }
+.spotlight__price { font-size: var(--fs-sm); color: var(--color-on-dark-muted); font-variant-numeric: tabular-nums; }
+.spotlight__links { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 8px; }
+.spotlight__toggle { position: absolute; right: var(--gutter); top: 16px; width: 32px; height: 32px; }
+@media (min-width: 900px) {
+  .spotlight__inner { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(32px, 6vw, 96px); min-height: 0; max-width: var(--page-max); margin: 0 auto; padding-block: 0; }
+  .spotlight__film { position: relative; inset: auto; z-index: 0; justify-self: end; height: min(88vh, 860px); aspect-ratio: 9 / 16; }
+  .spotlight__film::after { background: none; box-shadow: inset 0 0 48px 36px var(--ink); }
+  .spotlight__content { justify-items: start; text-align: left; }
+  .spotlight__text { font-size: 1.25rem; }
+  .spotlight__links { justify-content: flex-start; }
+  .spotlight__toggle { top: auto; bottom: 32px; }
+}
+
 /* Home + journal: story cards */
 .stories { margin-top: clamp(64px, 10vh, 96px); }
 .stories .tiles { margin-top: 0; }

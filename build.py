@@ -668,9 +668,15 @@ def home():
         for x in HOME["explore"])
     feat_links = "".join(f'<li><a class="btn btn--light btn--sm" href="{e(u)}">{e(t)}</a></li>' for t, u in feat["links"])
     stories = "".join(story_card(s, root) for s in JOURNAL)
+    spot = HOME["spotlight"]
+    sp = next((p for p in catalog if p["handle"] == spot["product"]), None)
+    if sp is None:
+        fail(f"data/home.json spotlight: no product with handle '{spot['product']}'")
+    spot_links = "".join(f'<li><a class="btn btn--{"light" if i == 0 else "on-dark"} btn--sm" href="{e(u)}">{e(t)}</a></li>'
+                         for i, (t, u) in enumerate(spot["links"]))
     main = f'''<section class="hero" aria-labelledby="hero-title">
   <div class="hero__film" aria-hidden="true">
-    <video class="hero__video" muted loop playsinline preload="metadata" poster="{root}assets/img/forest-poster.jpg">
+    <video class="hero__video" data-film muted loop playsinline preload="metadata" poster="{root}assets/img/forest-poster.jpg">
       <source src="{root}assets/video/forest-portrait.mp4" type="video/mp4" media="(max-width: 720px) and (orientation: portrait)">
       <source src="{root}assets/video/forest.mp4" type="video/mp4">
     </video>
@@ -698,6 +704,24 @@ def home():
   <p class="feature__caption" id="feature-caption" hidden>{e(feat["caption"])}</p>
 </section>
 {tile_rail("explore", "Shop by fabric", explore_tiles, "tiles--explore")}
+<section class="spotlight" aria-labelledby="spotlight-title">
+  <div class="spotlight__inner">
+    <div class="spotlight__film">
+      <video class="spotlight__video" data-film muted loop playsinline preload="none" poster="{root}assets/img/site/{e(spot["poster"])}.jpg" width="1080" height="1920" aria-label="{e(spot["alt"])}">
+        <source src="{root}assets/video/{e(spot["video"])}.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="spotlight__content">
+      <p class="spotlight__eyebrow">{e(spot["eyebrow"])}</p>
+      <h2 class="spotlight__title" id="spotlight-title">{e(spot["title"])}</h2>
+      <p class="spotlight__text">{e(spot["text"])}</p>
+      <p class="spotlight__price">{money(sp["price"], SYM)} · {len(sp["colours"])} colours · {e(sp["sizes"][0])} to {e(sp["sizes"][-1])}</p>
+      <ul class="spotlight__links">{spot_links}</ul>
+    </div>
+    <button type="button" class="round-btn spotlight__toggle" data-film-toggle aria-pressed="false" hidden>
+      {icon("pause")}<span class="sr-only" data-film-label>Pause film</span></button>
+  </div>
+</section>
 <section class="stories" aria-labelledby="stories-title" data-rail>
   <div class="stories__head"><h2 class="stories__title" id="stories-title">Latest stories</h2><a class="stories__all" href="journal/">View all</a></div>
   <div class="tiles">

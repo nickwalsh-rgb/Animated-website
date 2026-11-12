@@ -23,7 +23,7 @@ makes web-sized photos, commits the result and publishes it. You can also run it
 | --- | --- | --- |
 | Styles, prices, colours, sizes, stock | `data/catalog.json` (`stock[colour][size]` is the variant matrix) | `python3 build.py` |
 | Product photos | `assets/products/<handle>/<colour>-<n>.jpg` (see that folder's README; cropped to 4:5 by the build) | `python3 build.py` |
-| Homepage: hero, category strip, tiles, campaign, fabric rail, the five commitments | `data/home.json` | `python3 build.py` |
+| Homepage: hero, category strip, tiles, campaign, fabric rail, product film, the five commitments | `data/home.json` | `python3 build.py` |
 | Journal stories | `src/journal/<nn>-<slug>.html` (the number sets the order; reading time is worked out for you) | `python3 build.py` |
 | Homepage and journal photos | `assets/img/site/<name>.jpg` plus `<name>.webp` and `<name>-640.webp` | refresh |
 | Announcement bar, categories, free-delivery threshold, page size, gift cards, social links, business details, shipping wording, Shopify domain | `data/store.json` | `python3 build.py` |
@@ -49,7 +49,7 @@ unknown category or a missing stock cell.
 
 | Page | What's on it |
 | --- | --- |
-| Home `/` | Film hero with pill links, category strip, shop tiles rail, campaign image, shop-by-fabric rail, latest stories |
+| Home `/` | Film hero with pill links, category strip, shop tiles rail, campaign image, shop-by-fabric rail, product film, latest stories |
 | Journal `/journal/`, `/journal/<slug>/` | Care guides, repairs and notes on fabric |
 | Shop `/shop/`, `/shop/<category>/` | Sticky filter sidebar (drawer on phones), sort, Load more; filters kept in the address (`?size=M&colour=green`) |
 | Product `/products/<handle>/` | Gallery, colour and size selectors, stock messages, availability matrix, sticky Add to bag on phones, You may also like |
