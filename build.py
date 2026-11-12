@@ -708,6 +708,7 @@ def home():
   <div class="spotlight__inner">
     <div class="spotlight__film">
       <video class="spotlight__video" data-film muted loop playsinline preload="none" poster="{root}assets/img/site/{e(spot["poster"])}.jpg" width="1080" height="1920" aria-label="{e(spot["alt"])}">
+        <source src="{root}assets/video/{e(spot["video"])}-720.mp4" type="video/mp4" media="(max-width: 480px)">
         <source src="{root}assets/video/{e(spot["video"])}.mp4" type="video/mp4">
       </video>
     </div>
