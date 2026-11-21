@@ -1,160 +1,170 @@
-/* Archive 88: product detail page.
-   The size x colour variant matrix (#variant-matrix, written by build.py) drives everything: which sizes are
-   available in the chosen colour, stock messages, the gallery set, the mobile sticky bar and the size sheet.
-   Selection lives in the URL (?colour=olive&size=M) so a shared link opens the exact variant. */
+/* Archive 88: product page.
+   - Colour: each colour has its own address (?colour=), switched in place
+   - Size: radio tiles; the button reads "Choose size" (disabled look) until a size is picked, then "Add to bag"
+   - Sticky purchase bar once the main button scrolls away (IntersectionObserver)
+   - Gallery: two-column grid on desktop, swipe with a 1/4 counter on phones, full-screen viewer with zoom and keys
+   - Size guide: two tabs, measurements per size, hover a row to highlight it on the drawing */
 (() => {
   "use strict";
-  const { $, $$, esc, Drawer, Cart, cfg } = window.A88S;
-  const pdp = $("[data-pdp]");
-  if (!pdp) return;
-  const M = JSON.parse($("#variant-matrix").textContent);
-  const form = $("[data-buy]", pdp);
-  const sizeSet = $('[data-option="size"]', form);
-  const sizeMsg = $("[data-size-msg]", form);
-  const stockMsg = $("[data-stock-msg]", form);
-  const atc = $("[data-atc]", form);
-  const sticky = $("[data-sticky-atc]");
-  const stickyBtn = $("[data-sticky-btn]");
-  const sheet = document.getElementById("size-sheet");
-  const atcLabel = atc.innerHTML;
+  const { $, $$, Bag, Wish, openDialog, announce } = window.A88;
+  const page = $("[data-pdp]");
+  if (!page) return;
+  const P = JSON.parse($("#product-data").textContent);
+  const LOW = window.A88.cfg.low;
+  const form = $("[data-buy]", page), msg = $("[data-buy-msg]", form), atc = $("[data-atc]", form), atcLabel = $("[data-atc-label]", form);
+  const bar = $("[data-pbar]"), barBtn = $("[data-pbar-btn]");
+  let colour = P.colours[0].h;
 
-  const colour = () => M.colours.find((c) => c.h === form.colour.value) || M.colours[0];
-  const size = () => (form.querySelector('input[name="size"]:checked') || {}).value || "";
-  const units = (c, s) => (M.stock[c] || {})[s] || 0;
-
-  function syncSizes() {
-    const c = colour().h;
-    $$('input[name="size"]', form).forEach((input) => {
-      const n = units(c, input.value);
-      input.disabled = n === 0;
-      input.closest(".size-opt").classList.toggle("is-low", n > 0 && n <= cfg.lowStock);
-      input.setAttribute("aria-label", `${input.value}${n === 0 ? ", sold out" : n <= cfg.lowStock ? `, only ${n} left` : ""}`);
+  /* ── Colour ────────────────────────────────────────────────────────────── */
+  function setColour(h, { push = false } = {}) {
+    const c = P.colours.find((x) => x.h === h) || P.colours[0];
+    colour = c.h;
+    $$("[data-gal-set]", page).forEach((s) => (s.hidden = s.dataset.galSet !== c.h));
+    $$("[data-swatch]", page).forEach((a) => (a.dataset.swatch === c.h ? a.setAttribute("aria-current", "true") : a.removeAttribute("aria-current")));
+    $("[data-colour-name]", page).textContent = c.n;
+    const wl = $(".wishlink", page);
+    wl.dataset.wish = `${P.handle}/${c.h}`;
+    Wish.sync(page);
+    const stock = P.stock[c.h];
+    $$('input[name="size"]', form).forEach((r) => {
+      r.disabled = !(stock[r.value] > 0);
+      r.closest(".size").classList.toggle("is-low", stock[r.value] > 0 && stock[r.value] <= LOW);
+      if (r.disabled && r.checked) r.checked = false;
     });
+    paintButton();
+    const set = currentSet();
+    $("[data-gal-total]", page).textContent = $$(".gal__slide", set).length;
+    $("[data-gal-index]", page).textContent = "1";
+    set.scrollLeft = 0;
+    const url = new URL(location.href);
+    c.h === P.colours[0].h ? url.searchParams.delete("colour") : url.searchParams.set("colour", c.h);
+    history[push ? "pushState" : "replaceState"](null, "", url.pathname + url.search);
   }
-
-  function update({ push = true } = {}) {
-    const c = colour(), s = size();
-    $("[data-colour-name]", form).textContent = c.n;
-    $("[data-size-name]", form).textContent = s;
-    // gallery: show this colour's set
-    $$(".gallery__set", pdp).forEach((set) => (set.hidden = set.dataset.colour !== c.h));
-    updatePager();
-    // stock message
-    const n = s ? units(c.h, s) : 0;
-    stockMsg.className = "stock-msg";
-    if (!s) stockMsg.textContent = "";
-    else if (n <= cfg.lowStock) { stockMsg.textContent = `Only ${n} left in ${s}`; stockMsg.classList.add("is-low"); }
-    else { stockMsg.textContent = "In stock. Dispatched in 1 to 2 working days"; stockMsg.classList.add("is-in"); }
-    const all = M.sizes.every((x) => units(c.h, x) === 0);
-    atc.disabled = all;
-    atc.innerHTML = all ? `<span class="buy-btn__price">Sold out in ${esc(c.n)}</span>` : atcLabel;
-    // sticky bar
-    $("[data-sticky-variant]").textContent = [c.n, s].filter(Boolean).join(", ");
-    $("[data-sticky-label]", stickyBtn).textContent = all ? "Sold out" : s ? "Add to bag" : "Select size";
-    stickyBtn.disabled = all;
-    if (push) {
-      const url = new URL(location.href);
-      url.searchParams.set("colour", c.h);
-      s ? url.searchParams.set("size", s) : url.searchParams.delete("size");
-      history.replaceState(null, "", url);
-    }
-  }
-
-  function setInvalid(on) {
-    sizeSet.classList.toggle("is-invalid", on);
-    sizeMsg.textContent = on ? "Select a size to add this to your bag" : "";
-  }
-
-  form.addEventListener("change", (ev) => {
-    if (ev.target.name === "colour") {
-      const prev = size();
-      syncSizes();
-      if (prev && units(colour().h, prev) === 0) {
-        form.querySelector('input[name="size"]:checked').checked = false;
-        sizeMsg.textContent = `${prev} is sold out in ${colour().n}. Choose another size.`;
-      } else if (!sizeSet.classList.contains("is-invalid")) sizeMsg.textContent = "";
-    }
-    if (ev.target.name === "size") setInvalid(false);
-    update();
-  });
-
-  function item(s) {
-    const c = colour();
-    return {
-      sku: `${M.style}-${c.h.toUpperCase()}-${s}`, handle: M.handle, title: M.title,
-      url: `products/${M.handle}/?colour=${c.h}`, price: M.price, colour: c.h, colourName: c.n, hex: c.hex, size: s,
-      sil: M.sil, img: c.img || null, max: units(c.h, s), variantId: M.ids[`${c.h}/${s}`] || null,
-    };
-  }
-  function addSelected(opener) {
-    const s = size();
-    if (!s) return false;
-    if (Cart.add(item(s), { opener })) {
-      atc.classList.add("is-added");
-      $("[data-atc-label]", atc).textContent = "In bag";
-      setTimeout(() => { atc.classList.remove("is-added"); update({ push: false }); }, 1400);
-    }
-    return true;
-  }
-  form.addEventListener("submit", (ev) => {
+  const currentSet = () => $(`[data-gal-set="${CSS.escape(colour)}"]`, page);
+  $$("[data-swatch]", page).forEach((a) => a.addEventListener("click", (ev) => {
     ev.preventDefault();
-    if (!addSelected(atc)) {
-      setInvalid(true);
-      const first = form.querySelector('input[name="size"]:not(:disabled)');
-      sizeSet.scrollIntoView({ block: "center", behavior: window.A88S.reduced.matches ? "auto" : "smooth" });
-      first?.focus({ preventScroll: true });
+    if (a.dataset.swatch !== colour) { setColour(a.dataset.swatch, { push: true }); announce(`Colour: ${$("[data-colour-name]", page).textContent}`); }
+  }));
+  addEventListener("popstate", () => setColour(new URLSearchParams(location.search).get("colour") || P.colours[0].h));
+
+  /* ── Size and add to bag ───────────────────────────────────────────────── */
+  const chosen = () => $('input[name="size"]:checked', form)?.value;
+  function paintButton() {
+    const s = chosen();
+    atc.setAttribute("aria-disabled", String(!s));
+    atcLabel.textContent = s ? "Add to bag" : "Choose size";
+    barBtn.textContent = s ? "Add to bag" : "Choose size";
+    msg.textContent = "";
+    if (s) {
+      const n = P.stock[colour][s];
+      if (n <= LOW) msg.textContent = n === 1 ? "Only 1 left in stock" : `Only ${n} left in stock`;
     }
-  });
-
-  /* Mobile sticky Add to bag: visible whenever the main button is off screen. */
-  if ("IntersectionObserver" in window) {
-    new IntersectionObserver(([entry]) => {
-      const show = !entry.isIntersecting;
-      if (show) sticky.hidden = false;
-      requestAnimationFrame(() => sticky.classList.toggle("is-visible", show));
-      document.body.classList.toggle("has-sticky-atc", show);
-      sticky.toggleAttribute("inert", !show);
-    }, { threshold: 0 }).observe(atc);
   }
-  stickyBtn.addEventListener("click", () => {
-    if (size()) { addSelected(stickyBtn); return; }
-    // No size yet: open a bottom sheet with this colour's sizes, so the shopper never has to scroll back up.
-    const c = colour();
-    $("[data-size-sheet]", sheet).innerHTML = `<p class="size-sheet__note">Colour: ${esc(c.n)}</p>` + M.sizes.map((s) => {
-      const n = units(c.h, s);
-      return `<button type="button" data-pick="${esc(s)}" ${n ? "" : "disabled"} aria-label="${esc(s)}${n ? (n <= cfg.lowStock ? `, only ${n} left` : "") : ", sold out"}">${esc(s)}</button>`;
-    }).join("");
-    Drawer.open(sheet, stickyBtn);
-  });
-  sheet.addEventListener("click", (ev) => {
-    const pick = ev.target.closest("[data-pick]");
-    if (!pick) return;
-    const input = form.querySelector(`input[name="size"][value="${CSS.escape(pick.dataset.pick)}"]`);
-    input.checked = true;
-    setInvalid(false);
-    update();
-    Drawer.close(sheet);
-    addSelected(stickyBtn);
-  });
-
-  /* Gallery pager (phones: swipe carousel) */
-  function updatePager() {
-    const set = $(".gallery__set:not([hidden])", pdp);
-    if (!set) return;
-    const i = Math.round(set.scrollLeft / Math.max(1, set.clientWidth));
-    $("[data-gallery-index]", pdp).textContent = Math.min(i + 1, set.children.length);
-    $("[data-gallery-total]", pdp).textContent = set.children.length;
+  form.addEventListener("change", (ev) => { if (ev.target.name === "size") paintButton(); });
+  function add() {
+    const s = chosen();
+    if (!s) {
+      msg.textContent = "Choose a size";
+      const first = $('input[name="size"]:not(:disabled)', form);
+      first?.closest(".sizes").scrollIntoView({ block: "center", behavior: "smooth" });
+      first?.focus({ preventScroll: true });
+      return;
+    }
+    const c = P.colours.find((x) => x.h === colour);
+    Bag.add({ sku: `${P.style}-${c.h.toUpperCase()}-${s}`, handle: P.handle, title: P.title, url: P.url + (c.h === P.colours[0].h ? "" : `?colour=${c.h}`),
+      price: P.price, colour: c.h, colourName: c.n, hex: c.hex, size: s, sil: P.sil, img: c.img, max: P.stock[c.h][s], id: P.ids[`${c.h}/${s}`] || null });
   }
-  $$(".gallery__set", pdp).forEach((set) => set.addEventListener("scroll", updatePager, { passive: true }));
+  form.addEventListener("submit", (ev) => { ev.preventDefault(); add(); });
+  barBtn.addEventListener("click", add);
 
-  /* Restore selection from the URL */
-  const p = new URLSearchParams(location.search);
-  const wantColour = p.get("colour"), wantSize = p.get("size");
-  if (wantColour && M.colours.some((c) => c.h === wantColour)) form.querySelector(`input[name="colour"][value="${CSS.escape(wantColour)}"]`).checked = true;
-  syncSizes();
-  if (wantSize) {
-    const input = form.querySelector(`input[name="size"][value="${CSS.escape(wantSize)}"]`);
-    if (input && !input.disabled) input.checked = true;
+  /* Sticky purchase bar: shown once the main button has scrolled up out of view */
+  new IntersectionObserver(([en]) => {
+    const show = !en.isIntersecting && en.boundingClientRect.top < 0;
+    bar.classList.toggle("is-visible", show);
+    bar.setAttribute("aria-hidden", String(!show));
+    barBtn.tabIndex = show ? 0 : -1;
+  }).observe(atc);
+
+  /* ── Gallery counter (phones) ──────────────────────────────────────────── */
+  $$("[data-gal-set]", page).forEach((set) => set.addEventListener("scroll", () => {
+    const i = Math.round(set.scrollLeft / set.clientWidth) + 1;
+    $("[data-gal-index]", page).textContent = i;
+  }, { passive: true }));
+
+  /* ── Full-screen gallery ───────────────────────────────────────────────── */
+  const fs = $("[data-fs]");
+  const stage = $("[data-fs-stage]", fs), thumbs = $("[data-fs-thumbs]", fs);
+  let fsIndex = 0, zoom = 1, frames = [];
+  function fsShow(i) {
+    fsIndex = (i + frames.length) % frames.length;
+    zoom = 1;
+    stage.innerHTML = "";
+    const art = frames[fsIndex].querySelector(".art").cloneNode(true);
+    art.removeAttribute("loading");
+    stage.append(art);
+    $$("button", thumbs).forEach((b, n) => b.setAttribute("aria-current", String(n === fsIndex)));
+    $("[data-fs-index]", fs).textContent = fsIndex + 1;
   }
-  update({ push: false });
+  function setZoom(z) {
+    zoom = Math.min(3, Math.max(1, z));
+    const art = $(".art", stage);
+    if (art) art.style.transform = `scale(${zoom})`;
+  }
+  page.addEventListener("click", (ev) => {
+    const btn = ev.target.closest("[data-gal-open]");
+    if (!btn) return;
+    frames = $$(".gal__frame", currentSet());
+    thumbs.innerHTML = frames.map((f, n) => `<li><button type="button" aria-label="Image ${n + 1}">${f.querySelector(".art").outerHTML.replace(/role="img" aria-label="[^"]*"/, 'aria-hidden="true"')}</button></li>`).join("");
+    $("[data-fs-total]", fs).textContent = frames.length;
+    openDialog("fullscreen", btn);
+    fsShow(Number(btn.dataset.galOpen));
+    stage.focus();
+  });
+  thumbs.addEventListener("click", (ev) => { const b = ev.target.closest("button"); if (b) fsShow($$("button", thumbs).indexOf(b)); });
+  $$("[data-fs-zoom]", fs).forEach((b) => b.addEventListener("click", () => setZoom(zoom + (b.dataset.fsZoom === "in" ? 0.5 : -0.5))));
+  fs.addEventListener("keydown", (ev) => {
+    if (ev.key === "ArrowRight") { ev.preventDefault(); fsShow(fsIndex + 1); }
+    else if (ev.key === "ArrowLeft") { ev.preventDefault(); fsShow(fsIndex - 1); }
+    else if (ev.key === "+" || ev.key === "=") setZoom(zoom + 0.5);
+    else if (ev.key === "-") setZoom(zoom - 0.5);
+  });
+  stage.addEventListener("click", () => setZoom(zoom > 1 ? 1 : 2));
+
+  /* ── Size guide ────────────────────────────────────────────────────────── */
+  const sg = $("[data-sg]");
+  if (sg) {
+    const data = JSON.parse($("#size-data").textContent);
+    const tabs = $$('[role="tab"]', sg);
+    const select = (t) => {
+      tabs.forEach((x) => {
+        const on = x === t;
+        x.setAttribute("aria-selected", String(on));
+        x.tabIndex = on ? 0 : -1;
+        document.getElementById(x.getAttribute("aria-controls")).hidden = !on;
+      });
+      t.focus();
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener("click", () => select(t));
+      t.addEventListener("keydown", (ev) => {
+        if (ev.key === "ArrowRight" || ev.key === "ArrowLeft") { ev.preventDefault(); select(tabs[(i + (ev.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length]); }
+      });
+    });
+    const setSize = (s) => {
+      $$("[data-sg-size]", sg).forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.sgSize === s)));
+      data.values[s].forEach((v, i) => ($(`[data-sg-val="${i}"]`, sg).textContent = `${v} cm`));
+    };
+    sg.addEventListener("click", (ev) => { const b = ev.target.closest("[data-sg-size]"); if (b) setSize(b.dataset.sgSize); });
+    const mark = (i) => {
+      $$("[data-sg-row]", sg).forEach((r) => r.classList.toggle("is-on", r.dataset.sgRow === String(i)));
+      $$("[data-sg-mark]", sg).forEach((m) => m.classList.toggle("is-on", m.dataset.sgMark === String(i)));
+    };
+    $$("[data-sg-row]", sg).forEach((r) => {
+      r.addEventListener("mouseenter", () => mark(r.dataset.sgRow));
+      r.addEventListener("mouseleave", () => mark(-1));
+    });
+    $("#size-guide").addEventListener("dialog:open", () => { const s = chosen(); if (s && data.values[s]) setSize(s); });
+  }
+
+  setColour(new URLSearchParams(location.search).get("colour") || P.colours[0].h);
 })();

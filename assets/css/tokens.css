@@ -1,75 +1,76 @@
 /* Archive 88: design tokens.
-   Brand layer = the Archive 88 palette and fonts (Archivo Narrow + Archivo). Layout language = clean retail:
-   square controls, quiet type, product first (patterns studied from leading streetwear / sportswear stores).
-   Three layers. Components only read the semantic and component layers, never raw hex.
-   1. Primitive  : the brand palette and scales
-   2. Semantic   : what a value is FOR (text, surface, action, signal)
-   3. Component  : the few values a component owns (frame ratio, header heights, drawer width)
-   Fonts come from ../fonts/fonts.css. See docs/DESIGN-SYSTEM.md. */
+   Structure = the Carhartt WIP system from the audit (docs/DESIGN-SYSTEM.md): one family in two roles, a small
+   palette of ink, greys and signal colours, a custom spacing scale, square corners, no shadows, eased image overlays.
+   Values = the Archive 88 brand: ink, white, paper, mist and pine, burnt orange for signals, Archivo + Archivo Narrow.
+   Components read these tokens only; never raw hex in store.css. */
 
 :root {
-  /* 1 ─ Primitive ─────────────────────────────────────────────────────────── */
-  --ink: #1b211d;
-  --bone: #e6e3da;
-  --pine: #2f3d33;
-  --paper: #f5f4f0;
-  --white: #fbfaf8;
-  --mist: #ecebe6;                       /* product image ground: lighter than bone, so garments read */
-  --ink-soft: rgba(27, 33, 29, 0.68);    /* 5.4:1 on white, 5.1:1 on paper */
-  --bone-soft: rgba(230, 227, 218, 0.74);
-  --line: rgba(27, 33, 29, 0.12);
-  --line-strong: rgba(27, 33, 29, 0.3);
-  --accent: #a3471f;                     /* burnt orange: 5.5:1 on paper */
-  --accent-deep: #8a3a18;
+  /* Colour: role names from the original system, Archive 88 values ─────────────────────────────────────────── */
+  --black: #1b211d;        /* ink: text, primary buttons, solid header logo */
+  --white: #fbfaf8;        /* page background, type over images */
+  --darkGrey: #4a514c;     /* text on dark grounds, disabled */
+  --midGrey: #646a65;      /* secondary text (colour, price), link hover, input ring: 5.3:1 on white */
+  --subtleGrey: #dad7ce;   /* filter pill ring, rules */
+  --lightGrey: #f1efea;    /* size tiles, checkbox dots, teaser placeholder, disabled button */
+  --imageGrey: #ecebe6;    /* mist: product image ground */
+  --pine: #2f3d33;         /* success: added, in stock */
+  --signal: #a3471f;       /* burnt orange: New badge, low stock, bag count (replaces the original's green) */
+  --error: #8a3a18;        /* form errors (replaces the original's red) */
+  --rule: rgba(27, 33, 29, 0.12);
 
-  --font-display: "Archivo Narrow", "Archivo Narrow Fallback", sans-serif;
-  --font-body: "Archivo", "Archivo Fallback", system-ui, sans-serif;
+  /* Type: one sans family for UI and body, Narrow for display titles ─────────────────────────────────────── */
+  --font-sans: "Archivo", "Archivo Fallback", Helvetica, sans-serif;
+  --font-display: "Archivo Narrow", "Archivo Narrow Fallback", "Archivo", sans-serif;
+  --bold: 600;             /* the original sets almost all UI in Bold; Archive 88 uses a firm semibold */
+  --regular: 400;
+  --t0: 0.6875rem;  --t0-lh: 1.4;   /* 11: small print */
+  --t1: 0.875rem;   --t1-lh: 1.4;   /* 14: nav, links, cards, buttons, footer */
+  --t2: 1rem;       --t2-lh: 1.4;   /* 16: inputs on phones (stops iOS zoom) */
+  --t3: 1.25rem;    --t3-lh: 1.4;   /* 20: rail labels, product title, newsletter heading */
+  --t4: 2rem;       --t4-lh: 1.2;   /* 32: hero and tile titles on mobile, page titles */
+  --t5: 3rem;       --t5-lh: 1.1;   /* 48: hero titles and h1 on desktop */
+  --t6: 5rem;       --t6-lh: 1.1;   /* 80: display */
+  --t7: 7.5rem;     --t7-lh: 1.1;   /* 120: display */
 
-  --fs-xs: 0.75rem;                      /* 12: badges, legal */
-  --fs-sm: 0.8125rem;                    /* 13: meta, nav */
-  --fs-base: 0.9375rem;                  /* 15: UI + body */
-  --fs-md: 1.0625rem;                    /* 17: card titles on large screens, lead copy */
-  --fs-lg: clamp(1.375rem, 1.1rem + 1vw, 1.875rem);      /* section titles */
-  --fs-xl: clamp(2rem, 1.4rem + 2.6vw, 3.5rem);           /* page titles */
-  --fs-hero: clamp(2.5rem, 1.6rem + 4.4vw, 5.5rem);       /* campaign headline */
+  /* Spacing: the original's custom scale (class number -> px) ─────────────────────────────────────────────── */
+  --s1: 0.125rem;   /* 2 */
+  --s2: 0.3125rem;  /* 5 */
+  --s4: 0.625rem;   /* 10 */
+  --s6: 0.9375rem;  /* 15 */
+  --s8: 1.25rem;    /* 20: gutters, inner gaps */
+  --s12: 1.875rem;  /* 30 */
+  --s16: 2.5rem;    /* 40: desktop page margin, rail padding */
+  --s20: 3.125rem;  /* 50: control height */
+  --s24: 3.75rem;   /* 60: hero padding, desktop section spacing */
+  --s32: 5rem;      /* 80 */
+  --s40: 6.25rem;   /* 100 */
+  --s48: 7.5rem;    /* 120 */
+  --s64: 10rem;     /* 160 */
 
-  --t-press: 0.08s;
-  --t-fast: 0.2s;                        /* hovers, colour changes */
-  --t-base: 0.35s;                       /* drawers, menus */
-  --t-slow: 0.7s;                        /* section reveals */
-  --t-instant: 0s;                       /* card alternate-angle swap: by design, no fade */
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Shape, depth, overlays ─────────────────────────────────────────────────────────────────────────────── */
+  --radius: 0;
+  /* 16-stop eased gradients in ink (no banding). 65% on every image, 50% behind the see-through header. */
+  --overlay-65: rgba(27,33,29,.65) 0%, rgba(27,33,29,.643) 8.1%, rgba(27,33,29,.62) 15.5%, rgba(27,33,29,.584) 22.5%,
+    rgba(27,33,29,.537) 29%, rgba(27,33,29,.482) 35.3%, rgba(27,33,29,.42) 41.2%, rgba(27,33,29,.357) 47.1%,
+    rgba(27,33,29,.294) 52.9%, rgba(27,33,29,.227) 58.8%, rgba(27,33,29,.169) 64.7%, rgba(27,33,29,.114) 71%,
+    rgba(27,33,29,.067) 77.5%, rgba(27,33,29,.031) 84.5%, rgba(27,33,29,.008) 91.9%, rgba(27,33,29,0) 100%;
+  --overlay-50: rgba(27,33,29,.5) 0%, rgba(27,33,29,.495) 8.1%, rgba(27,33,29,.477) 15.5%, rgba(27,33,29,.449) 22.5%,
+    rgba(27,33,29,.413) 29%, rgba(27,33,29,.371) 35.3%, rgba(27,33,29,.323) 41.2%, rgba(27,33,29,.275) 47.1%,
+    rgba(27,33,29,.226) 52.9%, rgba(27,33,29,.175) 58.8%, rgba(27,33,29,.13) 64.7%, rgba(27,33,29,.088) 71%,
+    rgba(27,33,29,.052) 77.5%, rgba(27,33,29,.024) 84.5%, rgba(27,33,29,.006) 91.9%, rgba(27,33,29,0) 100%;
 
-  /* 2 ─ Semantic ──────────────────────────────────────────────────────────── */
-  --color-bg: var(--white);
-  --color-bg-alt: var(--paper);
-  --color-surface-dark: var(--ink);
-  --color-text: var(--ink);
-  --color-text-muted: var(--ink-soft);
-  --color-on-dark: var(--paper);
-  --color-on-dark-muted: var(--bone-soft);
-  --color-border: var(--line);
-  --color-border-strong: var(--line-strong);
-  --color-primary: var(--ink);           /* Add to bag, Checkout, Subscribe: solid ink, as retail expects */
-  --color-primary-hover: var(--pine);
-  --color-on-primary: var(--paper);
-  --color-signal: var(--accent);         /* bag count, low stock, sale price, delivery meter */
-  --color-media: var(--mist);            /* behind every product image */
-  --color-error: var(--accent-deep);
-  --color-scrim: rgba(27, 33, 29, 0.42);
-  --color-focus: var(--accent);
+  /* Motion ─────────────────────────────────────────────────────────────────────────────────────────────── */
+  --t-fast: 200ms;          /* links, header, overlays, drawers: everything on the original is 200ms */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --pop: linear(0, 0.38 9%, 0.82 19%, 1.05 29%, 1.09 36%, 1.03 50%, 0.99 63%, 1);   /* spring pop-in, 1s */
 
-  /* 3 ─ Component ─────────────────────────────────────────────────────────── */
-  --media-ratio: 4 / 5;                  /* strict: every product image, everywhere */
-  --gutter: clamp(16px, 2.4vw, 40px);
-  --grid-gap: clamp(8px, 1vw, 16px);
-  --page-max: 1920px;
-  --bar-h: 36px;                         /* announcement bar */
-  --nav-h: 64px;
-  --sidebar-w: 248px;
-  --radius: 0px;                         /* square controls throughout */
-  --drawer-w: min(440px, 100%);
+  /* Component ──────────────────────────────────────────────────────────────────────────────────────────── */
+  --header-height: 50px;
+  --gutter: var(--s8);
+  --info-w: 400px;
   --tap: 44px;
-  --z-header: 50; --z-mega: 49; --z-sticky: 44; --z-drawer: 80; --z-toast: 90;
+  --z-header: 50;
 }
-@media (max-width: 999px) { :root { --nav-h: 56px; } }
+@media (min-width: 1024px) {
+  :root { --header-height: 60px; --gutter: var(--s16); }
+}

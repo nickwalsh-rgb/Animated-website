@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /search/
+Disallow: /bag/
 
 Sitemap: https://nickwalsh-rgb.github.io/Animated-website/sitemap.xml

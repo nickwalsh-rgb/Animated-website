@@ -3,7 +3,8 @@
    validation, and Add to bag (a gift card is a normal bag line, with the recipient details attached). */
 (() => {
   "use strict";
-  const { $, $$, money, Cart, cfg, announce } = window.A88S;
+  const { $, $$, money, Bag, cfg, announce } = window.A88;
+  const whole = (n) => money(n).replace(/\.00$/, "");
   const root = $("[data-gift]");
   if (!root) return;
   const conf = JSON.parse($("#gift-config").textContent);
@@ -16,9 +17,8 @@
   /* Preview + price labels */
   function render() {
     const a = amount();
-    $("[data-gift-amount]", card).textContent = money(a);
-    $$("[data-gift-price]", root).forEach((n) => (n.textContent = money(a)));
-    const to = method && forms[method] ? $(`#${method}-to`, forms[method]).value.trim() : "";
+    $("[data-gift-amount]", card).textContent = whole(a);
+        const to = method && forms[method] ? $(`#${method}-to`, forms[method]).value.trim() : "";
     $("[data-gift-to]", card).textContent = to || "someone good";
     card.dataset.method = method || "email";
     $("[data-gift-kind]", card).textContent = method === "post" ? "Gift card · By post" : "E-gift card";
@@ -56,7 +56,6 @@
     const err = $(`#${input.id}-err`);
     err.textContent = msg;
     input.setAttribute("aria-invalid", msg ? "true" : "false");
-    input.closest(".field").classList.toggle("is-invalid", !!msg);
     return !msg;
   }
   Object.values(forms).forEach((f) => {
@@ -83,31 +82,20 @@
         ? "Sends " + new Date(d.date + "T12:00").toLocaleDateString(cfg.locale, { day: "numeric", month: "short" })
         : "Sends today")
       : d.postcode.toUpperCase();
-    const ok = Cart.add({
+    const ok = Bag.add({
       sku: `GIFT-${m.toUpperCase()}-${a}-${Date.now().toString(36)}`,
       handle: "gift-card", title: "Gift card", url: "gift-cards/", price: a,
       colour: m, colourName: (m === "email" ? "Email to " : "Post to ") + d.to, hex: m === "email" ? "#1b211d" : "#2f3d33",
       size: when, sil: "gift", img: null, max: 10,
-      variantId: conf.ids[`${m}/${a}`] || null,
+      id: conf.ids[`${m}/${a}`] || null,
       gift: { method: m, amount: a, ...d },
-    }, { opener: $("button[type=submit]", form) });
+    });
     if (ok) {
       form.reset();
       $$("[aria-invalid]", form).forEach((i) => i.removeAttribute("aria-invalid"));
       render();
       announce(`Gift card for ${d.to} added to your bag`);
     }
-  }
-
-  /* Card tilts toward the pointer (fine pointers, motion allowed) */
-  if (matchMedia("(hover: hover) and (pointer: fine)").matches && !window.A88S.reduced.matches) {
-    const stage = $(".gift__visual", root);
-    stage.addEventListener("pointermove", (ev) => {
-      const r = stage.getBoundingClientRect();
-      card.style.setProperty("--ry", `${((ev.clientX - r.left) / r.width - 0.5) * 16}deg`);
-      card.style.setProperty("--rx", `${((ev.clientY - r.top) / r.height - 0.5) * -12}deg`);
-    });
-    stage.addEventListener("pointerleave", () => { card.style.setProperty("--rx", "0deg"); card.style.setProperty("--ry", "0deg"); });
   }
 
   const want = new URLSearchParams(location.search).get("send");

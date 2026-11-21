@@ -9,27 +9,9 @@
   "currency_symbol": "£",
   "free_shipping_threshold": 150,
   "low_stock_threshold": 3,
-  "page_size": 24,
+  "page_size": 48,
   "shopify_domain": "",
   "_shopify_domain_note": "Set to your-store.myshopify.com and fill shopify_variant_ids in catalog.json to send the bag to Shopify checkout.",
-  "announcements": [
-    [
-      "Free UK delivery on orders over £150",
-      "",
-      ""
-    ],
-    [
-      "Free 30-day returns, collected from your door",
-      "Details",
-      "returns/"
-    ],
-    [
-      "Gift cards, sent by email or post",
-      "Shop gift cards",
-      "gift-cards/"
-    ]
-  ],
-  "_announcements_note": "Rotating bar above the header: [message, link text, link]. Links are relative to the site root.",
   "promises": [
     [
       "truck",
@@ -51,32 +33,228 @@
     {
       "handle": "outerwear",
       "title": "Outerwear",
-      "intro": "Coats and jackets in wool, wax and gabardine. Built for weather, cut for years."
+      "intro": "Coats and jackets in wool, wax and gabardine. Built for weather, cut for years.",
+      "subcategories": [
+        {
+          "title": "Coats",
+          "match": [
+            "overcoat",
+            "car coat",
+            "peacoat",
+            "topcoat",
+            "trench",
+            "mac",
+            "chore coat"
+          ]
+        },
+        {
+          "title": "Gilets",
+          "match": [
+            "gilet"
+          ]
+        },
+        {
+          "title": "Jackets",
+          "match": []
+        }
+      ],
+      "seo": [
+        "Archive 88 outerwear is cut for British weather and made to last for years: overcoats and car coats in virgin wool, waxed field jackets and Harringtons in British cotton, and a quilted liner that layers under all of them.",
+        "Every coat is kept in the range season after season, so the one you buy this winter is the one we'll still make next year. Not sure of your size? Our {size guide} lists chest and length for every style, and returns are free for 30 days."
+      ]
     },
     {
       "handle": "knitwear",
       "title": "Knitwear",
-      "intro": "Merino, lambswool and cashmere from mills that have spun for generations."
+      "intro": "Merino, lambswool and cashmere from mills that have spun for generations.",
+      "subcategories": [
+        {
+          "title": "Cardigans",
+          "match": [
+            "cardigan"
+          ]
+        },
+        {
+          "title": "Roll & mock necks",
+          "match": [
+            "roll neck",
+            "mock neck"
+          ]
+        },
+        {
+          "title": "Polos & zips",
+          "match": [
+            "polo",
+            "half-zip",
+            "henley",
+            "v-neck"
+          ]
+        },
+        {
+          "title": "Crew necks",
+          "match": []
+        }
+      ],
+      "seo": [
+        "Knitwear in merino, lambswool, Shetland wool and Mongolian cashmere, from mills that have spun for generations. Crew necks, cardigans, roll necks and polos, in colours that sit with everything else in the collection.",
+        "Wash wool cold and dry it flat and it will soften with every wear. See the {size guide} for chest measurements, or pair a crew with {trousers}."
+      ]
     },
     {
       "handle": "shirts",
       "title": "Shirts",
-      "intro": "Oxford, poplin, flannel and linen. The shirts you reach for first."
+      "intro": "Oxford, poplin, flannel and linen. The shirts you reach for first.",
+      "subcategories": [
+        {
+          "title": "Overshirts",
+          "match": [
+            "overshirt",
+            "workshirt"
+          ]
+        },
+        {
+          "title": "Oxford & poplin",
+          "match": [
+            "oxford",
+            "poplin"
+          ]
+        },
+        {
+          "title": "Summer shirts",
+          "match": [
+            "linen",
+            "seersucker",
+            "cuban",
+            "camp",
+            "silk"
+          ]
+        },
+        {
+          "title": "Casual shirts",
+          "match": []
+        }
+      ],
+      "seo": [
+        "Shirts in Oxford cloth, poplin, flannel, linen and seersucker: the shirts you reach for first. Overshirts in moleskin, wool and heavy twill double as a light jacket.",
+        "Every shirt is cut in a relaxed or regular fit and finished with strong seams and real buttons. Find your size in the {size guide}."
+      ]
     },
     {
       "handle": "trousers",
       "title": "Trousers",
-      "intro": "Chinos, wool trousers and selvedge denim, sized by the waist."
+      "intro": "Chinos, wool trousers and selvedge denim, sized by the waist.",
+      "subcategories": [
+        {
+          "title": "Chinos",
+          "match": [
+            "chino"
+          ]
+        },
+        {
+          "title": "Jeans",
+          "match": [
+            "jean"
+          ]
+        },
+        {
+          "title": "Workwear",
+          "match": [
+            "carpenter",
+            "painter",
+            "fatigue",
+            "drill"
+          ]
+        },
+        {
+          "title": "Wool trousers",
+          "match": [
+            "wool",
+            "flannel"
+          ]
+        },
+        {
+          "title": "Easy trousers",
+          "match": [
+            "drawstring",
+            "easy"
+          ]
+        },
+        {
+          "title": "Casual trousers",
+          "match": []
+        }
+      ],
+      "seo": [
+        "Trousers sized by the waist in inches: chinos, selvedge jeans, wool trousers and workwear cuts in drill and canvas. Every waist comes with a 32 inch inside leg, finished so it can be taken up.",
+        "Fits run from straight to relaxed and tapered. Choose a fit from the links above, or check the {size guide} for waist and hip measurements."
+      ]
     },
     {
       "handle": "jersey",
       "title": "Jersey",
-      "intro": "Heavyweight tees and loopback sweats in organic cotton."
+      "intro": "Heavyweight tees and loopback sweats in organic cotton.",
+      "subcategories": [
+        {
+          "title": "Sweatshirts",
+          "match": [
+            "sweatshirt"
+          ]
+        },
+        {
+          "title": "Polos & rugby",
+          "match": [
+            "polo",
+            "rugby"
+          ]
+        },
+        {
+          "title": "Long sleeves",
+          "match": [
+            "long-sleeve"
+          ]
+        },
+        {
+          "title": "T-shirts",
+          "match": []
+        }
+      ],
+      "seo": [
+        "Heavyweight T-shirts, loopback sweatshirts and rugby shirts in organic cotton, knitted and garment-dyed so they hold their shape wash after wash.",
+        "Boxy and regular fits, in colours that stay in the range. Pair a sweatshirt with {trousers} or layer a tee under {knitwear}."
+      ]
     },
     {
       "handle": "tailoring",
       "title": "Tailoring",
-      "intro": "Soft-shouldered jackets that dress up or down without trying."
+      "intro": "Soft-shouldered jackets that dress up or down without trying.",
+      "subcategories": [
+        {
+          "title": "Blazers",
+          "match": [
+            "blazer"
+          ]
+        },
+        {
+          "title": "Suit jackets",
+          "match": [
+            "suit jacket"
+          ]
+        },
+        {
+          "title": "Sport coats",
+          "match": [
+            "sport coat"
+          ]
+        },
+        {
+          "title": "Jackets & gilets",
+          "match": []
+        }
+      ],
+      "seo": [
+        "Soft-shouldered tailoring that dresses up or down without trying: blazers in wool hopsack and cashmere blends, sport coats in tweed and corduroy, and suit jackets in flannel, linen and mohair.",
+        "Jackets are half lined or unlined so they wear like a cardigan. Find your chest size in the {size guide}."
+      ]
     }
   ],
   "gift_cards": {
@@ -112,5 +290,137 @@
   "shipping_text": "Dispatched within 1 to 2 working days, tracked. UK delivery 1 to 3 working days: free on orders over £150, otherwise £5. International rates are shown at checkout.",
   "_shipping_text_note": "PLACEHOLDER wording. Replace with your real rates and times.",
   "legal_reviewed": false,
-  "_legal_reviewed_note": "Set to true once a solicitor has checked Privacy and Terms; it removes the 'Draft' note on those pages."
+  "_legal_reviewed_note": "Set to true once a solicitor has checked Privacy and Terms; it removes the 'Draft' note on those pages.",
+  "_page_size_note": "Products per listing page. Pages are numbered with ?page=2 and so on.",
+  "_categories_note": "subcategories: a style joins the first group whose match words appear in its title; the group with no match words takes the rest. seo: paragraphs under the grid; {size guide}, {trousers}, {knitwear} and other category names become links.",
+  "trending": [
+    "merino crew",
+    "overcoat",
+    "selvedge jean",
+    "oxford shirt",
+    "cashmere"
+  ],
+  "_trending_note": "Shown on the search page before the shopper types.",
+  "home": [
+    {
+      "module": "fullWidthTeaser",
+      "title": "Gifts that last",
+      "video": {
+        "desktop": "assets/video/forest.mp4",
+        "mobile": "assets/video/forest-portrait.mp4"
+      },
+      "imageDesktop": "assets/img/forest-poster.jpg",
+      "imageMobile": "assets/img/campaign/hero-1-mobile.jpg",
+      "alt": "Two people walk a sunlit forest path towards the sea.",
+      "links": [
+        [
+          "Shop now",
+          "shop/knitwear/"
+        ]
+      ],
+      "rail": {
+        "heading": "Shop the gift edit",
+        "seeAll": "shop/knitwear/",
+        "products": [
+          "cashmere-crew/camel",
+          "merino-crew",
+          "lambswool-shawl-cardigan",
+          "cashmere-roll-neck"
+        ]
+      }
+    },
+    {
+      "module": "fullWidthTeaser",
+      "title": "Wool, weathered in",
+      "imageDesktop": "assets/img/campaign/hero-2-desktop.jpg",
+      "imageMobile": "assets/img/campaign/hero-2-mobile.jpg",
+      "alt": "Two people stand at the edge of a pine forest, looking out over a bright sea.",
+      "links": [
+        [
+          "Shop outerwear",
+          "shop/outerwear/"
+        ]
+      ],
+      "rail": {
+        "heading": "Shop outerwear",
+        "seeAll": "shop/outerwear/",
+        "products": [
+          "wool-car-coat",
+          "waxed-field-jacket",
+          "melton-peacoat",
+          "wool-chore-coat"
+        ]
+      }
+    },
+    {
+      "module": "teaserGrid",
+      "teasers": [
+        {
+          "title": "Knitwear",
+          "image": "assets/img/menu-1.jpg",
+          "alt": "Tall pines frame a path that opens onto the sea.",
+          "links": [
+            [
+              "Shop now",
+              "shop/knitwear/"
+            ]
+          ]
+        },
+        {
+          "title": "Trousers",
+          "image": "assets/img/menu-2.jpg",
+          "alt": "Two walkers on a forest track, seen through the trunks.",
+          "links": [
+            [
+              "Shop now",
+              "shop/trousers/"
+            ]
+          ]
+        },
+        {
+          "title": "Shirts",
+          "image": "assets/img/menu-3.jpg",
+          "alt": "Dappled light falls across a woodland path.",
+          "links": [
+            [
+              "Shop now",
+              "shop/shirts/"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "module": "teaserGrid",
+      "teasers": [
+        {
+          "title": "The permanent collection",
+          "image": "assets/img/menu-4.jpg",
+          "alt": "A pine forest opens onto a hazy coastline.",
+          "links": [
+            [
+              "Shop all",
+              "shop/"
+            ],
+            [
+              "Our story",
+              "about/"
+            ]
+          ]
+        },
+        {
+          "title": "New arrivals",
+          "image": "assets/img/menu-5.jpg",
+          "alt": "Two people walk out of the trees towards the light.",
+          "links": [
+            [
+              "Shop now",
+              "shop/new-arrivals/"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "_home_note": "The homepage, top to bottom. Modules: fullWidthTeaser (title, images, links, optional rail of four products as handle or handle/colour) and teaserGrid (two or three 3:4 tiles)."
 }
