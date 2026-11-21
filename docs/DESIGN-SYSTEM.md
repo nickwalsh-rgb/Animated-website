@@ -1,203 +1,110 @@
 # Archive 88: brand and design system
 
-Archive 88 is a **permanent collection** of 100 styles (1,830 size × colour
-variants in the sample data). It keeps **the Archive 88 identity** (palette, Archivo Narrow + Archivo, the wordmark
-and the A88 mark) and uses a **clean retail layout** built for range and conversion: announcement bar, mega-menu,
-search, full-bleed campaign imagery, product rails, plain product cards and a calm footer.
-
-> The layout patterns were studied from leading streetwear and sportswear stores (inverting header over imagery,
-> two-link campaign heroes, editorial splits, bestseller rails, category grid, service bar, newsletter in the
-> footer). Only the patterns are borrowed. Every name, image, colour and word on the site is Archive 88's own.
-
-Built with the `ui-ux-pro-max` skill (design-system search: *premium clothing e-commerce, minimal editorial*; style
-**Minimalism & Swiss**, variance 3, motion 3, density 5) for structure and UX rules. The visual layer is the
-existing brand, not the skill's generated palette and fonts.
-
----
+The storefront rebuilds the **Carhartt WIP UK** store layout, module for module, from the audit of 21 November 2026
+(header, mega menu, full-width teasers with product rails, teaser grids, plain product card, category page with a
+filter pill, 400px product information column, full bag page, full-screen search, footer). Only the structure,
+spacing system and interaction patterns are borrowed. Every name, logo, colour, typeface, image and word is
+**Archive 88's own**: the wordmark and A88 mark traced from the Figma "Archive 88 / Wordmark" component, the
+Archive 88 palette, Archivo and Archivo Narrow, and the forest film.
 
 ## 1. Brand
 
-Brand assets live in one place each: the wordmark letters, A88 mark and social icons in `src/brand-defs.html`,
-fonts in `assets/fonts/`, social links and business details in `data/store.json`.
-
 | | |
 | --- | --- |
-| Positioning | Considered clothing in natural fibres, kept in the range season after season. |
+| Positioning | Considered clothing in natural fibres, kept in the range season after season |
 | Tagline | The permanent collection |
-| Voice | Plain, specific, unhurried. Say what it is made of and how it fits. |
-| Signature elements | Wordmark header that turns see-through over imagery, the graded forest film, square controls in ink, the woven orange stripe (gift card), the A88 mark that closes every page |
+| Voice | Plain, specific, unhurried. Sentence case. Say what it is made of and how it fits |
+| Assets | Wordmark letters, A88 mark and social icons in `src/brand-defs.html`; fonts in `assets/fonts/`; campaign stills from the forest film in `assets/img/campaign/` |
 
-### Colour
+### Colour: the original's roles, Archive 88's values
 
-| Token | Hex | Use |
-| --- | --- | --- |
-| Ink | `#1B211D` | Text, primary buttons (Add to bag, Checkout, Subscribe), announcement bar, footer, selected chips |
-| White | `#FBFAF8` | Page background |
-| Paper | `#F5F4F0` | Newsletter band, type on ink |
-| Mist | `#ECEBE6` | Behind every product image (lighter than bone so garments read) |
-| Pine | `#2F3D33` | Hover on ink, *in stock* and *added* states, the posted gift card |
-| Burnt orange | `#A3471F` (deep `#8A3A18`) | **Signals only**: bag count, *Selling fast*, low-stock dots, delivery meter, sale price, focus ring, search highlight |
-
-Primary actions are solid ink, as shoppers expect from retail; orange is kept for signals so it always means
-*look here*. Text contrast: muted text 5.1:1+ on white and paper, orange 5.5:1 on paper, paper on ink 15:1.
+| Token | Hex | Original role and value | Use |
+| --- | --- | --- | --- |
+| `--black` | `#1B211D` (ink) | black `#000` | Text, primary buttons, logo on the solid header |
+| `--white` | `#FBFAF8` | white `#FFF` | Page background, type over images |
+| `--darkGrey` | `#4A514C` | darkGrey `#555` | SEO copy, text on dark grounds |
+| `--midGrey` | `#646A65` | midGrey `#737373` | Colour and price lines, link hover, input ring (5.3:1 on white) |
+| `--subtleGrey` | `#DAD7CE` | subtleGrey `#DDD` | Filter pill ring, panel border |
+| `--lightGrey` | `#F1EFEA` | lightGrey `#F3F3F3` | Size tiles, checkbox dots, teaser placeholder, disabled button |
+| `--imageGrey` | `#ECEBE6` (mist) | imageGrey `#EFEFEF` | Product image ground |
+| `--signal` | `#A3471F` (burnt orange) | green `#00A442` | "New" badge, low-stock dots and messages |
+| `--error` | `#8A3A18` | red `#DE141F` | Form errors |
+| `--pine` | `#2F3D33` | – | Button hover, success messages, the posted gift card |
 
 ### Typography
 
 | Role | Face | Where |
 | --- | --- | --- |
-| Display | **Archivo Narrow** 600, sentence case | Hero and banner headlines, page, section and product titles |
-| UI + body | **Archivo** 400 / 500 | Navigation, buttons, cards, prices, forms, body copy |
+| Display | **Archivo Narrow** 600 (variable 400–700) | Hero and tile titles, page titles (h1), mobile menu |
+| UI and body | **Archivo** (variable 100–900): 600 for UI, 400 for prose | Navigation, cards, buttons, prices, forms, footer; prose in 400 |
 
-Sentence case throughout (no tracked uppercase): quieter, faster to read in a dense grid. Type scale is in tokens
-(`--fs-xs` 12 to `--fs-hero`, fluid). Self-hosted with metric-matched fallbacks, so text doesn't shift when fonts load.
+Scale (tokens `--t0` to `--t7`, as on the original): 11, 14, 16, 20, 32, 48, 80, 120px. The original sets almost all
+UI in Bold; Archive 88 uses a firm 600. Body prose (SEO copy, accordions, info pages, promises) is 400.
 
-### Product card
-Image on the mist ground (strict 4:5) with one small badge at most (*Selling fast*, *New*, *Bestseller* or *Sold out*),
-then name and price on one line, the colour name, and swatches. Desktop hover swaps the photo to the alternate angle
-instantly and reveals quick-add sizes along the bottom of the image. The whole card is one link target; swatches and
-quick add sit above it.
+### Spacing, shape, motion
+- Custom scale `--s1` … `--s64`: 2, 5, 10, 15, 20, 30, 40, 50, 60, 80, 100, 120, 160px. Working rhythm: 20px gutters,
+  40px desktop margins, 60px hero padding and desktop section spacing.
+- Square corners everywhere except the round filter pill, checkbox dots and round buttons. No shadows: depth comes
+  from photography and two 16-stop eased ink gradients (`--overlay-65` on images, `--overlay-50` behind the
+  see-through header).
+- 200ms for links, header, overlays and drawers. Hover effects only under `(hover: hover) and (pointer: fine)`.
+  `prefers-reduced-motion` removes movement and skips the hero film.
+- One breakpoint, 1024px: below it every multi-column band is a swipe row with a peek of the next item.
 
----
+## 2. Pages
 
-## 2. Token architecture (`assets/css/tokens.css`)
+| Page | What's on it |
+| --- | --- |
+| Home `/` | Page builder from `store.json → home`: full-width teaser (film) + rail, full-width teaser + rail, three 3:4 tiles, two 3:4 tiles |
+| Listings `/shop/…` | Sub-category links (4-column block indented 200px; two-row scroll on phones), h1 and intro, Filter pill (sticky top right on desktop, bottom centre on phones), 4/2-column grid, 48 per page with `?page=`, SEO copy |
+| Product `/products/<handle>/?colour=` | Two-column gallery (swipe with 1/4 counter on phones), 400px information column: New, title, price, photographic swatches, sizes in three columns, size guide, Choose size → Add to bag, wishlist, five promises, five accordions; sticky purchase bar; Complete the look; You might also like; Product JSON-LD |
+| Bag `/bag/` | Line items, quantity, Remove (on hover on desktop, always on phones), promo code, promises, free-delivery message, totals, Checkout column (first on phones) |
+| Search `/search/?query=` | Full screen, own header (logo, boxed field, Close), trending searches, suggestions, live results, Filter pill |
+| Gift cards, About, Size guide, Delivery & returns, Contact, Privacy, Terms, 404 | Same shell |
 
-1. **Primitive**: the brand palette, fonts, type scale, motion speeds.
-2. **Semantic**: what a value is for: `--color-text`, `--color-primary` (ink), `--color-signal` (orange), `--color-media`, `--color-on-dark`, `--color-error`, `--color-focus`.
-3. **Component**: values a component owns: `--media-ratio: 4 / 5`, `--bar-h`, `--nav-h`, `--sidebar-w`, `--drawer-w`, `--radius: 0`, `--tap: 44px`.
-
-Components read layers 2 and 3 only. To restyle, change a semantic token; no component CSS changes.
-
-Motion: `--t-press` 80ms, `--t-fast` 200ms (hovers), `--t-base` 350ms (drawers, menus), `--t-slow` 700ms (section
-reveals), plus `--t-instant` 0ms for the card angle swap. `prefers-reduced-motion` removes movement but keeps every
-state change.
-
----
+Listing tree: `shop/` (Shop all), `shop/new-arrivals/`, `shop/bestsellers/`, `shop/<category>/`, sub-categories
+`shop/<category>/<group>/` and fits `shop/<category>/<fit>-fit/` (from `store.json → categories[].subcategories`),
+`shop/fabric/<fabric>/` and `shop/fit/<fit>/` (derived from each style's material and fit lines in `build.py`).
 
 ## 3. Components
 
-Markup is generated by `components.py` / `build.py` (one function per component); styles live in
-`assets/css/store.css` under the same name; behaviour lives in `assets/js/`.
+| Component | Python | CSS | JS |
+| --- | --- | --- | --- |
+| Header (see-through over the hero, solid after 10px of scroll or when a menu opens) | `header()` | `.hdr` | `store.js` |
+| Mega menu (second level only, columns of three, hover or chevron button) | inside `header()` | `.mega` | `store.js` |
+| Breadcrumb in the header (product pages) | `header(crumbs=…)` | `.hdr__crumbs` | – |
+| Mobile menu (full screen, drill-down, back arrow) | `menu_dialog()` | `.menu` | `store.js` |
+| Login drawer | `login_dialog()` | `.drawer` | `store.js` |
+| Added-to-bag pop-up | inside `header()` | `.added` | `store.js` |
+| Full-width teaser | `full_width_teaser()` | `.teaser--full` | `store.js` (film) |
+| Product rail | `products_listing()` | `.rail` | – |
+| Teaser grid | `teaser_grid()` | `.tgrid`, `.teaser--tile` | – |
+| Product card (one per colourway) | `product_card()` | `.card`, `.wish` | `store.js` (wishlist) |
+| Carousel with round arrows | `carousel()` | `.carousel` | `store.js` |
+| Sub-category links | `subnav()` | `.subnav` | – |
+| Filter pill and panel | `filter_pill()`, `filter_panel()` | `.pill`, `.fpanel`, `.facet` | `plp.js` |
+| Pagination | `pagination()` | `.pager` | `plp.js` |
+| Gallery and full-screen viewer | in `pdp()` | `.gal`, `.fs` | `pdp.js` |
+| Size selector, add to bag, sticky bar | in `pdp()` | `.size`, `.buy`, `.pbar` | `pdp.js` |
+| Size guide (two tabs, numbered drawing) | `size_guide_dialog()` | `.sg`, `.tabs` | `pdp.js` |
+| Accordion | `accordion()` | `.acc` | – (native `<details>`) |
+| Bag page | `bag()` | `.bag`, `.line`, `.totals` | `bag.js` |
+| Search page | `search_page()`, `search_index()` | `.srch` | `search.js` + `plp.js` |
+| Footer and newsletter | `footer()` | `.ftr`, `.news`, `.dot` | `store.js` |
 
-| Component | Python | CSS | JS | Notes |
-| --- | --- | --- | --- | --- |
-| Announcement bar | `announce_bar()` | `.announce` | `store.js` | Messages from `store.json` → `announcements`. Rotates every 6s; pauses on hover/focus; prev/next and a pause button; starts paused with reduced motion. |
-| Header | `header()` | `.nav` | `store.js` | Wordmark, Shop (mega-menu), New in, Outerwear, Knitwear, Gift cards; Search and Bag. Phones: search, bag and menu icons. |
-| Mega-menu | `mega()` | `.mega` | `store.js` | Desktop. Featured, categories with counts, shop by size (links pre-filter the grid), two editorial tiles. Click or hover; Esc returns focus to Shop. |
-| Search | `search_drawer()`, `search_index()` | `.search`, `.search-hit` | `store.js` | Panel from the top. `search.json` (~20 KB) loads on first open; every word must match name, category, colour or cloth; name matches rank first; Enter opens the top hit. |
-| Menu | `menu_drawer()` | `.menu__*` | `store.js` (`Drawer`) | Phones/tablets: every category with counts, sizes, help links. |
-| Rail | `rail()` | `.rail` | `store.js` | Sideways product row: native scroll-snap (swipe, trackpad, keyboard) plus previous/next buttons on desktop. New in, Bestsellers, *You may also like*. |
-| Media frame | `media()`, `frame()` | `.media` | – | The only way an image is drawn. Strict 4:5. |
-| Product card | `product_card()` | `.card` | `store.js` | Used on PLP, rails and search. |
-| Swatches | `swatch_list()` | `.swatch` | `store.js` | Recolour the card in place and update the colour name; link keeps `?colour=`. |
-| Quick add | inside `product_card()` | `.quick-add` | `store.js` | Fine pointers only. Sizes for the shown colour; sold-out struck through. |
-| Badge | `badge()` | `.badge` | – | One per card, in priority order. |
-| Category pills | inline in `plp()` | `.pills` | – | Phones/tablets (where the sidebar is a drawer): sideways row of categories. |
-| Filter group | `filter_group()` | `.filter` | `plp.js` | `<details>`; shows a count of active choices. |
-| Size chips / colour options | `size_chips()`, `colour_filters()` | `.chip`, `.colour-opt` | `plp.js` | Real checkboxes, 44px targets. |
-| Drawer | `drawer()` | `.drawer--right/left/top/bottom` | `store.js` (`Drawer`) | One controller for bag, menu, search, mobile filters, size sheet. |
-| Colour / size selectors | `colour_selector()`, `size_selector()` | `.option`, `.size-opt` | `pdp.js` | Real radios. Sold-out sizes disabled and struck; low stock gets an orange dot. |
-| Variant matrix | `variant_matrix()` | `.matrix` | – | Full size × colour availability table (PDP, *Availability*). |
-| Add to bag | inline in `pdp()` | `.buy-btn` | `pdp.js` | Full-width ink button. |
-| Sticky Add to bag | `sticky_atc()` | `.sticky-atc` | `pdp.js` | Bar pinned to the bottom, phones/tablets only. |
-| Accordion | `accordion()` | `.accordion` | – | Native `<details>`. |
-| Promises, sign-up, footer | `promises()`, `signup()`, `footer()` | `.promises`, `.signup`, `.footer` | `store.js` | Service bar, newsletter (inline validation; hook `window.A88S.subscribe(email)` to your email provider), four link columns, legal row, A88 mark. |
-| Form field | `field()` | `.field` | `gift.js` | Visible label, hint, error under the field. |
+## 4. Accessibility and SEO
+- Skip link, visually hidden h1 on the home page, module titles as h2, card titles h2 on listings and h3 in rails.
+- Screen-reader labels for visual-only values ("Colour:", "Price:"), the bag count ("Go to bag, 2 items"), icon
+  buttons ("Show sub categories for Clothing", "Open the main menu", "Add to wishlist: …"), 44px targets.
+- Full-tile anchors on teasers use `tabindex="-1"`, so keyboard users meet each link once.
+- Native `<dialog>` for every overlay (focus trap, Escape, focus return). `scrollbar-gutter: stable`.
+- The hero film can be paused and is not loaded with reduced motion.
+- Canonical URLs, Open Graph, Organization + WebSite JSON-LD on home, BreadcrumbList on listings and products,
+  Product JSON-LD on products. Search and bag are `noindex, follow`.
+- Hooks: `window.A88.subscribe(email, interests)` for the newsletter; if `window.dataLayer` exists, teasers send GA4
+  `view_promotion` and `select_promotion`.
 
-### Scaling the catalogue
-- Data shape: one style per entry; `stock[colour][size]` **is** the variant matrix. SKUs are derived
-  (`A88-012-OLIVE-M`). Add styles, colours or sizes without touching code.
-- `build.py` validates every style (required fields, unique handle/style, known category, a stock cell for every
-  size × colour) and stops with a clear message if anything is wrong.
-- Listing pages are server-rendered (complete without JS, crawlable) and enhanced client-side. Filtering and sorting
-  work on in-memory card data, so they are instant; "Load more" pages through 24 at a time (`page_size` in
-  `store.json`).
-- Past roughly 500 styles per listing, move cards to a JSON index rendered client-side, or paginate listings into
-  `/shop/<category>/page/2/` at build time. The card component and filter logic don't change.
-- Shopify: add `shopify_domain` in `store.json` and `shopify_variant_ids` (`"colour/size": id`) per style; the
-  bag's Checkout button then hands off to `https://<shop>/cart/<id>:<qty>,…`.
-
----
-
-## 4. UX rules (enforced)
-
-**Strict 4:5 photography.** `.media` owns `aspect-ratio: 4 / 5`; content is `object-fit: cover`. The build also
-centre-crops every uploaded photo to exactly 4:5 and writes 480 / 960 / 1600px WebP + a 1200px JPEG, so a wrong
-upload can't distort the grid or shift layout. Until photos exist, placeholder art in the same frame is shown.
-
-**Instant alternate angle on hover.** Both angles are in the frame from the start; on hover (or keyboard focus) the
-second shows with a 0ms transition. Only on `(hover: hover) and (pointer: fine)`: touch devices never get stuck
-hover states, and they reach every angle on the PDP.
-
-**Slide-out bag drawer.** Every add opens the drawer (right side) with the new line highlighted. Focus is trapped,
-Esc / scrim / close dismiss it, focus returns to the button that opened it, and the page behind is `inert`.
-The drawer shows a free-delivery meter, quantity steppers capped at real stock, remove, subtotal and Checkout.
-
-**PLP sticky sidebar.** From 1000px, the filter column is sticky with its own scroll; the toolbar (count, active
-filter chips, sort) is sticky under the header. Below 1000px, the same form becomes a left drawer with a live
-*Show N styles* button, and category pills sit under the title. Size and colour filters combine per variant (a style
-matches *M + green* only if it has a green colourway in stock in M), and matching cards switch to that colourway.
-Filters and sort live in the URL, so the mega-menu's size links open a pre-filtered grid.
-
-**PDP variant matrix.** Choosing a colour updates the gallery, which sizes are available, low-stock dots and the
-stock message. If the chosen size is sold out in the new colour, it is cleared with a message saying so. Submitting
-without a size shows the error next to the sizes and moves focus there. `?colour=&size=` deep-links a variant.
-Desktop: photos in a two-column grid beside a sticky buy column. Phones: a swipeable row with a counter.
-
-**Mobile sticky Add to bag.** Whenever the main button is off screen, a bar pins to the bottom (safe-area aware)
-with the product, chosen colour/size and price. With no size chosen it reads *Select size* and opens a bottom sheet
-of sizes; picking one adds to the bag. Page padding grows so the bar never covers the footer.
-
-**Accessibility.** AA contrast on every text/background pair; visible focus ring on everything (light on dark
-sections); real form controls for every option; 44px minimum targets; live regions announce result counts, search
-results, stock and bag changes; skip link; auto-rotating content can be paused; `prefers-reduced-motion` respected.
-
----
-
-## 4b. Header and homepage
-
-**Inverting header (site-wide).** Any section marked `data-nav="dark"` flips the header while the header sits over
-it. Sections that also carry `data-nav-clear` (the film hero, the editorial split, the banner) make it see-through
-with light type, so the imagery runs behind it; other dark sections (the footer) give a solid ink bar. Everywhere
-else it is a solid light bar. `store.js` checks which section is under the middle of the header as you scroll
-(measured where the header really is, below the announcement bar at the top). Opening the mega-menu always brings
-the solid light bar back.
-
-**Homepage, top to bottom.**
-
-| Section | Pattern |
-| --- | --- |
-| Film hero | Graded forest film full-bleed under the header; headline and two text links (*Shop all*, *New in*) centred low. Muted, pauses off screen, Pause/Play button, poster only with reduced motion. |
-| New in | Product rail, *See all* link. |
-| Editorial split | Two campaign images side by side (stacked on phones), headline and link over the lower edge. |
-| Bestsellers | Product rail (top-ranked styles that aren't new). |
-| Shop by category | Six tiles, product art on mist, name and count. |
-| Banner | Full-bleed image with a short brand story and link. |
-| Brand copy | Two short paragraphs (also useful for search engines). |
-| Promises, sign-up, footer | Shared by every page. |
-
-Motion is deliberately calm: no loader, no pinned or scroll-driven sections, no animation libraries. Sections fade up
-16px once as they arrive (`home.js`); with reduced motion or without JS everything is simply visible.
-
-## 4c. Gift cards
-
-`/gift-cards/` (`gift()` in build.py, `assets/js/gift.js`, settings in `store.json` → `gift_cards`): amount chips,
-then two buttons, **Email a gift card** and **Post a gift card**. Each opens its own form (email: name, email, your
-name, message, send date; post: name, address, UK postcode, your name, message). A live card preview shows the amount
-and recipient. Fields validate when you leave them and on submit, with the error under the field. The card goes in
-the bag as a normal line with the recipient details attached, and does not count toward free delivery.
-`?send=email|post` deep-links a method.
-
-Before launch: confirm gift card terms (validity, refunds) and set up Shopify gift card products; add their
-variant ids to `gift_cards.shopify_variant_ids` (`"email/100": id`). Recipient details travel with the bag line
-but a plain cart link can't pass them to Shopify; that needs Shopify's gift card recipient fields or an app.
-
-## 5. Pre-delivery checklist (ui-ux-pro-max)
-
-- [x] No emoji as icons (SVG sprite)
-- [x] Pointer cursor and hover feedback on every clickable element
-- [x] Hover/press transitions 80–350ms on the motion tokens
-- [x] Text contrast ≥ 4.5:1
-- [x] Visible focus for keyboard navigation; mega-menu reachable and closable by keyboard
-- [x] `prefers-reduced-motion` respected (film, reveals, announcement rotation)
-- [x] Responsive at 375 / 768 / 1024 / 1440, no horizontal scroll (checked at 390px)
-- [x] Media space reserved (aspect-ratio), font fallbacks metric-matched (no CLS)
+## 5. Not built (and why)
+- Cookie banner: the site sets no cookies and loads no third-party scripts; add one with your consent tool when you add analytics.
+- Accounts: the Login drawer is in place and says accounts open soon.
+- Country switcher, apps, store finder, Apple Pay: Archive 88 has no equivalent yet.

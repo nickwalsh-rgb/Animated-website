@@ -1,9 +1,8 @@
 # Archive 88
 
 Online shop for **Archive 88**: a permanent collection of considered clothing in natural fibres, kept in every size.
-100 styles (sample data) with size × colour variants, a listing page with a sticky filter sidebar, product pages
-with a variant matrix and a mobile sticky Add to bag, a slide-out bag, search, gift cards by email or post, and
-the info pages a shop needs.
+The layout rebuilds the Carhartt WIP UK store module for module (see `docs/DESIGN-SYSTEM.md`), carrying the Archive 88
+brand: wordmark, palette, Archivo type and the forest film. 100 styles (sample data) shown as 305 colourway cards.
 
 Live: https://nickwalsh-rgb.github.io/Animated-website/
 
@@ -21,8 +20,8 @@ makes web-sized photos, commits the result and publishes it. You can also run it
 | To change | Edit | Then |
 | --- | --- | --- |
 | Styles, prices, colours, sizes, stock | `data/catalog.json` (`stock[colour][size]` is the variant matrix) | `python3 build.py` |
-| Product photos | `assets/products/<handle>/<colour>-<n>.jpg` (see that folder's README; cropped to 4:5 by the build) | `python3 build.py` |
-| Announcement bar, categories, free-delivery threshold, page size, gift cards, social links, business details, shipping wording, Shopify domain | `data/store.json` | `python3 build.py` |
+| Product photos | `assets/products/<handle>/<colour>-<n>.jpg` (see that folder's README; cropped to 2:3 by the build) | `python3 build.py` |
+| Homepage modules, categories and sub-categories, SEO copy, trending searches, free-delivery threshold, page size, gift cards, social links, business details, Shopify domain | `data/store.json` | `python3 build.py` |
 | About, Size guide, Delivery & returns, Contact, Privacy, Terms | `src/pages/*.html` | `python3 build.py` |
 | Markup of any component | `components.py`, `build.py` | `python3 build.py` |
 | Tokens, styles, behaviour | `assets/css/tokens.css`, `assets/css/store.css`, `assets/js/*.js` | refresh |
@@ -35,7 +34,7 @@ python3 tools/seed_catalog.py # regenerate the SAMPLE catalogue (overwrites data
 python3 tools/make_sprite.py  # rebuild the icon + garment sprite (assets/sprite.svg)
 ```
 
-`index.html`, `shop/`, `products/`, `gift-cards/`, the info page folders (`about/`, `contact/`...), `404.html`,
+`index.html`, `shop/`, `products/`, `bag/`, `search/`, `gift-cards/`, the info page folders (`about/`, `contact/`...), `404.html`,
 `search.json`, `sitemap.xml` and `robots.txt` are **generated**. Don't edit them by hand.
 
 The build stops with a clear message if a style is missing a field, has a duplicate handle or style number, an
@@ -45,24 +44,22 @@ unknown category or a missing stock cell.
 
 | Page | What's on it |
 | --- | --- |
-| Home `/` | Film hero, New in rail, editorial split, Bestsellers rail, category grid, banner, brand copy |
-| Shop `/shop/`, `/shop/<category>/` | Sticky filter sidebar (drawer on phones), sort, Load more; filters kept in the address (`?size=M&colour=green`) |
-| Product `/products/<handle>/` | Gallery, colour and size selectors, stock messages, availability matrix, sticky Add to bag on phones, You may also like |
-| Gift cards `/gift-cards/` | Amount, then Email or Post, each with its own form and a live card preview |
-| Info | About, Size guide, Delivery & returns, Contact, Privacy, Terms of sale |
-| 404 | Page not found, with search. Also forwards old `/storefront/...` links to their new address |
+| Home `/` | Full-width film teaser + product rail, full-width teaser + rail, three tiles, two tiles (edit in `store.json` → `home`) |
+| Listings `/shop/…` | Shop all, New arrivals, Bestsellers, six categories with sub-categories and fits, fabrics, fits. Filter pill, 48 per page (`?page=2`), filters in the address |
+| Product `/products/<handle>/` | Gallery, colours (`?colour=`), sizes, size guide, sticky purchase bar, accordions, Complete the look, You might also like |
+| Bag `/bag/` | Full page: lines, promo code, totals, checkout (Shopify hand-off) |
+| Search `/search/?query=` | Full screen, trending searches, suggestions, live results with filters |
+| Gift cards, info pages, 404 | Same shell |
 
-Shared on every page: announcement bar, header that turns see-through over imagery, desktop mega-menu, search,
-bag drawer, service bar, newsletter sign-up, footer.
-
-Brand, tokens, components and UX rules: [docs/DESIGN-SYSTEM.md](docs/DESIGN-SYSTEM.md).
+Shared on every page: header that is see-through over the hero, mega menus, full-screen mobile menu, login drawer,
+added-to-bag pop-up, newsletter and footer.
 
 ## Before launch
 
 All product data is **sample data**.
 
 - [ ] Real styles, prices and stock in `data/catalog.json`; photos in `assets/products/<handle>/`
-- [ ] Real campaign photography (the homepage currently uses stills from the forest film)
+- [ ] Real campaign photography (the homepage uses the forest film and stills from it) and product photos (2:3)
 - [ ] Business details in `data/store.json`: currently **placeholders** (fictional company, Ofcom drama phone number, `.example` email)
 - [ ] Real Instagram/Facebook URLs and shipping wording in `data/store.json`
 - [ ] Size guide measurements in `src/pages/size-guide.html` (currently sample numbers)
@@ -83,7 +80,7 @@ data/catalog.json        the styles (sample data)
 src/pages/               About, Size guide, Delivery & returns, Contact, Privacy, Terms (content)
 src/brand-defs.html      wordmark letters, A88 mark, social icons (SVG symbols)
 assets/css/              tokens.css (design tokens), store.css (components)
-assets/js/               store.js (shared), plp.js, pdp.js, home.js, gift.js
+assets/js/               store.js (shared), plp.js, pdp.js, bag.js, search.js, gift.js
 assets/sprite.svg        icons + placeholder garment art (tools/make_sprite.py)
 assets/products/         product photos (one folder per style)
 assets/fonts, img, video self-hosted fonts, images, the forest film

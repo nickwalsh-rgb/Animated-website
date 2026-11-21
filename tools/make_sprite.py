@@ -25,6 +25,13 @@ ICONS = {
     "search": '<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.4-4.4"/>',
     "user": '<circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
     "trash": '<path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/>',
+    "heart": '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/>',
+    "burger": '<path d="M3 9h18M3 15h18"/>',
+    "back": '<path d="M19 12H5M11 6l-6 6 6 6"/>',
+    "chev-l": '<path d="m15 6-6 6 6 6"/>',
+    "chev-r": '<path d="m9 6 6 6-6 6"/>',
+    "zoom-in": '<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.4-4.4M8 11h6M11 8v6"/>',
+    "zoom-out": '<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.4-4.4M8 11h6"/>',
 }
 
 SHAPES = {
