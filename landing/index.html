@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Archive 88 Reel</title>
+<meta name="description" content="Archive 88: the permanent collection. Considered clothing in wool, linen, cotton and cashmere, kept in every size, season after season.">
+<meta name="theme-color" content="#1b211d">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="../assets/fonts/archivo-narrow-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+<link rel="stylesheet" href="landing.css">
+<script>document.documentElement.classList.add("js")</script>
+</head>
+<body>
+
+<!-- Shared shapes: wordmark letters, A88 mark and garment silhouettes (from src/brand-defs.html and assets/sprite.svg) -->
+<svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
+  <defs>
+    <path id="wm-A" d="M0 66.4465L20.8478 1.14235H32.7473L53.5951 66.4465H43.4092L39.1254 52.4528H13.8034L9.51956 66.4465H0ZM16.3736 43.79H36.4599L28.2731 17.04C28.0827 16.1515 27.8447 15.1044 27.5591 13.8986C27.2735 12.6927 27.0673 11.6139 26.9404 10.6619L26.6548 9.32917H26.274L26.0836 10.7571C25.8932 11.7091 25.6711 12.7879 25.4172 13.9938C25.1634 15.1996 24.9095 16.215 24.6557 17.04L16.3736 43.79Z"/>
+    <path id="wm-R" d="M78.9172 66.4465V1.14235H105.477C111.95 1.14235 116.853 2.84 120.184 6.23531C123.516 9.63062 125.182 14.0255 125.182 19.4199C125.182 23.4181 124.183 26.8928 122.184 29.8438C120.184 32.7949 117.376 34.9368 113.759 36.2695L126.705 66.4465H116.139L104.43 38.0782H88.4367V66.4465H78.9172ZM88.4367 29.5106H104.81C108.047 29.5106 110.554 28.5904 112.331 26.75C114.108 24.9095 114.996 22.4662 114.996 19.4199C114.996 16.4371 114.14 14.0889 112.426 12.3754C110.712 10.6619 108.206 9.80515 104.906 9.80515H88.4367V29.5106Z"/>
+    <path id="wm-C" d="M177.445 67.5889C169.131 67.5889 162.753 64.7965 158.31 59.2117C153.868 53.6269 151.647 45.1544 151.647 33.7944C151.647 22.371 153.868 13.8827 158.31 8.32961C162.753 2.77654 169.131 0 177.445 0C181.951 0 185.949 0.904358 189.439 2.71307C192.93 4.52179 195.675 7.2666 197.674 10.9475C199.673 14.6284 200.672 19.293 200.672 24.9412H190.867C190.867 19.4199 189.645 15.3106 187.202 12.6134C184.759 9.91621 181.506 8.5676 177.445 8.5676C172.114 8.5676 168.147 10.5032 165.545 14.3745C162.943 18.2458 161.642 23.9258 161.642 31.4145V36.1743C161.642 43.663 162.959 49.3431 165.593 53.2143C168.226 57.0856 172.241 59.0213 177.635 59.0213C181.76 59.0213 185.06 57.6727 187.535 54.9755C190.01 52.2782 191.248 48.2007 191.248 42.7428H200.672C200.672 48.3911 199.673 53.0557 197.674 56.7366C195.675 60.4175 192.93 63.1464 189.439 64.9234C185.949 66.7004 181.951 67.5889 177.445 67.5889Z"/>
+    <path id="wm-H" d="M229.707 66.4465V1.14235H239.227V28.7491H263.787V1.14235H273.307V66.4465H263.787V37.3167H239.227V66.4465H229.707Z"/>
+    <path id="wm-I" d="M304.816 66.4465V1.14235H314.336V66.4465H304.816Z"/>
+    <path id="wm-V" d="M359.839 66.4465L339.943 1.14235H350.32L365.646 54.2615H366.027L381.734 1.14235H391.064L371.168 66.4465H359.839Z"/>
+    <path id="wm-E" d="M416.957 66.4465V1.14235H457.605V9.80515H426.476V28.7491H453.417V37.3167H426.476V57.7837H458.176V66.4465H416.957Z"/>
+    <path id="wm-8a" d="M570.793 67.5889C566.541 67.5889 563.066 66.7321 560.369 65.0186C557.672 63.3051 555.704 61.0045 554.467 58.1169C553.229 55.2293 552.61 52.0403 552.61 48.5498C552.61 44.9958 553.277 41.8702 554.609 39.173C555.942 36.4758 558.068 34.3973 560.988 32.9377C558.639 31.3511 556.878 29.2726 555.704 26.7024C554.53 24.1321 553.943 21.2921 553.943 18.1824C553.943 14.8188 554.562 11.7725 555.799 9.04358C557.037 6.31464 558.925 4.12514 561.464 2.47509C564.002 0.825028 567.112 0 570.793 0C574.537 0 577.663 0.825028 580.17 2.47509C582.676 4.12514 584.549 6.31464 585.786 9.04358C587.024 11.7725 587.642 14.8188 587.642 18.1824C587.642 21.2921 587.055 24.1321 585.881 26.7024C584.707 29.2726 582.914 31.3511 580.503 32.9377C583.486 34.3973 585.643 36.4758 586.976 39.173C588.309 41.8702 588.975 44.9958 588.975 48.5498C588.975 52.0403 588.341 55.2293 587.071 58.1169C585.802 61.0045 583.85 63.3051 581.217 65.0186C578.583 66.7321 575.108 67.5889 570.793 67.5889ZM570.793 59.7828C573.712 59.7828 575.949 58.7674 577.504 56.7366C579.059 54.7057 579.836 51.9133 579.836 48.3594C579.836 44.7419 579.059 41.9337 577.504 39.9346C575.949 37.9354 573.712 36.9359 570.793 36.9359C567.873 36.9359 565.636 37.9354 564.081 39.9346C562.527 41.9337 561.749 44.7419 561.749 48.3594C561.749 51.9133 562.527 54.7057 564.081 56.7366C565.636 58.7674 567.873 59.7828 570.793 59.7828ZM570.793 29.225C573.204 29.225 575.14 28.2731 576.6 26.3692C578.059 24.4653 578.789 21.8315 578.789 18.4679C578.789 15.0409 578.059 12.4072 576.6 10.5667C575.14 8.72626 573.204 7.80604 570.793 7.80604C568.381 7.80604 566.461 8.72626 565.033 10.5667C563.606 12.4072 562.892 15.0409 562.892 18.4679C562.892 21.8315 563.606 24.4653 565.033 26.3692C566.461 28.2731 568.381 29.225 570.793 29.225Z"/>
+    <path id="wm-8b" d="M621.818 67.5889C617.566 67.5889 614.091 66.7321 611.394 65.0186C608.697 63.3051 606.729 61.0045 605.492 58.1169C604.254 55.2293 603.635 52.0403 603.635 48.5498C603.635 44.9958 604.302 41.8702 605.634 39.173C606.967 36.4758 609.093 34.3973 612.013 32.9377C609.664 31.3511 607.903 29.2726 606.729 26.7024C605.555 24.1321 604.968 21.2921 604.968 18.1824C604.968 14.8188 605.587 11.7725 606.824 9.04358C608.062 6.31464 609.95 4.12514 612.489 2.47509C615.027 0.825028 618.137 0 621.818 0C625.562 0 628.688 0.825028 631.194 2.47509C633.701 4.12514 635.573 6.31464 636.811 9.04358C638.049 11.7725 638.667 14.8188 638.667 18.1824C638.667 21.2921 638.08 24.1321 636.906 26.7024C635.732 29.2726 633.939 31.3511 631.528 32.9377C634.51 34.3973 636.668 36.4758 638.001 39.173C639.334 41.8702 640 44.9958 640 48.5498C640 52.0403 639.365 55.2293 638.096 58.1169C636.827 61.0045 634.875 63.3051 632.242 65.0186C629.608 66.7321 626.133 67.5889 621.818 67.5889ZM621.818 59.7828C624.737 59.7828 626.974 58.7674 628.529 56.7366C630.084 54.7057 630.861 51.9133 630.861 48.3594C630.861 44.7419 630.084 41.9337 628.529 39.9346C626.974 37.9354 624.737 36.9359 621.818 36.9359C618.898 36.9359 616.661 37.9354 615.106 39.9346C613.552 41.9337 612.774 44.7419 612.774 48.3594C612.774 51.9133 613.552 54.7057 615.106 56.7366C616.661 58.7674 618.898 59.7828 621.818 59.7828ZM621.818 29.225C624.229 29.225 626.165 28.2731 627.625 26.3692C629.084 24.4653 629.814 21.8315 629.814 18.4679C629.814 15.0409 629.084 12.4072 627.625 10.5667C626.165 8.72626 624.229 7.80604 621.818 7.80604C619.406 7.80604 617.486 8.72626 616.058 10.5667C614.63 12.4072 613.916 15.0409 613.916 18.4679C613.916 21.8315 614.63 24.4653 616.058 26.3692C617.486 28.2731 619.406 29.225 621.818 29.225Z"/>
+    <path id="mono-path" pathLength="1" d="M127.857 67.4431C123.614 67.4431 120.147 66.5882 117.455 64.8783C114.764 63.1685 112.801 60.8729 111.566 57.9915C110.331 55.1102 109.714 51.928 109.714 48.445C109.714 44.8987 110.379 41.7799 111.709 39.0885C113.038 36.3971 115.16 34.3231 118.073 32.8666C115.73 31.2835 113.972 29.2095 112.801 26.6448C111.629 24.08 111.044 21.2462 111.044 18.1431C111.044 14.7868 111.661 11.7471 112.896 9.02407C114.131 6.30102 116.015 4.11624 118.548 2.46975C121.081 0.823249 124.184 0 127.857 0C131.593 0 134.712 0.823249 137.213 2.46975C139.715 4.11624 141.583 6.30102 142.818 9.02407C144.053 11.7471 144.67 14.7868 144.67 18.1431C144.67 21.2462 144.084 24.08 142.913 26.6448C141.741 29.2095 139.952 31.2835 137.546 32.8666C140.522 34.3231 142.675 36.3971 144.005 39.0885C145.335 41.7799 146 44.8987 146 48.445C146 51.928 145.367 55.1102 144.1 57.9915C142.834 60.8729 140.886 63.1685 138.258 64.8783C135.63 66.5882 132.163 67.4431 127.857 67.4431ZM78.8419 67.4431C74.599 67.4431 71.1319 66.5882 68.4405 64.8783C65.7491 63.1685 63.7859 60.8729 62.5511 57.9915C61.3162 55.1102 60.6988 51.928 60.6988 48.445C60.6988 44.8987 61.3637 41.7799 62.6936 39.0885C64.0234 36.3971 66.1449 34.3231 69.0579 32.8666C66.7148 31.2835 64.9575 29.2095 63.7859 26.6448C62.6144 24.08 62.0286 21.2462 62.0286 18.1431C62.0286 14.7868 62.6461 11.7471 63.8809 9.02407C65.1158 6.30102 66.9998 4.11624 69.5329 2.46975C72.0659 0.823249 75.1689 0 78.8419 0C82.5782 0 85.697 0.823249 88.1984 2.46975C90.6998 4.11624 92.568 6.30102 93.8029 9.02407C95.0377 11.7471 95.6552 14.7868 95.6552 18.1431C95.6552 21.2462 95.0694 24.08 93.8979 26.6448C92.7263 29.2095 90.9373 31.2835 88.5309 32.8666C91.5073 34.3231 93.6604 36.3971 94.9902 39.0885C96.3201 41.7799 96.985 44.8987 96.985 48.445C96.985 51.928 96.3518 55.1102 95.0852 57.9915C93.8187 60.8729 91.8714 63.1685 89.2433 64.8783C86.6153 66.5882 83.1481 67.4431 78.8419 67.4431ZM0 66.3032L20.8029 1.13988H32.6766L53.4795 66.3032H43.3155L39.041 52.3396H13.7736L9.49902 66.3032H0ZM127.857 59.6539C130.77 59.6539 133.002 58.6406 134.554 56.6142C136.105 54.5877 136.881 51.8013 136.881 48.255C136.881 44.6454 136.105 41.8432 134.554 39.8484C133.002 37.8536 130.77 36.8562 127.857 36.8562C124.944 36.8562 122.712 37.8536 121.16 39.8484C119.609 41.8432 118.833 44.6454 118.833 48.255C118.833 51.8013 119.609 54.5877 121.16 56.6142C122.712 58.6406 124.944 59.6539 127.857 59.6539ZM78.8419 59.6539C81.7549 59.6539 83.9872 58.6406 85.5387 56.6142C87.0902 54.5877 87.866 51.8013 87.866 48.255C87.866 44.6454 87.0902 41.8432 85.5387 39.8484C83.9872 37.8536 81.7549 36.8562 78.8419 36.8562C75.9289 36.8562 73.6966 37.8536 72.1451 39.8484C70.5936 41.8432 69.8178 44.6454 69.8178 48.255C69.8178 51.8013 70.5936 54.5877 72.1451 56.6142C73.6966 58.6406 75.9289 59.6539 78.8419 59.6539ZM16.3383 43.6955H36.3813L28.2121 17.0033C28.0221 16.1167 27.7846 15.0718 27.4997 13.8686C27.2147 12.6654 27.0089 11.5888 26.8822 10.6389L26.5973 9.30904H26.2173L26.0273 10.7339C25.8373 11.6838 25.6157 12.7604 25.3624 13.9636C25.1091 15.1668 24.8558 16.18 24.6025 17.0033L16.3383 43.6955ZM78.8419 29.162C81.2483 29.162 83.1798 28.2121 84.6363 26.3123C86.0928 24.4125 86.8211 21.7844 86.8211 18.4281C86.8211 15.0085 86.0928 12.3804 84.6363 10.5439C83.1798 8.70744 81.2483 7.7892 78.8419 7.7892C76.4355 7.7892 74.5198 8.70744 73.095 10.5439C71.6701 12.3804 70.9577 15.0085 70.9577 18.4281C70.9577 21.7844 71.6701 24.4125 73.095 26.3123C74.5198 28.2121 76.4355 29.162 78.8419 29.162ZM127.857 29.162C130.263 29.162 132.195 28.2121 133.651 26.3123C135.108 24.4125 135.836 21.7844 135.836 18.4281C135.836 15.0085 135.108 12.3804 133.651 10.5439C132.195 8.70744 130.263 7.7892 127.857 7.7892C125.45 7.7892 123.535 8.70744 122.11 10.5439C120.685 12.3804 119.973 15.0085 119.973 18.4281C119.973 21.7844 120.685 24.4125 122.11 26.3123C123.535 28.2121 125.45 29.162 127.857 29.162Z"/>
+    <linearGradient id="shade" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".12"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".16"/></linearGradient><pattern id="weave" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M0 2.5h10M0 7.5h10" stroke="rgba(0,0,0,.09)" stroke-width="2"/><path d="M2.5 0v10M7.5 0v10" stroke="rgba(255,255,255,.07)" stroke-width="2"/></pattern><path id="p-coat" d="M168 70 L232 70 L268 82 L316 100 Q334 108 337 130 L352 382 Q340 390 324 386 L310 214 L306 446 L94 446 L90 214 L76 386 Q60 390 48 382 L63 130 Q66 108 84 100 L132 82 Z"/><path id="p-knit" d="M166 76 Q200 92 234 76 L282 88 L322 108 Q338 116 340 136 L350 372 L322 376 L306 206 L304 408 L96 408 L94 206 L78 376 L50 372 L60 136 Q62 116 78 108 L118 88 Z"/><path id="p-shirt" d="M170 72 L230 72 L270 84 L318 104 Q334 112 336 132 L348 370 L322 374 L306 206 L304 404 Q250 426 200 418 Q150 426 96 404 L94 206 L78 374 L52 370 L64 132 Q66 112 82 104 L130 84 Z"/><path id="p-tee" d="M168 82 Q200 98 232 82 L276 94 L342 134 L318 196 L294 182 L296 408 L104 408 L106 182 L82 196 L58 134 L124 94 Z"/><path id="p-trouser" d="M120 64 L280 64 L300 452 L216 452 L202 176 L198 176 L184 452 L100 452 Z"/><path id="p-gift" d="M84 168 H316 Q340 168 340 192 V318 Q340 342 316 342 H84 Q60 342 60 318 V192 Q60 168 84 168 Z"/><path id="p-blazer" d="M168 70 L232 70 L268 82 L316 100 Q334 108 337 130 L350 372 L324 376 L310 214 L306 400 Q260 418 212 412 L200 300 L188 412 Q140 418 94 400 L90 214 L76 376 L50 372 L63 130 Q66 108 84 100 L132 82 Z"/>
+    <g id="s-coat"><use href="#p-coat" fill="currentColor" stroke="rgba(0,0,0,.16)" stroke-width="1.5"/><use href="#p-coat" fill="url(#shade)"/><path d="M168 70 L200 168 L232 70 M168 70 L150 120 L176 140 M232 70 L250 120 L224 140 M200 168 L200 446 M118 330 L168 326 M232 326 L282 330 M56 362 L80 366 M320 366 L344 362" fill="none" stroke="rgba(0,0,0,.2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="200" cy="200" r="4.5" fill="rgba(0,0,0,.28)"/><circle cx="200" cy="262" r="4.5" fill="rgba(0,0,0,.28)"/><circle cx="200" cy="324" r="4.5" fill="rgba(0,0,0,.28)"/></g>
+    <g id="s-knit"><use href="#p-knit" fill="currentColor" stroke="rgba(0,0,0,.16)" stroke-width="1.5"/><use href="#p-knit" fill="url(#shade)"/><path d="M166 76 Q200 112 234 76 M172 82 Q200 102 228 82 M96 386 L304 386 M52 352 L80 356 M320 356 L348 352 M150 130 L150 380 M250 130 L250 380 M200 120 L200 380" fill="none" stroke="rgba(0,0,0,.2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="s-shirt"><use href="#p-shirt" fill="currentColor" stroke="rgba(0,0,0,.16)" stroke-width="1.5"/><use href="#p-shirt" fill="url(#shade)"/><path d="M170 72 L184 106 L200 90 L216 106 L230 72 M206 96 L206 418 M226 150 L262 150 L262 192 L226 192 Z M54 348 L80 352 M320 352 L346 348" fill="none" stroke="rgba(0,0,0,.2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="200" cy="130" r="4.5" fill="rgba(0,0,0,.28)"/><circle cx="200" cy="180" r="4.5" fill="rgba(0,0,0,.28)"/><circle cx="200" cy="230" r="4.5" fill="rgba(0,0,0,.28)"/><circle cx="200" cy="280" r="4.5" fill="rgba(0,0,0,.28)"/><circle cx="200" cy="330" r="4.5" fill="rgba(0,0,0,.28)"/><circle cx="200" cy="380" r="4.5" fill="rgba(0,0,0,.28)"/></g>
+    <g id="s-tee"><use href="#p-tee" fill="currentColor" stroke="rgba(0,0,0,.16)" stroke-width="1.5"/><use href="#p-tee" fill="url(#shade)"/><path d="M168 82 Q200 116 232 82 M68 130 L92 190 M332 130 L308 190 M104 392 L296 392" fill="none" stroke="rgba(0,0,0,.2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="s-trouser"><use href="#p-trouser" fill="currentColor" stroke="rgba(0,0,0,.16)" stroke-width="1.5"/><use href="#p-trouser" fill="url(#shade)"/><path d="M120 86 L280 86 M140 64 L140 86 M200 64 L200 86 M260 64 L260 86 M206 86 L206 156 Q204 168 198 176 M126 92 Q150 104 158 146 M274 92 Q250 104 242 146 M150 170 L142 450 M250 170 L258 450 M101 436 L185 436 M215 436 L299 436" fill="none" stroke="rgba(0,0,0,.2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="206" cy="76" r="4.5" fill="rgba(0,0,0,.28)"/></g>
+    <g id="s-blazer"><use href="#p-blazer" fill="currentColor" stroke="rgba(0,0,0,.16)" stroke-width="1.5"/><use href="#p-blazer" fill="url(#shade)"/><path d="M168 70 L150 128 L178 150 L200 250 M232 70 L250 128 L222 150 L200 250 M112 320 L168 316 M232 316 L288 320 M236 172 L272 170 M54 352 L78 356 M322 356 L346 352" fill="none" stroke="rgba(0,0,0,.2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="200" cy="274" r="4.5" fill="rgba(0,0,0,.28)"/></g>
+  </defs>
+</svg>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- ── Count-in ─────────────────────────────────────────────────────────────────────────────────────────── -->
+<div class="intro" aria-hidden="true">
+  <div class="intro__shutters"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="intro__inner">
+    <svg class="intro__mono" viewBox="-2 -2 150 72"><use href="#mono-path" class="intro__mono-fill"/><use href="#mono-path" class="intro__mono-line"/></svg>
+    <div class="intro__count"><span class="js-count">00</span></div>
+    <div class="intro__meta"><span>Archive 88</span><span class="js-intro-state">Loading reel</span><span>2026</span></div>
+    <div class="intro__bar"><i class="js-intro-bar"></i></div>
+  </div>
+</div>
+
+<!-- ── Cursor and film grain ────────────────────────────────────────────────────────────────────────────── -->
+<div class="cursor" aria-hidden="true"><div class="cursor__ring"><span class="cursor__label"></span></div><div class="cursor__dot"></div></div>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ── Heads-up display ─────────────────────────────────────────────────────────────────────────────────── -->
+<header class="hud">
+  <a class="hud__logo" href="#top" data-cursor="Top" aria-label="Archive 88, back to the top"><svg viewBox="0 0 146 68" aria-hidden="true"><use href="#mono-path"/></svg></a>
+  <p class="hud__rec" aria-hidden="true"><i></i><span>Rec</span><span class="hud__fps">25 fps</span></p>
+  <button class="hud__menu magnetic" type="button" aria-expanded="false" aria-controls="index" data-cursor="Open">
+    <span class="hud__menu-lines" aria-hidden="true"><i></i><i></i></span><span class="hud__menu-text">Index</span>
+  </button>
+</header>
+<div class="hud hud--bottom" aria-hidden="true">
+  <p class="hud__tc">TC <span class="js-tc">00:00:00:00</span></p>
+  <p class="hud__scene"><span class="js-scene-no">01</span><span class="hud__scene-name"><span class="js-scene-name">Opening</span></span></p>
+  <div class="hud__prog"><i class="js-prog"></i></div>
+</div>
+
+<!-- ── Scene index ──────────────────────────────────────────────────────────────────────────────────────── -->
+<nav class="index" id="index" aria-label="Scenes" inert>
+  <div class="index__bg" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  <div class="index__inner">
+    <p class="label">Scenes in this reel</p>
+    <ol class="index__list js-index-list"></ol>
+    <p class="index__foot">Archive 88 · The permanent collection</p>
+  </div>
+</nav>
+
+<main id="main">
+<span id="top"></span>
+
+<!-- 01 ── Opening: the wordmark is a window onto the film; scroll flies through the I ─────────────────────── -->
+<section class="scene hero" id="opening" data-scene="Opening">
+  <div class="stage hero__stage">
+    <div class="hero__film">
+      <video class="js-film" muted loop playsinline preload="none" poster="../assets/img/forest-poster.jpg" aria-hidden="true"
+             data-land="../assets/video/forest.mp4" data-port="../assets/video/forest-portrait.mp4"></video>
+    </div>
+    <div class="hero__shade" aria-hidden="true"></div>
+    <svg class="hero__knock js-knock" aria-hidden="true" focusable="false">
+      <defs>
+        <clipPath id="wm-clip"><rect x="-6" y="-3" width="652" height="74"/></clipPath>
+        <mask id="knock" maskUnits="userSpaceOnUse" x="0" y="0" width="100%" height="100%">
+          <rect width="100%" height="100%" fill="#fff"/>
+          <g class="js-wm-zoom">
+            <g clip-path="url(#wm-clip)" fill="#000">
+              <g class="js-wm-l"><use href="#wm-A"/></g>
+              <g class="js-wm-l"><use href="#wm-R"/></g>
+              <g class="js-wm-l"><use href="#wm-C"/></g>
+              <g class="js-wm-l"><use href="#wm-H"/></g>
+              <g class="js-wm-l"><use href="#wm-I"/></g>
+              <g class="js-wm-l"><use href="#wm-V"/></g>
+              <g class="js-wm-l"><use href="#wm-E"/></g>
+              <g class="js-wm-l"><use href="#wm-8a"/></g>
+              <g class="js-wm-l"><use href="#wm-8b"/></g>
+            </g>
+          </g>
+        </mask>
+      </defs>
+      <rect class="hero__paper js-paper" width="100%" height="100%" mask="url(#knock)"/>
+      <g class="js-wm-rule"><line class="hero__rule" x1="0" y1="0" x2="1" y2="0"/></g>
+    </svg>
+
+    <div class="hero__ui js-hero-ui">
+      <div class="hero__top">
+        <p class="label js-rise">The permanent collection</p>
+        <p class="label js-rise">Reel 01 · 2026</p>
+      </div>
+      <h1 class="sr-only">Archive 88</h1>
+      <p class="hero__lede js-lines">Considered clothing in natural fibres,<br>kept in every size, season after season.</p>
+      <div class="hero__bottom">
+        <p class="label js-rise">Wool · Linen · Cotton · Cashmere</p>
+        <p class="hero__scroll js-rise"><span>Scroll</span><i aria-hidden="true"></i></p>
+      </div>
+      <span class="crop crop--tl" aria-hidden="true"></span><span class="crop crop--tr" aria-hidden="true"></span>
+      <span class="crop crop--bl" aria-hidden="true"></span><span class="crop crop--br" aria-hidden="true"></span>
+    </div>
+
+    <div class="hero__end js-hero-end">
+      <p class="label hero__end-label">Scene 01 · Exterior, forest, morning</p>
+      <h2 class="hero__headline js-chars">Made to be kept.</h2>
+      <p class="hero__end-sub">Fewer things, made well, and made again.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 02 ── Manifesto: read it as you scroll; the garments slot into the sentence ──────────────────────────── -->
+<section class="scene manifesto" id="manifesto" data-scene="Manifesto">
+  <div class="stage manifesto__stage">
+    <div class="wrap manifesto__wrap">
+      <p class="label manifesto__label">What we make</p>
+      <p class="manifesto__text js-words">We make fewer things <span class="pill" style="--c:#b9b2a4;--g:#ecebe6"><svg viewBox="0 0 400 500"><use href="#s-shirt"/></svg></span> and keep making them. Wool from the mill <span class="pill" style="--c:#d3c6ae;--g:#2f3d33"><svg viewBox="0 0 400 500"><use href="#s-knit"/></svg></span> that spun it last year. Linen <span class="pill" style="--c:#e9e3d3;--g:#b08a5b"><svg viewBox="0 0 400 500"><use href="#s-trouser"/></svg></span> washed soft before it is cut. Every style stays in the range, in every size, until you wear it out <span class="pill" style="--c:#b08a5b;--g:#1b211d"><svg viewBox="0 0 400 500"><use href="#s-coat"/></svg></span> which takes a while.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 03 ── Fibres: one field of strands that re-forms as wool, linen, cotton and cashmere ──────────────────── -->
+<section class="scene fibres" id="fibres" data-scene="Fibres">
+  <div class="stage fibres__stage js-fibre-stage">
+    <canvas class="fibres__canvas js-fibre-canvas" aria-hidden="true"></canvas>
+    <div class="fibres__ui wrap">
+      <div class="fibres__head">
+        <p class="label">Natural fibres only</p>
+        <p class="fibres__count" aria-hidden="true"><span class="roll js-fibre-no"><span>01</span><span>02</span><span>03</span><span>04</span></span><span class="fibres__of">/ 04</span></p>
+      </div>
+      <div class="fibres__names">
+        <h2 class="fibres__name js-fibre-name is-on" data-i="0">Wool</h2>
+        <h2 class="fibres__name js-fibre-name" data-i="1">Linen</h2>
+        <h2 class="fibres__name js-fibre-name" data-i="2">Cotton</h2>
+        <h2 class="fibres__name js-fibre-name" data-i="3">Cashmere</h2>
+      </div>
+      <div class="fibres__specs">
+        <dl class="spec js-fibre-spec is-on">
+          <div><dt>Diameter</dt><dd>17–23 µm</dd></div>
+          <div><dt>Character</dt><dd>Crimped, springy, warm when damp</dd></div>
+          <div><dt>Styles using it</dt><dd>43</dd></div>
+        </dl>
+        <dl class="spec js-fibre-spec">
+          <div><dt>Fibre length</dt><dd>50–90 cm line flax</dd></div>
+          <div><dt>Character</dt><dd>Long, smooth, cool, softens every wash</dd></div>
+          <div><dt>Styles using it</dt><dd>8</dd></div>
+        </dl>
+        <dl class="spec js-fibre-spec">
+          <div><dt>Staple</dt><dd>28–36 mm long-staple</dd></div>
+          <div><dt>Character</dt><dd>Soft, breathable, washes at home</dd></div>
+          <div><dt>Styles using it</dt><dd>50</dd></div>
+        </dl>
+        <dl class="spec js-fibre-spec">
+          <div><dt>Diameter</dt><dd>Under 19 µm</dd></div>
+          <div><dt>Character</dt><dd>Fine undercoat, light and very warm</dd></div>
+          <div><dt>Styles using it</dt><dd>7</dd></div>
+        </dl>
+      </div>
+      <p class="fibres__hint label" aria-hidden="true">Move through the fibres</p>
+    </div>
+  </div>
+</section>
+
+<!-- 04 ── Collection: eight looks on a moving rail. Add photos with data-image (see README) ─────────────── -->
+<section class="scene looks" id="collection" data-scene="Collection">
+  <div class="stage looks__stage">
+    <p class="looks__ghost js-looks-ghost" aria-hidden="true">Collection one · Collection one ·</p>
+    <div class="looks__head wrap">
+      <p class="label">Collection one</p>
+      <h2 class="looks__title">Eight looks from<br>the permanent collection</h2>
+    </div>
+    <ol class="looks__track js-looks-track">
+      <li class="look" data-image="" style="--bg:#e3ded2;--c:#b08a5b;--h:62vh;--y:4vh">
+        <figure>
+          <div class="look__frame" data-cursor="Look"><div class="look__media"><svg viewBox="0 0 400 500" aria-hidden="true"><use href="#s-coat"/></svg></div><span class="look__tag">A88-001 · Camel</span><span class="look__ratio">2:3</span></div>
+          <figcaption><span class="look__no">Look 01</span><span class="look__name">Single-Breasted Overcoat</span><span class="look__mat">Virgin wool</span></figcaption>
+        </figure>
+      </li>
+      <li class="look" data-image="" style="--bg:#2f3d33;--c:#8e4527;--h:52vh;--y:-6vh">
+        <figure>
+          <div class="look__frame" data-cursor="Look"><div class="look__media"><svg viewBox="0 0 400 500" aria-hidden="true"><use href="#s-knit"/></svg></div><span class="look__tag">A88-017 · Rust</span><span class="look__ratio">2:3</span></div>
+          <figcaption><span class="look__no">Look 02</span><span class="look__name">Cashmere Roll Neck</span><span class="look__mat">Mongolian cashmere</span></figcaption>
+        </figure>
+      </li>
+      <li class="look" data-image="" style="--bg:#b9b2a4;--c:#e9e3d3;--h:58vh;--y:8vh">
+        <figure>
+          <div class="look__frame" data-cursor="Look"><div class="look__media"><svg viewBox="0 0 400 500" aria-hidden="true"><use href="#s-trouser"/></svg></div><span class="look__tag">A88-055 · Ecru</span><span class="look__ratio">2:3</span></div>
+          <figcaption><span class="look__no">Look 03</span><span class="look__name">Drawstring Linen Trouser</span><span class="look__mat">Washed linen</span></figcaption>
+        </figure>
+      </li>
+      <li class="look" data-image="" style="--bg:#ecebe6;--c:#b9b2a4;--h:64vh;--y:-2vh">
+        <figure>
+          <div class="look__frame" data-cursor="Look"><div class="look__media"><svg viewBox="0 0 400 500" aria-hidden="true"><use href="#s-shirt"/></svg></div><span class="look__tag">A88-034 · Stone</span><span class="look__ratio">2:3</span></div>
+          <figcaption><span class="look__no">Look 04</span><span class="look__name">Poplin Shirt</span><span class="look__mat">Cotton poplin</span></figcaption>
+        </figure>
+      </li>
+      <li class="look" data-image="" style="--bg:#d3c6ae;--c:#5e6142;--h:54vh;--y:6vh">
+        <figure>
+          <div class="look__frame" data-cursor="Look"><div class="look__media"><svg viewBox="0 0 400 500" aria-hidden="true"><use href="#s-blazer"/></svg></div><span class="look__tag">A88-085 · Olive</span><span class="look__ratio">2:3</span></div>
+          <figcaption><span class="look__no">Look 05</span><span class="look__name">Unstructured Blazer</span><span class="look__mat">Wool-cashmere blend</span></figcaption>
+        </figure>
+      </li>
+      <li class="look" data-image="" style="--bg:#1b211d;--c:#f6f5f1;--h:60vh;--y:-5vh">
+        <figure>
+          <div class="look__frame" data-cursor="Look"><div class="look__media"><svg viewBox="0 0 400 500" aria-hidden="true"><use href="#s-tee"/></svg></div><span class="look__tag">A88-067 · Optic White</span><span class="look__ratio">2:3</span></div>
+          <figcaption><span class="look__no">Look 06</span><span class="look__name">Heavyweight Tee</span><span class="look__mat">Organic cotton jersey</span></figcaption>
+        </figure>
+      </li>
+      <li class="look" data-image="" style="--bg:#a3471f;--c:#d3c6ae;--h:56vh;--y:5vh">
+        <figure>
+          <div class="look__frame" data-cursor="Look"><div class="look__media"><svg viewBox="0 0 400 500" aria-hidden="true"><use href="#s-knit"/></svg></div><span class="look__tag">A88-020 · Oat</span><span class="look__ratio">2:3</span></div>
+          <figcaption><span class="look__no">Look 07</span><span class="look__name">Fisherman Jumper</span><span class="look__mat">Geelong lambswool</span></figcaption>
+        </figure>
+      </li>
+      <li class="look" data-image="" style="--bg:#e3ded2;--c:#1e2421;--h:62vh;--y:-3vh">
+        <figure>
+          <div class="look__frame" data-cursor="Look"><div class="look__media"><svg viewBox="0 0 400 500" aria-hidden="true"><use href="#s-trouser"/></svg></div><span class="look__tag">A88-053 · Ink</span><span class="look__ratio">2:3</span></div>
+          <figcaption><span class="look__no">Look 08</span><span class="look__name">Rigid Selvedge Jean</span><span class="look__mat">Japanese selvedge denim</span></figcaption>
+        </figure>
+      </li>
+    </ol>
+    <div class="looks__foot wrap" aria-hidden="true"><span class="label js-looks-count">01 / 08</span><span class="looks__bar"><i class="js-looks-bar"></i></span></div>
+  </div>
+</section>
+
+<!-- 05 ── Construction: pattern pieces leave the cutting mat and become a shirt ───────────────────────────── -->
+<section class="scene build" id="construction" data-scene="Construction">
+  <div class="stage build__stage">
+    <div class="build__side wrap">
+      <p class="label">How a shirt is made</p>
+      <h2 class="build__title">Eight pieces.<br>One shirt.</h2>
+      <ol class="build__steps js-steps">
+        <li><b>Cut</b><span>Pieces cut on the grain, one pair at a time</span></li>
+        <li><b>Join</b><span>Shoulders, sleeves and sides brought together</span></li>
+        <li><b>Stitch</b><span>Single-needle seams, 18 stitches per 3 cm</span></li>
+        <li><b>Finish</b><span>Seven buttons, a pocket and a press</span></li>
+      </ol>
+      <dl class="build__stats">
+        <div><dt>Pieces</dt><dd class="js-stat-pieces">08</dd></div>
+        <div><dt>Seams</dt><dd class="js-stat-seams">00</dd></div>
+        <div><dt>Buttons</dt><dd class="js-stat-buttons">0</dd></div>
+      </dl>
+    </div>
+    <div class="build__board">
+      <svg class="build__svg js-build" viewBox="0 0 1200 760" role="img" aria-label="Shirt pattern pieces assembling into a finished poplin shirt">
+        <defs>
+          <pattern id="mat-minor" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="currentColor" stroke-opacity=".08" stroke-width="1"/></pattern>
+          <pattern id="mat-major" width="100" height="100" patternUnits="userSpaceOnUse"><rect width="100" height="100" fill="url(#mat-minor)"/><path d="M100 0H0V100" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="1"/></pattern>
+          <pattern id="poplin" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#b9b2a4"/><path d="M0 1.5h6M0 4.5h6" stroke="#000" stroke-opacity=".06" stroke-width="1.4"/><path d="M1.5 0v6M4.5 0v6" stroke="#fff" stroke-opacity=".08" stroke-width="1.4"/></pattern>
+          <mask id="stitch-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="1200" height="760"><g class="js-stitch-mask" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"></g></mask>
+        </defs>
+        <g class="mat js-mat">
+          <rect class="mat__grid" x="0" y="0" width="1200" height="760" fill="url(#mat-major)"/>
+          <g class="mat__ruler js-ruler"></g>
+        </g>
+        <g class="pieces js-pieces" transform="translate(380 110) scale(1.1)"></g>
+        <g class="stitches" transform="translate(380 110) scale(1.1)" mask="url(#stitch-mask)"><g class="js-stitches" fill="none" stroke="#fbfaf8" stroke-width="1.6" stroke-dasharray="5 4" stroke-linecap="round"></g></g>
+        <g class="buttons js-buttons" transform="translate(380 110) scale(1.1)"></g>
+        <g class="hangtag js-tag" transform="translate(860 200)">
+          <g class="js-tag-swing">
+            <line x1="0" y1="-60" x2="0" y2="0" stroke="currentColor" stroke-width="1.2"/>
+            <rect x="-62" y="0" width="124" height="168" fill="#fbfaf8" stroke="#1b211d" stroke-width="1.2"/>
+            <circle cx="0" cy="14" r="4" fill="none" stroke="#1b211d" stroke-width="1.2"/>
+            <use href="#mono-path" transform="translate(-34 34) scale(.47)" fill="#1b211d"/>
+            <text x="0" y="90" text-anchor="middle" class="tag__t">Poplin Shirt</text>
+            <text x="0" y="108" text-anchor="middle" class="tag__s">A88-034 · Stone</text>
+            <text x="0" y="126" text-anchor="middle" class="tag__s">Cotton poplin</text>
+            <text x="0" y="152" text-anchor="middle" class="tag__p">£115</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- 06 ── Numbers: two belts of type that answer your scroll speed, then the figures ─────────────────────── -->
+<section class="scene numbers" id="numbers" data-scene="Numbers">
+  <div class="marquee js-marquee" data-dir="1" aria-hidden="true"><div class="marquee__row">
+    <span>Natural fibres</span><svg viewBox="0 0 146 68"><use href="#mono-path"/></svg><span>Kept in every size</span><svg viewBox="0 0 146 68"><use href="#mono-path"/></svg><span>Repairs for life</span><svg viewBox="0 0 146 68"><use href="#mono-path"/></svg>
+  </div></div>
+  <div class="marquee marquee--alt js-marquee" data-dir="-1" aria-hidden="true"><div class="marquee__row">
+    <span>Wool</span><b>✕</b><span>Linen</span><b>✕</b><span>Cotton</span><b>✕</b><span>Cashmere</span><b>✕</b>
+  </div></div>
+  <div class="wrap stats">
+    <h2 class="sr-only">The collection in numbers</h2>
+    <div class="stat"><p class="odo js-odo" data-to="100" aria-label="100">100</p><p class="stat__t">styles in the permanent collection</p></div>
+    <div class="stat"><p class="odo js-odo" data-to="06" aria-label="6">06</p><p class="stat__t">sizes in every style, XS to XXL or waist 28 to 38</p></div>
+    <div class="stat"><p class="odo js-odo" data-to="00" aria-label="0">00</p><p class="stat__t">seasonal drops. Nothing leaves the range when the weather turns</p></div>
+    <div class="stat"><p class="odo js-odo" data-to="30" aria-label="30">30</p><p class="stat__t">days for free returns, collected from your door</p></div>
+  </div>
+</section>
+
+<!-- 07 ── Sign-up and credits ──────────────────────────────────────────────────────────────────────────── -->
+<section class="scene outro" id="signup" data-scene="Sign-up">
+  <div class="wrap outro__wrap">
+    <p class="label">Opening soon</p>
+    <h2 class="outro__title js-wave">The permanent collection</h2>
+    <form class="signup js-signup" novalidate>
+      <label class="signup__label" for="email">Get one email when the shop opens. Nothing else.</label>
+      <div class="signup__row">
+        <input class="signup__input" id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+        <button class="signup__btn magnetic" type="submit" data-cursor="Send"><span class="signup__btn-t">Tell me first</span><svg class="signup__tick" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></button>
+      </div>
+      <p class="signup__msg js-signup-msg" role="status" aria-live="polite"></p>
+    </form>
+    <a class="outro__shop" href="../shop/" data-cursor="Shop">Browse the sample shop <span aria-hidden="true">→</span></a>
+  </div>
+
+  <div class="credits" aria-label="Credits">
+    <div class="credits__roll js-credits">
+      <p><span>Brand</span>Archive 88</p>
+      <p><span>Collection</span>The permanent collection</p>
+      <p><span>Film</span>Forest, morning</p>
+      <p><span>Type</span>Archivo and Archivo Narrow</p>
+      <p><span>Fibres</span>Wool, linen, cotton, cashmere</p>
+      <p><span>Photography</span>Coming with the collection</p>
+      <p><span>Motion</span>Hand-written, no libraries</p>
+    </div>
+  </div>
+
+  <footer class="outro__foot">
+    <svg class="outro__wm js-foot-wm" viewBox="0 0 640 68" role="img" aria-label="Archive 88">
+      <use href="#wm-A"/><use href="#wm-R"/><use href="#wm-C"/><use href="#wm-H"/><use href="#wm-I"/><use href="#wm-V"/><use href="#wm-E"/><use href="#wm-8a"/><use href="#wm-8b"/>
+    </svg>
+    <div class="outro__legal wrap"><span>© 2026 Archive 88</span><a href="../" data-cursor="Home">Home</a><a href="../about/" data-cursor="Read">About</a><a href="../contact/" data-cursor="Write">Contact</a></div>
+  </footer>
+</section>
+</main>
+
+<script src="landing.js" defer></script>
+</body>
+</html>
