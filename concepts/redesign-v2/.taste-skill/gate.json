@@ -1,0 +1,329 @@
+{
+ "start": "2026-11-22T00:26:31.257Z",
+ "round": 1,
+ "idle": 0,
+ "errors": 0,
+ "status": "pass",
+ "history": [
+  {
+   "at": "2026-11-22T00:28:23.749Z",
+   "mode": "manual",
+   "status": "fail",
+   "fails": 3,
+   "round": 1,
+   "reused": false,
+   "stopHookActive": false
+  },
+  {
+   "at": "2026-11-22T00:28:27.397Z",
+   "mode": "manual",
+   "status": "fail",
+   "fails": 3,
+   "round": 1,
+   "reused": true,
+   "stopHookActive": false
+  },
+  {
+   "at": "2026-11-22T00:30:24.450Z",
+   "mode": "manual",
+   "status": "pass",
+   "fails": 0,
+   "round": 1,
+   "reused": false,
+   "stopHookActive": false
+  }
+ ],
+ "max": 3,
+ "marker": {
+  "page": "index.html",
+  "url": null,
+  "root": null,
+  "kind": "product",
+  "category": "natural-fibre clothing",
+  "primary": "Shop the collection",
+  "rounds": 3,
+  "start": "2026-11-22T00:26:31.257Z",
+  "by": "gate.mjs --start"
+ },
+ "manual": true,
+ "roundKey": "67b46eab018ef8f5:226577ea",
+ "roundFree": false,
+ "idleFree": false,
+ "blockKey": null,
+ "fp": "ba1187a074c7e85e",
+ "page": "index.html",
+ "found": {
+  "fails": [
+   {
+    "check": "product-shown",
+    "where": "main#top > section.hero.hero--film \"Natural-fibre clothing, kept in every si\"",
+    "msg": "the hero of this product page shows no photograph and no render of the product: the page's pictures (\"Two people walking a forest pa\", \"A camel wool coat with toggle \", \"A brown wool knit laid flat on\") sit below it",
+    "fix": "lead with the product itself: the client's photograph of it, else stand-in photographs of its kind (photos.mjs search), a render (assets/objects/product-render, [data-product], data-product-place=hero) only when the brief asks for 3D; never a drawing, never mood stock, never another maker's product",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "product-shown"
+    ],
+    "wheres": [
+     "main#top > section.hero.hero--film \"Natural-fibre clothing, kept in every si\""
+    ]
+   }
+  ],
+  "warns": [
+   {
+    "check": "scroll-reveal",
+    "where": "section#idea > div.wrap > p.mo-wh__text \"We make one collection and keep it. A st\"",
+    "msg": "starts \"color\" (0.2 s) the moment it is scrolled into view (an IntersectionObserver) on span.mo-w:nth-of-type(1) (inside a dealt moment's section, [data-moment]: an enter moment is expected on every kind; its still is judged under reduced motion)",
+    "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "scroll-reveal",
+    "where": "section#repairs \"Repairs for as long as you wear it Any A\"",
+    "msg": "starts \"opacity\" (0.4 s) the moment it is scrolled into view (an IntersectionObserver) on div.mo-ph__words (inside a dealt moment's section, [data-moment]: an enter moment is expected on every kind; its still is judged under reduced motion)",
+    "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "pinned",
+    "where": "section#repairs > div.wrap.mo-ph \"Repairs for as long as you wear it Any A\"",
+    "msg": "held on screen for 2 screens of scroll (position: sticky) while the page moves on (inside a dealt moment's section, [data-moment]: expected on every kind, two moments at most, house rule; its still is judged under reduced motion)",
+    "fix": "let the section scroll with the page",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "cta",
+    "where": "section#repairs \"Repairs for as long as you wear it\"",
+    "msg": "a section over 1.5 screens long with no link or button in it",
+    "fix": "add the action: a button in the hero, one on every priced item, one in the closing section",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "copy-headings",
+    "where": "h2#repairs-h \"Repairs for as long as you wear it\"",
+    "msg": "\"Repairs for as long as you wear it\" names no product, part, place or section (the one brand line a page may have)",
+    "fix": "name the thing in every heading: the product, a part, the place or a section noun",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "section-gaps",
+    "where": "section#fabrics / section#repairs",
+    "msg": "276px between these sections, +49% against the median 185px of gaps at a change of ground",
+    "fix": "use one gap between sections (all within 25% of each other)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "links",
+    "where": "div.span-2.footer__col:nth-of-type(5) > ul > li:nth-of-type(2) > a \"Contact\"",
+    "msg": "\"Contact\" goes to #contact, the block it already sits in",
+    "fix": "point every link at a real section, page or file",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "photo-set",
+    "where": "div#shirts > div.tile__media > img \"photo-f15502264-500.webp\"",
+    "msg": "7 photographs in more than one look: lightness from 0.34 to 0.83; the odd one out is photo-f15502264-500.webp",
+    "fix": "grade the photographs to one look (light, colour, warmth), or replace the odd one out",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "photo-credit",
+    "where": "(the page text)",
+    "msg": "1 library source (wikimedia): the page credits wikimedia; confirm each shows the client's own product, place or people",
+    "fix": "confirm the library photograph shows the client's own product, place or people; otherwise replace it",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "nav-labels",
+    "where": "div.wrap.nav__bar > nav.nav__links > div.nav__item:nth-of-type(1) > a.nav__link \"Collection\"",
+    "msg": "\"Collection\" opens a section headed \"Clothing ranges from £85\"",
+    "fix": "name each nav link after the heading of the section it opens",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "nav-labels",
+    "where": "div.nav__menu > div.wrap.grid > div.menu-col.span-3:nth-of-type(1) > a:nth-of-type(3) \"ShirtsOxford, poplin, flannel, linen\"",
+    "msg": "\"ShirtsOxford, poplin, flannel, linen\" opens a section headed \"Shirts, 18 styles\"",
+    "fix": "name each nav link after the heading of the section it opens",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "nav-labels",
+    "where": "div.wrap.nav__bar > nav.nav__links > div.nav__item:nth-of-type(2) > a.nav__link \"Fabrics\"",
+    "msg": "\"Fabrics\" opens a section headed \"Natural-fibre cloths, close up\"",
+    "fix": "name each nav link after the heading of the section it opens",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "label-centre",
+    "where": "header.nav > div.wrap.nav__bar > div.nav__actions > a.btn.btn--primary \"Shop the collection\"",
+    "msg": "its label sits 18px off-centre (25px of room at the left, 43px at the right) (and 1 more like it: \"Shop the collection\")",
+    "fix": "centre the label in its button, or fill the empty side with an icon",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "nav-current",
+    "where": "header.nav",
+    "msg": "the nav stays on screen with 4 links to the page's sections, but never marks the one you are in (no link changes as the page scrolls)",
+    "fix": "mark the link of the section on screen (a colour, a weight or a line under it) as the visitor scrolls",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "button-contrast",
+    "where": "div.span-4.stack-4 > form.form > div.btn-row > button.btn.btn--secondary \"Subscribe\"",
+    "msg": "the button \"Subscribe\" (#e7e6e4) stands only 1.20:1 off the ground around it: it reads as part of the ground, or as switched off",
+    "fix": "give the button a fill that stands at least 1.5:1 off what is around it, or an outline in the ink",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "action-repeat",
+    "where": "header.nav > div.wrap.nav__bar > div.nav__actions > a.btn.btn--primary \"shop the collection\"",
+    "msg": "\"shop the collection\" shows 2 times on the first screen at 1440px (nav, hero): the nav's button and the hero's; nothing else on the screen may repeat it",
+    "fix": "show the action once a screen besides the nav's button: the hero's, the close's or the phone bar's, never all at once",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "form-send",
+    "where": "div.closing__links:nth-of-type(2) > div.grid:nth-of-type(1) > div.span-4.stack-4:nth-of-type(1) > form.form \"mailto:hello@archive88.example\"",
+    "msg": "the form opens a mail to hello@archive88.example: a stand-in until the client gives its form address; list it in the report",
+    "fix": "send the form to the client's address (data-endpoint) and show the confirmation only after it answers; list a mailto stand-in in the report",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "nav",
+    "where": "header.nav > div.wrap.nav__bar > button.nav__toggle",
+    "msg": "the nav is lopsided: its last item ends 13px inside the content's edge (366px), while its first starts on the other edge",
+    "fix": "start the nav's first item and end its last on the content's two edges",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "button-styles",
+    "where": "div.hero-text.hero__in > div.hero__media.hero__fill > div.hero__over > button.ly-play \"Play the film\"",
+    "msg": "on the phone 3 buttons run the full width of their column, but  \"Play the film\" is 185px of 318px: one action in two sizes",
+    "fix": "give every button the same width rule on the phone: all full width, or all at their own width",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "section-gaps",
+    "where": "main#top > section.hero.hero--film / section#collection",
+    "msg": "118px between these sections, -38% against the median 190px",
+    "fix": "use one gap between sections (all within 25% of each other)",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "photo-set",
+    "where": "img#denim \"photo-f79388517-500.webp\"",
+    "msg": "11 photographs in more than one look: lightness from 0.17 to 0.54; warm and cool photographs mixed (b* -11 to +16); the odd one out is photo-f79388517-500.webp",
+    "fix": "grade the photographs to one look (light, colour, warmth), or replace the odd one out",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "label-centre",
+    "where": "div.hero__over > div > div.btn-row > a.btn.btn--primary \"Shop the collection\"",
+    "msg": "its label sits 18px off-centre (56px of room at the left, 74px at the right)",
+    "fix": "centre the label in its button, or fill the empty side with an icon",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   }
+  ],
+  "crashed": [],
+  "seconds": {
+   "consistency": 109,
+   "layout": 4
+  }
+ },
+ "open": [],
+ "waived": [
+  {
+   "check": "product-shown",
+   "where": "main#top > section.hero.hero--film \"Natural-fibre clothing, kept in every si\"",
+   "msg": "the hero of this product page shows no photograph and no render of the product: the page's pictures (\"Two people walking a forest pa\", \"A camel wool coat with toggle \", \"A brown wool knit laid flat on\") sit below it",
+   "fix": "lead with the product itself: the client's photograph of it, else stand-in photographs of its kind (photos.mjs search), a render (assets/objects/product-render, [data-product], data-product-place=hero) only when the brief asks for 3D; never a drawing, never mood stock, never another maker's product",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "product-shown"
+   ],
+   "wheres": [
+    "main#top > section.hero.hero--film \"Natural-fibre clothing, kept in every si\""
+   ],
+   "reason": "the deal gave the film hero and the client's own campaign film leads it (people walking in the collection); the garments are shown big in the next section, and the client's own product photographs are listed to replace the stand-ins"
+  }
+ ],
+ "warnCount": 22,
+ "at": "2026-11-22T00:30:24.450Z"
+}

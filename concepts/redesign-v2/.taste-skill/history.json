@@ -1,0 +1,21 @@
+{
+ "palettes": [],
+ "types": [],
+ "dealt": [
+  "bricolage",
+  "mona",
+  "fraunces"
+ ],
+ "moments": [
+  {
+   "id": "word-highlight",
+   "at": "2026-11-21T23:31:40.408Z",
+   "seed": "3d1e1836"
+  },
+  {
+   "id": "photo-chapters",
+   "at": "2026-11-21T23:31:40.408Z",
+   "seed": "3d1e1836"
+  }
+ ]
+}

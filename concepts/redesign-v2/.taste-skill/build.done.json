@@ -1,0 +1,11 @@
+{
+ "page": "index.html",
+ "url": null,
+ "root": null,
+ "kind": "product",
+ "category": "natural-fibre clothing",
+ "primary": "Shop the collection",
+ "rounds": 3,
+ "start": "2026-11-22T00:26:31.257Z",
+ "by": "gate.mjs --start"
+}
